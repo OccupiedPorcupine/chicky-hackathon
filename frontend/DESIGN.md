@@ -24,14 +24,25 @@ in `base.css` instead.
 ## Character
 
 Chicky is a planning tool for hawker and F&B owners. It should feel calm, warm and a little
-hand-made, not like an analytics dashboard.
+hand-made, not like an analytics dashboard. The look comes from the brand asset sheet
+([docs/brand/asset-sheet.png](../docs/brand/asset-sheet.png)): Chicky the chick, and five colours.
 
-- **Warm, quiet surfaces.** A cream page (`--page`), white cards with a soft shadow, and one
-  gradient: the sidebar (and the top bar on phones), which runs from teal to sand.
-- **One accent.** Teal marks what is interactive, selected or predicted. Everything else is ink
-  on cream. Don't introduce a second accent colour; use the status colours only for status.
-- **A serif voice.** Kaisei HarunoUmi at regular weight carries the whole app, headings included.
-  Hierarchy comes from size and colour, never bold.
+- **Warm, quiet surfaces.** A cream page (`--page`, Cream), shell cards with a soft shadow, and
+  one gradient: the sidebar (and the top bar on phones), which runs from soft yolk to cream.
+  Cream is the page and Shell the cards, not the other way round: the lighter card lifts off the
+  warmer page the way white cards did on the old cream page, and a page of cream cards reads
+  heavy and yellow.
+- **Ink, with yolk and coral as supporting colours.** Ink carries text, icons and recorded data.
+  The ink-green `--accent` family marks what is interactive or predicted: focus rings, links,
+  primary buttons, the dashed forecast line. **Yolk** fills (always with ink text) mark what is
+  selected or hovered. **Coral** is for callouts only: needs-attention tags such as "New dish",
+  and the "Huat tomorrow" tagline pill. Neither yolk nor coral is ever small text (see
+  [Colour](#colour)). Use the status colours only for status.
+- **A rounded voice.** Baloo 2 (`--font-display`) is the heavy, rounded face of the wordmark and
+  headings, as on the sheet. Nunito (`--font-ui`) carries everything people read: body text,
+  controls, tables, charts and the assistant. Weight belongs to the display face: headings are
+  Baloo 2 at 600 (page titles 700, the wordmark 800), and running text stays at Nunito 400. Don't
+  bold body text for emphasis; use a heading, size or colour.
 - **Plain words.** Sentence case, short labels, no jargon (see [Writing](#writing)).
 
 ## Pages
@@ -48,7 +59,7 @@ body.app-shell
 assistant bubble   added by js/assistant.js, bottom right
 ```
 
-The same markup is the **left sidebar** at 1100px and wider (248px, full height, the teal-to-sand gradient, the
+The same markup is the **left sidebar** at 1100px and wider (248px, full height, the yolk-to-cream gradient, the
 menu always open) and a **top bar with a Menu sheet** below that. One set of links serves both, so the guided
 tour finds the same targets either way. The page grid is `body.app-shell { grid-template-columns: var(--sidebar-w) 1fr }`,
 so nothing fixed or sticky ever covers the content: the sidebar is a column, the top bar is in the flow, and
@@ -64,7 +75,7 @@ so nothing fixed or sticky ever covers the content: the sidebar is a column, the
 
 The sign-in page (and its sign-up, forgot and reset views, all in `index.html`) shares the colours, type, cards and buttons but has no navigation and no smooth scrolling: one centred card on the soft brand gradient. Its
 left half is a decorative picture of what Chicky does: a sales line that draws itself, the dashed
-teal forecast continuing it, and two cards (tomorrow's forecast, a prep-list nudge) floating over it.
+green forecast continuing it, and two cards (tomorrow's forecast, a prep-list nudge) floating over it.
 
 ### Getting around
 
@@ -73,7 +84,7 @@ teal forecast continuing it, and two cards (tomorrow's forecast, a prep-list nud
 - **Top-level pages** (Dashboard, Demand forecast, Prep list, Data ingestion, Dishes, Documents) are listed in the sidebar
   (the Menu button on a phone) on **every** signed-in page, in that order, with those labels and these inline-SVG
   icons (`.nav-icon`, `currentColor`). The current page is in the list too, with `aria-current="page"` (which draws the
-  teal bar and tint); the others get `data-guide-id="nav-<page>"` so the guided tour can point at them. The markup is
+  ink bar and yolk tint); the others get `data-guide-id="nav-<page>"` so the guided tour can point at them. The markup is
   identical on every page apart from which link is current, so copy the header from `dashboard.html`.
 - **Subpages** (a page that only makes sense inside another, such as one dish's history) don't go
   in the menu. Link to them from their parent page, and give them a way back: a "← Dashboard"
@@ -98,31 +109,69 @@ Sign in ──► Dashboard ◄──► Demand forecast ◄──► Prep list 
 
 ## Colour
 
-All colours are tokens in `base.css`. Don't write hex values in page stylesheets.
+All colours are tokens in `base.css`. Don't write hex values anywhere else: page stylesheets and
+scripts use the tokens (`color-mix()` with a token is fine for a translucent shade).
+
+**Brand colours**, from the asset sheet:
 
 | Token | Value | Use for |
 | --- | --- | --- |
-| `--ink` | `#425664` | Text, icons, recorded data in charts |
-| `--muted` | `#66767f` | Secondary text: ledes, captions, notes, placeholders |
-| `--subtle` | `#9aa6af` | Decorative or switched-off icons. Never text (fails contrast) |
-| `--teal` | `#1ba098` | Brand accent: focus ring, selected outlines, predictions, icon fills, highlight ring |
-| `--teal-strong` | `#0f7d77` | Teal **behind or as text**: primary buttons, user chat bubbles, links, success text, the wordmark |
-| `--teal-hover` | `#0b6a65` | Hover on `--teal-strong` fills |
-| `--teal-soft` | `#d9efec` | Selected state (current menu item, active tag) |
-| `--teal-tint` | `#ebf6f5` | Hover state on light surfaces |
-| `--neutral-soft` | `#f1f4f5` | Neutral hover, inactive tags, segmented track, assistant bubbles |
-| `--border` | `#d8dce1` | Outlines of controls, menus and dashed drop zones |
-| `--divider` | `#e6e8eb` | Rules between rows, sections and chart gridlines |
-| `--page` | `#fffcf5` | Page background |
-| `--surface` | `#fff` | Cards, controls, menus |
-| `--surface-muted` | `#fbfcfc` | Inset areas inside a surface (drop zone, assistant confirm card) |
-| `--error` / `--error-soft` | `#b3261e` / `#fdecea` | Error text / error message background |
-| `--warning` / `--warning-soft` | `#7a4b00` / `#fff1d6` | Needs-attention tags such as "New dish" |
-| `--header-gradient` | teal → sage → sand | The top bar only |
+| `--ink` | `#103f40` | Ink. Text, icons, recorded data in charts, the primary button's outline and fill |
+| `--yolk` | `#ffc629` | Yolk. Fills and outlines only (hover outline on cards and secondary buttons), always with ink text. Never text |
+| `--coral` | `#f26350` | Coral. Callout fills and large type only (the tagline pill). Never small text |
+| `--cream` | `#fff4dd` | Cream. The page (`--page`) |
+| `--shell` | `#fffdf5` | Shell. Cards, controls and menus (`--surface`), and text on ink or green fills |
 
-**Contrast.** `--ink`, `--muted`, `--teal-strong` and `--error` all pass WCAG AA (4.5:1) on
-`--page` and `--surface`. Brand `--teal` is only 3.2:1 against white, so never put text in it or
-white text on it. Use `--teal-strong` instead.
+**Derived tokens:**
+
+| Token | Value | Use for |
+| --- | --- | --- |
+| `--muted` | `#6b604d` | Secondary text: ledes, captions, notes, placeholders. A warm taupe |
+| `--subtle` | `#a7a592` | Decorative or switched-off icons. Never text (fails contrast) |
+| `--accent` | `#2a766f` | Interactive marks: focus ring, selected outlines, predictions, icon fills, the tour's highlight ring. Not text |
+| `--accent-strong` | `#17605b` | Accent **behind or as text**: user chat bubbles, send buttons, links, success text, the wordmark |
+| `--accent-hover` | `= --ink` | Hover on `--accent-strong` fills |
+| `--accent-soft` | `= --yolk-soft` `#ffe7a1` | Selected state (current menu item, active tag, rest-day toggle), the primary button at rest |
+| `--accent-tint` | `= --yolk-tint` `#fff1c9` | Hover state on light surfaces, the chip behind a card's icon |
+| `--coral-strong` | `#b23a24` | Coral as small text (via `--warning`) |
+| `--neutral-soft` | `#f7edd8` | Neutral hover, inactive tags, segmented track, assistant bubbles |
+| `--border` | `#e2d3b3` | Outlines of controls, menus and dashed drop zones |
+| `--divider` | `#efe4cb` | Rules between rows, sections and chart gridlines |
+| `--card-line` / `--sand-line` | `#eadbb9` / `#f1dfb8` | Outlines of cards and sections / of sand panels |
+| `--sand-soft` | `#fcefd2` | Large warm panels ("Your week") |
+| `--surface-muted` | `#fff9ec` | Inset areas inside a surface (drop zone, action rows, assistant confirm card) |
+| `--error` / `--error-soft` | `#a3193f` / `#fbe6ea` | Error text / error message background. A crimson, so it never reads as coral |
+| `--warning` / `--warning-soft` | `= --coral-strong` / `= --coral-soft` `#fde4da` | Needs-attention tags such as "New dish" and "Sold out by 13:10" |
+| `--heat-1` … `--heat-4` | `#7fbbaf` `#479589` `#226e66` `= --ink` | One ink-green ramp for magnitude: the revenue heatmap, and the ranked bars and treemap tiles on the dashboard |
+| `--header-gradient` / `--sidebar-gradient` | yolk-soft → yolk-tint → cream | The top bar on phones / the sidebar |
+| `--wash-gradient` | yolk-tint → shell → sand-soft | The panel a page opens with: the dashboard's hero, the sign-in picture |
+| `--focus-halo`, `--backdrop`, `--scrim` | translucent accent / ink | The ring round a focused field, behind a dialog, behind the tour's spotlight |
+
+**Contrast (WCAG AA).** Every text colour passes 4.5:1 on every light fill it can sit on:
+
+| Text | `--page` | `--surface` | `--surface-muted` | `--neutral-soft` | `--sand-soft` | `--accent-soft` | `--accent-tint` | `--warning-soft` | `--error-soft` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `--ink` | 10.6 | 11.4 | 11.1 | 10.0 | 10.2 | 9.5 | 10.3 | 9.6 | 9.7 |
+| `--muted` | 5.6 | 6.1 | 5.9 | 5.3 | 5.4 | 5.0 | 5.5 | 5.1 | 5.2 |
+| `--accent-strong` | 6.7 | 7.2 | 7.0 | 6.3 | 6.4 | 6.0 | 6.5 | 6.0 | 6.2 |
+| `--error` | 6.9 | 7.4 | 7.2 | 6.5 | 6.7 | 6.2 | 6.7 | 6.2 | 6.4 |
+| `--warning` | 5.5 | 5.9 | 5.7 | 5.1 | 5.2 | 4.9 | 5.3 | 4.9 | 5.0 |
+
+Text on fills: Shell on ink (primary button filled, tooltips, the top treemap tile) 11.4:1; Shell on
+`--accent-strong` 7.2:1; Shell on `--heat-3` 5.9:1; Shell on `--error` 7.5:1; ink on Yolk 7.4:1;
+ink on the lightest treemap tile 7.3:1.
+
+The rules that follow from the numbers:
+
+- **Yolk and Coral are never text on Cream or Shell** (1.4:1 and 2.9–3.1:1). Use them as fills with
+  ink text, or use `--coral-strong` for coral words.
+- **Shell on Coral is 3.1:1**, so a coral pill's text must be large (24px, or 18.7px at 700 and
+  over); smaller coral labels are `--warning-soft` with `--warning` text. Ink on Coral is 3.7:1, also
+  large text only.
+- **`--accent` is for marks, not words.** It is 4.4:1 or more on every light fill, comfortably above
+  the 3:1 a focus ring or chart line needs; for text use `--accent-strong`.
+- The heatmap's lightest step, `--heat-1`, is 2.14:1 on the card. That is fine for an ordinal ramp
+  because every value is also in the "Show as a table" view and the tooltip.
 
 ## Type
 
@@ -135,12 +184,15 @@ white text on it. Use `--teal-strong` instead.
 | `--text-sm` | 14px | Controls, labels, table cells, notes |
 | `--text-xs` | 12px | Captions, metadata, table headers, tags |
 
-- **`--font-display` (Kaisei HarunoUmi)** is used everywhere on the page, always at weight 400.
-- **`--font-ui` (Inter)** is used only on the assistant's own surfaces: the floating assistant
-  panel, the guided-tour bubble and the dashboard's chat box (the large assistant input). The
-  font switch tells users "this is the assistant talking", so keep Inter out of page content.
-- Load both on every signed-in page:
-  `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Kaisei+HarunoUmi&display=swap`
+- **`--font-display` (Baloo 2)** is for the wordmark, headings (`h1`–`h3`, card and section
+  titles, the assistant panel's title) and the sign-in headline. Headings are 600, page titles 700,
+  the wordmark 800.
+- **`--font-ui` (Nunito)** is everything else: body text, controls, tables, charts, the assistant
+  and the guided tour, at 400 (500 for small buttons in the assistant and tour).
+- Neither face has Chinese, so both fall back to the system's CJK font (`--font-cjk`: PingFang SC,
+  Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC), which covers the dashboard's 播放中文.
+- Load both on every page:
+  `https://fonts.googleapis.com/css2?family=Baloo+2:wght@600..800&family=Nunito:wght@400..700&display=swap`
 - Uppercase is only for table column headers (`--text-xs`, `letter-spacing: 0.08em`).
 
 ## Spacing, shape and depth
@@ -224,7 +276,7 @@ panel, such as the dashboard's "Actions needed" checklist. Don't put forms or ta
 
 | Class | Use for |
 | --- | --- |
-| `.primary-button` | The main action of the view, in the dashboard's "Record sales" look: a light-teal pill that fills dark teal from where the pointer entered (see [Motion](#motion)). **At most one visible at a time.** |
+| `.primary-button` | The main action of the view, in the dashboard's "Record sales" look: a yolk pill with an ink outline that fills with ink from where the pointer entered (see [Motion](#motion)). **At most one visible at a time.** |
 | `.secondary-button` | Other actions: Cancel, Sign up, Ask |
 | `.text-button` | Low-emphasis inline actions: Remove, Log in (as a switch) |
 | `.segmented` | Choosing between 2–4 views. Set `aria-pressed` on the buttons, not a class |
@@ -289,7 +341,7 @@ are the two references.
 ### Charts
 
 Charts use Chart.js through `js/chart-theme.js`. **A chart of one measure over days** (the dashboard's demand chart, the forecast page's
-history) is `chickyChart.recordedChart(canvas, { labels, dates, values, unit, label, averageOf })`: the ink line with a faint teal wash,
+history) is `chickyChart.recordedChart(canvas, { labels, dates, values, unit, label, averageOf })`: the ink line with a faint accent wash,
 a labelled peak, a dotted guide and a tooltip that gives the full date and how far above or below the average that day is. Put it in
 `card graph chart-card` with `.chart > .chart-inner > canvas` and a `.chart-caption` under it; `chickyChart.pointer` and
 `chickyChart.keyboard` (arrow keys, with a live region) are wired in for you. A page that also has predictions keeps them in text or
@@ -303,10 +355,10 @@ datasets: [{ label: "Portions sold", data, ...chickyChart.recordedLine }]
 | Preset | Meaning |
 | --- | --- |
 | `recordedLine` / `recordedBar` | Sales that happened: solid `--ink` |
-| `predictedLine` | Model output: dashed `--teal` |
+| `predictedLine` | Model output: dashed `--accent` |
 
-That split is the whole chart vocabulary: **ink is what happened, dashed teal is what we expect.**
-Gridlines are `--divider`, axis text is `--muted` in the display font, and legends are off (say
+That split is the whole chart vocabulary: **ink is what happened, dashed green is what we expect.**
+Gridlines are `--divider`, axis text is `--muted` in the UI font, and legends are off (say
 what the chart shows in the card title instead). Give every `<canvas>` `role="img"` and an
 `aria-label` describing the chart.
 
@@ -362,7 +414,7 @@ coordinates, so scrolling, zoom and device-pixel ratio can't throw them off.
 | Primary buttons | The cursor-origin fill (below) | Scale to 97% |
 | Secondary buttons | Lift 1px with a soft shadow | Scale to 97% |
 | Cards | None (a card that moves is a distraction; `[data-spotlight]` cards get a soft pointer light) | – |
-| Fields | Border darkens to `--subtle` | Focus: `--teal` border and a soft teal halo |
+| Fields | Border darkens to `--subtle` | Focus: `--accent` border and a soft `--focus-halo` |
 | Menu items | Nudge 4px right | – |
 | Avatar, assistant bubble, icon buttons | Grow slightly | Shrink slightly |
 
@@ -381,7 +433,7 @@ Load `js/motion.js` on every page, after `base.css` and before the page's own sc
 Load `js/motion.js` on every page, after `base.css` and before the page's own script. Signed-in pages also load Lenis (pinned, with an integrity hash; copy the tag from `dashboard.html`) in the `<head>`. GSAP is no longer used anywhere.
 
 **Cursor-origin fill** (every `.primary-button`, or anything marked `data-cursor-fill`; the look is in `css/base.css`, the
-behaviour is one delegated listener in [js/motion.js](js/motion.js)): on hover a dark-teal circle grows from where the pointer
+behaviour is one delegated listener in [js/motion.js](js/motion.js)): on hover an ink circle grows from where the pointer
 entered until it covers the button, and shrinks back to that spot when the pointer leaves; keyboard focus (`:focus-visible`)
 and a touch press grow it from the centre. The button's size never changes (the circle is clipped inside it) and the focus ring
 stays. It is only a preview: nothing is activated by hover or focus, and a disabled button never shows it. With reduced motion the
@@ -472,9 +524,9 @@ a page's `<head>` into new pages. The icon is a placeholder until there's a logo
 
 | State | Treatment |
 | --- | --- |
-| Hover | `--teal-tint` background on light items; `--teal-hover` on teal fills |
-| Selected | `--teal-soft` background, or `aria-pressed="true"` on a segmented button |
-| Focus | 2px `--teal` outline, 2px offset (global `:focus-visible` in `base.css`). Never remove it without a replacement |
+| Hover | `--accent-tint` (yolk) background on light items; `--accent-hover` on accent fills |
+| Selected | `--accent-soft` (yolk) background with ink text, or `aria-pressed="true"` on a segmented button |
+| Focus | 2px `--accent` outline, 2px offset (global `:focus-visible` in `base.css`). Never remove it without a replacement |
 | Disabled | 45% opacity, `cursor: not-allowed` |
 | Error | `--error` text; `--error-soft` background only inside the assistant |
 

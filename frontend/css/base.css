@@ -41,7 +41,7 @@
   --sidebar-gradient: linear-gradient(180deg, var(--yolk-soft) 0%, var(--yolk-tint) 52%, var(--cream) 100%);
   /* A soft wash behind a page's opening panel (the dashboard's hero, the sign-in picture). */
   --wash-gradient: linear-gradient(135deg, var(--yolk-tint) 0%, var(--shell) 55%, var(--sand-soft) 100%);
-  --sand: #f7e3bc;           /* warm sand: the sign-in page's second colour blob */
+  --sand: #f7e3bc;           /* warm sand, the base of --sand-soft and --sand-line */
   --sand-soft: #fcefd2;      /* sand, lightened for large surfaces */
   --sand-line: #f1dfb8;
   --card-line: #eadbb9;      /* the outline of cards and sections */
