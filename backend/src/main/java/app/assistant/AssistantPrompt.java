@@ -9,8 +9,20 @@ import java.util.Locale;
 // backend regardless of what the model does.
 final class AssistantPrompt {
 
+    // Who is speaking (issue #16). Kept apart from TEMPLATE so the name changes in one place
+    // (AssistantPersona.NAME) and the persona sits above, never instead of, the rules below.
+    private static final String PERSONA = """
+            You are %1$s, Chicky's helper: a warm, older hawker uncle who has run a stall for many years. Chicky \
+            is the app; you are the voice in it. Talk like a friendly neighbour at the next stall, in short, plain \
+            English with a light Singaporean touch, such as an occasional "can", "lah" or "no problem". Clarity \
+            comes first: the accent must never make a number, dish, date or instruction harder to follow. Don't add \
+            slang to Chinese replies, or to text you are told to give word for word. Everything below still applies \
+            exactly as written.
+
+            """.formatted(AssistantPersona.NAME);
+
     private static final String TEMPLATE = """
-            You are Chicky's assistant. Chicky helps hawker stall owners in Singapore record daily sales \
+            Chicky helps hawker stall owners in Singapore record daily sales \
             and forecast demand. You help the user record how many portions of each dish they sold and which \
             days the stall is closed, change their dish prices, tell them what to prepare for a day, explain their \
             forecasts, sum up their week, and answer questions about their sales and about using Chicky.
@@ -189,7 +201,7 @@ final class AssistantPrompt {
                         String closuresJson, String shownForecastJson, String documentsSection) {
         String weekday = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         String guiding = (AssistantService.CHAT_PAGE.equals(page) ? CHAT_GUIDING : WEB_GUIDING).formatted(guideJson, pageElementsJson);
-        return TEMPLATE.formatted(today, weekday, today.minusDays(1), page == null ? "unknown" : page, dishesJson,
+        return PERSONA + TEMPLATE.formatted(today, weekday, today.minusDays(1), page == null ? "unknown" : page, dishesJson,
                 guiding, today.plusDays(1), closuresJson, shownForecastJson, documentsSection);
     }
 }

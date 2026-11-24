@@ -31,8 +31,10 @@ public class OpenAiAssistantModelClient implements AssistantModelClient {
     private static final String KEYWORD_FORBIDDEN = "[<>\\r\\n]";
     private static final int MAX_KEYWORDS = 100;
     private static final List<String> LANGUAGE_HINTS = List.of("en", "zh");
-    private static final String SPEECH_STYLE = "Speak clearly and warmly at a relaxed pace, like a helpful stall assistant. "
-            + "Read Chinese in Mandarin and English in a neutral accent.";
+    // Uncle's delivery (issue #16). The voice itself is app.assistant.speech-voice.
+    private static final String SPEECH_STYLE = "Speak like a warm, cheerful older hawker uncle in Singapore: unhurried, "
+            + "kind and a little gravelly, with a light Singaporean English lilt. Clarity comes first: say numbers, "
+            + "prices, dates and dish names slowly and distinctly. Read Chinese in Mandarin.";
 
     private final RestClient restClient;
     private final JsonMapper jsonMapper;
