@@ -1,0 +1,60 @@
+{
+  "canvas": [
+    1254,
+    1254
+  ],
+  "states": {
+    "ready": {
+      "alpha_bbox_at_128": [
+        216,
+        194,
+        1035,
+        1122
+      ],
+      "shared_alpha_matte_pixel_identical": true,
+      "hair_pixels_identical": true,
+      "left_outer_head_and_shoulder_pixels_identical": true,
+      "right_outer_head_and_shoulder_pixels_identical": true,
+      "webp_canvas_and_alpha_identical": true
+    },
+    "listening": {
+      "alpha_bbox_at_128": [
+        216,
+        194,
+        1035,
+        1122
+      ],
+      "shared_alpha_matte_pixel_identical": true,
+      "hair_pixels_identical": true,
+      "left_outer_head_and_shoulder_pixels_identical": true,
+      "right_outer_head_and_shoulder_pixels_identical": true,
+      "webp_canvas_and_alpha_identical": true
+    },
+    "speaking": {
+      "alpha_bbox_at_128": [
+        216,
+        194,
+        1035,
+        1122
+      ],
+      "shared_alpha_matte_pixel_identical": true,
+      "hair_pixels_identical": true,
+      "left_outer_head_and_shoulder_pixels_identical": true,
+      "right_outer_head_and_shoulder_pixels_identical": true,
+      "webp_canvas_and_alpha_identical": true
+    },
+    "thinking": {
+      "alpha_bbox_at_128": [
+        216,
+        194,
+        1035,
+        1122
+      ],
+      "shared_alpha_matte_pixel_identical": true,
+      "hair_pixels_identical": true,
+      "left_outer_head_and_shoulder_pixels_identical": true,
+      "right_outer_head_and_shoulder_pixels_identical": true,
+      "webp_canvas_and_alpha_identical": true
+    }
+  }
+}
