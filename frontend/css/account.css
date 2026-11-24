@@ -31,7 +31,7 @@
 .chat-reminders-title { font-size: var(--text-sm); font-weight: 500; }
 .chat-reminder { display: grid; grid-template-columns: 1fr 112px; gap: 12px; align-items: center; }
 .chat-reminder-toggle { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--text-sm); cursor: pointer; }
-.chat-reminder-toggle input { width: 18px; height: 18px; accent-color: var(--teal-strong); }
+.chat-reminder-toggle input { width: 18px; height: 18px; accent-color: var(--accent-strong); }
 .chat-qr svg { display: block; width: 100%; height: auto; }
 
 /* On a phone the link opens the app directly; the QR code is for scanning from a computer. */

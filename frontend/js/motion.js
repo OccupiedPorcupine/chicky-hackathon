@@ -170,7 +170,7 @@ const chickyMotion = (() => {
   }
 
   // ---- Pointer light on [data-spotlight] cards ----
-  // Adapted from React Bits' SpotlightCard: a soft teal glow under the pointer and a brighter rim on the nearest edge.
+  // Adapted from React Bits' SpotlightCard: a soft accent glow under the pointer and a brighter rim on the nearest edge.
   // The original runs a requestAnimationFrame loop per card; here one delegated pointermove listener writes two CSS
   // variables (batched per frame) and CSS draws it. What is under the pointer is looked up when drawing, not remembered
   // from the last move: after a scroll the pointer has not moved but a different card is beneath it.
