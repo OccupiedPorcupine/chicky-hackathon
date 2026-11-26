@@ -146,7 +146,7 @@
   display: grid;
   grid-template-columns: 32px repeat(var(--weeks, 53), minmax(12px, 1fr));
   grid-template-rows: 16px;
-  grid-auto-rows: auto;
+  grid-auto-rows: minmax(12px, auto);   /* a square's minimum, so Mon/Wed/Fri keep their rows even with no squares */
   gap: 3px;
   min-width: calc(32px + var(--weeks, 53) * 15px);
   font-size: var(--text-xs);
