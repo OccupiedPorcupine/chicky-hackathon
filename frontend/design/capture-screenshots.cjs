@@ -30,6 +30,29 @@ const capture = async (page, out) => {
 
   let signedIn = false;
   const context = page.context();
+  // Google only serves its real button to the site's registered origins, so a local capture would show no button.
+  // For the screenshot only, Google's script is replaced by a stand-in that draws the same standard outline
+  // "Sign in with Google" button where js/auth.js asks for it. Nothing is sent to Google.
+  await context.route("https://accounts.google.com/gsi/client", route => route.fulfill({
+    contentType: "text/javascript",
+    body: `window.google = { accounts: { id: {
+      initialize() {},
+      renderButton(container, options) {
+        const button = document.createElement("div");
+        button.setAttribute("role", "button");
+        button.style.cssText = "display:flex;align-items:center;box-sizing:border-box;height:40px;width:" + (options.width || 258) + "px;"
+          + "padding:0 12px;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#3c4043;"
+          + "font:500 14px/1 Roboto,Arial,sans-serif;letter-spacing:0.25px;cursor:pointer";
+        button.innerHTML = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">'
+          + '<path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/>'
+          + '<path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.6c-.5 2.9-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 7-10.1 7-17.5z"/>'
+          + '<path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.9-6.2C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.9l7.9-6.2z"/>'
+          + '<path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>'
+          + '<span style="flex:1;text-align:center">Sign in with Google</span>';
+        container.replaceChildren(button);
+      }
+    } } };`
+  }));
   await context.route("http://localhost:8080/**", async (route) => {
     const url = new URL(route.request().url());
     const p = url.pathname;
@@ -37,7 +60,8 @@ const capture = async (page, out) => {
     if (p === "/api/profile") return signedIn
       ? json(route, { name: "Mei Ling", email: "mei@example.com" })
       : route.fulfill({ status: 401, contentType: "application/json", body: "{}" });
-    if (p === "/api/config") return json(route, { googleClientId: "" });
+    // A placeholder client ID, as in CI, so the sign-in page draws its Google button (the stand-in below).
+    if (p === "/api/config") return json(route, { googleClientId: "ci-placeholder.apps.googleusercontent.com" });
     if (p === "/api/dishes") return json(route, dishes.map(d => ({ ...d, ...money[d.id] })));
     // Pages that show money, leftovers and prep: figures are derived from the sample sales, over whatever range is asked for.
     if (p === "/api/revenue") {
@@ -135,6 +159,7 @@ const capture = async (page, out) => {
   await shoot("styleguide", { fullPage: true });
 
   await page.goto(`${BASE}/index.html`);
+  await page.waitForSelector("#google-button [role=button]", { timeout: 5000 });
   await shoot("login");
   signedIn = true;
 
