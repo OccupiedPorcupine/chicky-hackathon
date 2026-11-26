@@ -94,8 +94,10 @@
   transition: width var(--duration-slow, 450ms) var(--ease-in-out, ease-in-out);
 }
 
-.guide-progress { margin: 0 0 4px; font-size: 12px; color: var(--muted); }
-.guide-progress:empty { display: none; }
+/* Uncle pointing at the spotlight, the step count and, while he reads the step out, his sound bars. */
+.guide-head { display: flex; align-items: center; gap: 8px; margin: -4px 0 6px -6px; }
+.guide-uncle { flex: none; width: 56px; height: 56px; }
+.guide-progress { margin: 0; font-size: 12px; color: var(--muted); }
 .guide-text { margin: 0; font-size: 15px; line-height: 1.45; }
 
 .guide-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }

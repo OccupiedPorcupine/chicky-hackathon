@@ -131,8 +131,44 @@
       voiceListeners.add(callback);
       callback(voiceState);
       return () => voiceListeners.delete(callback);
-    }
+    },
+    follow
   };
+
+  // Shows Uncle's voice state on another element (the dashboard's voice box, "Your week", the forecast's
+  // Ask card, the tour bubble): sets its data-voice-state, swaps the picture in an .assistant-face inside
+  // it, and fills a [data-voice-fx] slot with the decorations. With once, it stops after Uncle is back to
+  // ready, so a "Your week" Play only follows its own speech. Returns a function that stops following and
+  // puts the element back to ready.
+  function follow(element, { once = false } = {}) {
+    const slot = element.querySelector("[data-voice-fx]");
+    if (slot && !slot.firstElementChild) slot.innerHTML = VOICE_FX;
+    let busySeen = false;
+    let stop = null;
+    const show = state => {
+      element.dataset.voiceState = state;
+      showFace(element, state);
+    };
+    stop = window.chickyAssistant.onVoiceState(state => {
+      show(state);
+      if (state !== "ready") busySeen = true;
+      else if (once && busySeen) stop?.();
+    });
+    return () => {
+      stop();
+      show("ready");
+    };
+  }
+
+  // Uncle's round avatar at rest, or the picture for the current voice state.
+  function showFace(element, state) {
+    const image = element.querySelector(".assistant-face img");
+    if (!image) return;
+    const picture = `${UNCLE_IMAGES}${state === "ready" ? "avatar-64" : state}.webp`;
+    if (image.getAttribute("src") === picture) return;
+    image.srcset = state === "ready" ? AVATAR_SRCSET : "";
+    image.src = picture;
+  }
 
   init();
 
@@ -179,7 +215,12 @@
 
     const chatInput = chatBox.querySelector("textarea");
     const chatSend = chatBox.querySelector(".send");
-    const chatMic = chatBox.querySelector('[aria-label="Voice input"]');
+    const chatMic = chatBox.querySelector(".chat-mic");
+
+    // The large version of the widget, so it shows Uncle in the same state, and its mic is pressed
+    // while he listens.
+    follow(chatBox);
+    window.chickyAssistant.onVoiceState(state => chatMic.setAttribute("aria-pressed", String(state === "listening")));
 
     chatInput.placeholder = "Say your sales, e.g. “chicken rice 42”";
     chatInput.addEventListener("keydown", event => {
@@ -191,14 +232,14 @@
     });
 
     chatSend.disabled = !status.available;
-    chatSend.title = "Send to the assistant";
+    chatSend.title = `Send to ${ASSISTANT_NAME}`;
     chatSend.addEventListener("click", () => {
       setOpen(true);
       sendFromInput(chatInput);
     });
 
     chatMic.disabled = !status.voice;
-    chatMic.title = status.voice ? "Speak to the assistant" : "Voice input isn’t available on this server";
+    chatMic.title = status.voice ? `Speak to ${ASSISTANT_NAME}` : "Voice input isn’t available on this server";
     chatMic.addEventListener("click", () => {
       setOpen(true);
       toggleRecording();
@@ -209,6 +250,8 @@
   // question, or a suggestion button's data-question, through this conversation and open the panel.
   function connectAskCards() {
     document.querySelectorAll("[data-assistant-ask]").forEach(card => {
+      // Its answers come from Uncle, so his face there follows his state too.
+      follow(card);
       const askForm = card.querySelector("form");
       const askInput = askForm.querySelector("input, textarea");
       card.querySelectorAll("input, textarea, button").forEach(control => {
@@ -335,11 +378,9 @@
   function setVoiceState(next) {
     if (next === voiceState) return;
     voiceState = next;
-    [bubble, panel].forEach(node => { node.dataset.voiceState = next; });
     [bubble, panel].forEach(node => {
-      const image = node.querySelector(".assistant-face img");
-      image.srcset = next === "ready" ? AVATAR_SRCSET : "";
-      image.src = `${UNCLE_IMAGES}${next === "ready" ? "avatar-64" : next}.webp`;
+      node.dataset.voiceState = next;
+      showFace(node, next);
     });
     debug("voice state", next);
     voiceListeners.forEach(callback => {

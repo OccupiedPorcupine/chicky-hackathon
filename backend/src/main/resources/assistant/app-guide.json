@@ -23,7 +23,7 @@
         { "guideId": "account-menu", "description": "Your initials and name at the bottom of the left sidebar (at the top right on a phone). Opens the user's name and email, a link to the Account page (chat apps) and the Log out button." },
         { "guideId": "demand-chart", "description": "Line chart and total of portions sold per day, all dishes combined, for the 7 days ending on the latest recorded sale." },
         { "guideId": "dish-chart", "description": "Bar chart of portions sold per dish over the same 7 days, the dish with the most demand first." },
-        { "guideId": "week-summary", "description": "Your week: the same 7 days in a short sentence (portions against the week before, then leftovers and sell-outs when they were recorded). Play reads it aloud in English, 播放中文 in Mandarin. Asking the assistant \"how was my week?\" gives a fuller summary that also includes revenue and the best seller." },
+        { "guideId": "week-summary", "description": "Your week, with Uncle presenting it: the same 7 days in a short sentence (portions against the week before, then leftovers and sell-outs when they were recorded). Play reads it aloud in English, 播放中文 in Mandarin. Asking the assistant \"how was my week?\" gives a fuller summary that also includes revenue and the best seller." },
         { "guideId": "revenue-card", "description": "Revenue and gross profit for the same 7 days as the charts, with the margin. Dishes without a price are named here and not counted as $0; the Set prices link goes to the Dishes page." },
         { "guideId": "revenue-treemap", "description": "Treemap under the revenue figures: one rectangle per dish, sized by its share of the revenue, the biggest first. Hovering, tapping or focusing a rectangle shows the dish's revenue and percentage; small dishes are combined into Other." },
         { "guideId": "waste-card", "description": "Leftover portions for the same 7 days, and what that food cost at each dish's unit cost (dishes without a cost are left out)." },
@@ -31,7 +31,7 @@
         { "guideId": "revenue-heatmap", "description": "Revenue by day for the last 53 weeks, one square per day like a GitHub calendar: darker teal means more revenue, grey means no sales, an outlined square means closed. Hovering shows the amount; Show as a table lists each month." },
         { "guideId": "actions-needed", "description": "Things to do now, worked out from the stall's data: days with no sales logged (Add sales opens a form for that day), uploaded files not imported yet, dishes without a price, dishes that sold out at least twice this week (See prep list), trading hours to set once dishes sell out (when sold-out days count in forecasts), showers in NEA's 4-day outlook when the stall's past rainy days of that weekday sold noticeably more or less (See the forecast), and a public holiday coming up, with how the same holiday went last year. Each card can be dismissed." },
         { "guideId": "record-sales-button", "description": "Record sales button next to Actions needed. Opens a form for any day: portions sold of each dish, the time a dish sold out, and portions left over." },
-        { "guideId": "assistant-chat", "description": "Large text box for typing or speaking to the assistant, e.g. to record today's sales." }
+        { "guideId": "assistant-chat", "description": "Large text box headed \"Tell Uncle your sales\", for typing or speaking to the assistant (Uncle), e.g. to record today's sales." }
       ]
     },
     {
@@ -53,7 +53,7 @@
         { "guideId": "forecast-result", "description": "Predicted portions, the likely range, how the forecast was worked out (the model, or an average of past sales such as the last 4 Saturdays, and why), and the chart of past sales for the chosen dish." },
         { "guideId": "history-view", "description": "Switch the chart between the last 7 days and the same weekday in past weeks." },
         { "guideId": "demand-factors", "description": "Which factors went into the forecast: public holidays do when the model is used; weather and local events aren't used yet." },
-        { "guideId": "forecast-ask", "description": "Ask about this forecast card: Why this number? and Why this range? buttons, and a box to ask the assistant about the forecast on screen. The answer shows in the assistant panel." }
+        { "guideId": "forecast-ask", "description": "Ask Uncle about this forecast card: Why this number? and Why this range? buttons, and a box to ask the assistant about the forecast on screen. The answer shows in the assistant panel." }
       ]
     },
     {

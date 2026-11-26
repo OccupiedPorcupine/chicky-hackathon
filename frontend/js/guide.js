@@ -29,6 +29,8 @@ window.chickyGuide = (() => {
   let tween = null;
   let arrived = false;
   let leaving = false;
+  // Stops the bubble following Uncle's voice state (js/assistant.js), once it has started.
+  let stopFollowingVoice = null;
 
   function start(newSteps) {
     if (!newSteps?.length) return;
@@ -123,6 +125,8 @@ window.chickyGuide = (() => {
   function end() {
     clearState();
     window.chickyAssistant?.stopSpeaking();
+    stopFollowingVoice?.();
+    stopFollowingVoice = null;
     cancelAnimationFrame(frame);
     window.removeEventListener("resize", schedulePosition);
     window.removeEventListener("scroll", schedulePosition, true);
@@ -166,6 +170,8 @@ window.chickyGuide = (() => {
     bubble.classList.add("is-new");
 
     layer.querySelector(".guide-next").focus({ preventScroll: true });
+    // Uncle in the bubble shows the speaking state while he reads the step out.
+    stopFollowingVoice ??= window.chickyAssistant?.follow?.(layer.querySelector(".guide-bubble")) ?? null;
     window.chickyAssistant?.speak(message);
   }
 
@@ -175,9 +181,13 @@ window.chickyGuide = (() => {
     layer.innerHTML = `
       <div class="guide-shade"></div>
       <div class="guide-ring" aria-hidden="true"></div>
-      <div class="guide-bubble" role="dialog" aria-label="Assistant guide" aria-describedby="guide-text">
+      <div class="guide-bubble" role="dialog" aria-label="Guided tour" aria-describedby="guide-text">
         <div class="guide-meter" aria-hidden="true"><span></span></div>
-        <p class="guide-progress"></p>
+        <div class="guide-head">
+          <img class="guide-uncle" src="images/brand/uncle/pointing.webp" alt="" width="56" height="56">
+          <p class="guide-progress"></p>
+          <span class="guide-fx" data-voice-fx></span>
+        </div>
         <p class="guide-text" id="guide-text" aria-live="polite"></p>
         <div class="guide-actions">
           <button class="guide-exit" type="button">Exit</button>

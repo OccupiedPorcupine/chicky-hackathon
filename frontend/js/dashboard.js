@@ -915,6 +915,8 @@ const weekText = document.getElementById("week-summary-text");
 const weekButtons = document.getElementById("week-summary-buttons");
 const weekStatus = document.getElementById("week-summary-status");
 let weekSummary = null;
+const weekCard = document.querySelector(".week-summary");
+let stopFollowingWeek = null;
 
 async function loadWeekSummary() {
   try {
@@ -963,6 +965,9 @@ weekButtons.addEventListener("click", async event => {
   const language = button.dataset.language;
   showWeekSummary(language);
   weekStatus.textContent = language === "zh" ? "正在准备语音…" : "Getting the audio…";
+  // Uncle in the card shows the state of this playback only, until he is back to ready.
+  stopFollowingWeek?.();
+  stopFollowingWeek = window.chickyAssistant?.follow(weekCard, { once: true });
   const played = await window.chickyAssistant?.play(weekSentence(weekSummary, language));
   weekStatus.textContent = played ? "" : "It couldn’t be played just now, but the summary is above.";
 });
