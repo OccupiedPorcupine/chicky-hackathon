@@ -91,11 +91,47 @@ async function apiRequest(path, options = {}) {
   return readResponse(response);
 }
 
+// Signed in: a brand-new account sees the welcome once (issue #25); everyone else goes straight
+// to the Dashboard. An older backend doesn't send welcomeSeen, so it means "go to the Dashboard".
 function showAccount(user) {
-
+  if (user?.welcomeSeen === false) {
+    showWelcome(user);
+    return;
+  }
   window.location.href = "dashboard.html";
-
 }
+
+// A short tour of the Dashboard for "Show me around", in js/guide.js's step format.
+const WELCOME_TOUR = [
+  { page: "dashboard", url: "dashboard.html", guideId: "record-sales-button", message: "Start here: record what you sold each day. About a week of sales is enough for a first forecast." },
+  { page: "dashboard", url: "dashboard.html", guideId: "actions-needed", message: "Chicky lists what needs doing here, like a day with no sales logged." },
+  { page: "dashboard", url: "dashboard.html", guideId: "assistant-button", message: "Or just tell Uncle. Tap here and say what you sold, like “today chicken rice 42”." }
+];
+
+function showWelcome(user) {
+  document.querySelector("#account-name").textContent = user.name ? `Hi, ${user.name}.` : "Hi there.";
+  document.querySelector("#account-email").textContent = user.email || "you";
+  const picture = document.querySelector("#account-picture");
+  picture.hidden = !user.pictureUrl;
+  if (user.pictureUrl) picture.src = user.pictureUrl;
+
+  showPanel("account");
+  document.querySelector("#account-heading").focus();
+  // Seen once it is on screen, so the next sign-in, on any device, goes to the Dashboard.
+  apiRequest("/api/profile/welcome-seen", { method: "POST" })
+    .catch(error => console.warn("[auth] couldn't record the welcome as seen:", error.status, error.message));
+}
+
+// Starts the tour the way js/guide.js continues one across pages: it reads the tour from
+// sessionStorage when the Dashboard loads.
+document.querySelector("#welcome-tour").addEventListener("click", () => {
+  try {
+    sessionStorage.setItem("chicky-guide-tour", JSON.stringify({ steps: WELCOME_TOUR, index: 0, hole: null }));
+  } catch (error) {
+    // No storage: the Dashboard opens without the tour.
+  }
+  window.location.href = "dashboard.html";
+});
 
 async function restoreSession() {
   try {
