@@ -401,6 +401,22 @@ render if a page forgets `base.css`.
 | --- | --- |
 | <img src="design/screenshots/assistant.png" alt="Assistant panel" width="360"> | ![Guided tour](design/screenshots/guide.png) |
 
+**Uncle is the assistant** (the voice; Chicky stays the app). The launcher is his round face
+(`images/brand/uncle/avatar-64.webp`) with a small ink mic badge, and the panel's header shows his face, his name
+(`ASSISTANT_NAME` in `js/assistant.js`, a placeholder until the name is decided) and "Voice assistant". His replies
+carry a small avatar; the user's bubbles are `--accent-strong`. The confirm card's Confirm and Cancel are the page's
+yolk-and-ink and outlined pills.
+
+**Voice states.** `js/assistant.js` sets `data-voice-state` on the launcher and the panel to `ready`, `listening`
+(recording), `thinking` (waiting for a reply, a transcript or speech) or `speaking` (audio playing, even with the
+panel closed, as in the tour or "Your week" Play). The state swaps Uncle's picture
+(`images/brand/uncle/<state>.webp`; the avatar at rest) and shows one decoration beside him, drawn in SVG: ink arcs
+while listening, a "…" thought bubble while thinking and coral sound bars while speaking. They animate only under
+`prefers-reduced-motion: no-preference`. The words stay in `.assistant-status` for screen readers. Anything else
+that shows Uncle follows the same state through `window.chickyAssistant.onVoiceState(callback)` (it gets the
+current state at once and each change after, and returns a function that stops it) or reads
+`window.chickyAssistant.voiceState`; don't work it out again.
+
 The tour is the app's most animated surface; see [Motion](#motion).
 
 ## Motion
@@ -424,7 +440,7 @@ rising in, no figures counting up and no charts drawing in: a page's content is 
 and a figure is written as it is, so a number on screen is always the real number. Following a link goes straight to the
 page, with no wait for an animation, and that holds for Back and Forward and for every `prefers-reduced-motion` setting.
 Don't add `@view-transition`, a `view-transition-name`, an entrance animation or a delay before `location` changes.
-Nothing shimmers or drifts on its own either. The sign-in page's picture is the one exception: Chicky and Uncle rise in and the chips settle beside them, once.
+Nothing shimmers or drifts on its own either (Uncle's voice-state decorations move only while he is listening, thinking or speaking). The sign-in page's picture is the one exception: Chicky and Uncle rise in and the chips settle beside them, once.
 Animate only a response to something the user just did (below).
 
 **Loading text** (a `.note`, `.status-text`, `.empty-state` or `.lede` starting with "Loading" or "Checking") gets
