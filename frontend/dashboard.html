@@ -71,11 +71,20 @@
         </section>
 
         <!-- Sends to the voice assistant (js/assistant.js), which opens its panel to reply. -->
-        <section class="chat-box" aria-label="AI assistant" data-guide-id="assistant-chat">
-          <textarea aria-label="Message to AI assistant" placeholder="What would you like to know?"></textarea>
+        <section class="chat-box" aria-labelledby="chat-box-title" data-guide-id="assistant-chat" data-voice-state="ready">
+          <div class="chat-box-head">
+            <span class="assistant-face"><img src="images/brand/uncle/avatar-64.webp" srcset="images/brand/uncle/avatar-64.webp 64w, images/brand/uncle/avatar.webp 512w" sizes="40px" width="40" height="40" alt=""></span>
+            <h2 id="chat-box-title" class="chat-box-title">Tell Uncle your sales</h2>
+            <span class="chat-box-fx" data-voice-fx></span>
+          </div>
+          <textarea aria-label="Message to Uncle" placeholder="What would you like to know?"></textarea>
           <div class="chat-toolbar">
-            <button class="icon-button" type="button" disabled title="Voice input" aria-label="Voice input"><img src="images/dashboard/icon7.svg" alt=""></button>
-            <button class="icon-button send" type="button" disabled title="Send message" aria-label="Send message"><img src="images/dashboard/icon3.svg" alt=""></button>
+            <button class="icon-button chat-mic" type="button" disabled title="Voice input" aria-label="Speak to Uncle" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2Z"/></svg>
+            </button>
+            <button class="icon-button send" type="button" disabled title="Send message" aria-label="Send to Uncle">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11 20V7.83l-5.59 5.58L4 12l8-8 8 8-1.41 1.41L13 7.83V20h-2Z"/></svg>
+            </button>
           </div>
         </section>
       </div>
@@ -131,7 +140,12 @@
       <!-- The same 7 days in a few sentences, to read or play aloud (GET /api/summary/weekly, issue #56). -->
       <section class="card week-summary" aria-labelledby="week-heading" data-guide-id="week-summary">
         <div class="week-summary-heading">
-          <h2 id="week-heading" class="card-title">Your week</h2>
+          <!-- Uncle presents the week; while Play reads it out he shows the speaking state (js/dashboard.js). -->
+          <div class="week-summary-title">
+            <img class="week-uncle" src="images/brand/uncle/presenting.webp" alt="" width="64" height="64">
+            <h2 id="week-heading" class="card-title">Your week</h2>
+            <span class="week-fx" data-voice-fx></span>
+          </div>
           <div class="week-summary-buttons" id="week-summary-buttons" hidden>
             <button class="secondary-button" type="button" data-language="en">Play</button>
             <button class="secondary-button" type="button" data-language="zh" lang="zh">播放中文</button>

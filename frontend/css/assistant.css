@@ -64,14 +64,16 @@
 .assistant-face::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--ink); }
 .assistant-face img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* The avatar's own ring sits at 87.5% of the picture, so it is scaled up to meet the frame's. */
-[data-voice-state="ready"] .assistant-face img { transform: scale(1.15); }
+.assistant-face img { transform: scale(1.15); }
 /* The state pictures are busts: enlarged and lifted so the face fills the frame like the avatar. */
 [data-voice-state]:not([data-voice-state="ready"]) .assistant-face img { transform: translateY(6%) scale(1.45); }
 
 /* What Uncle is doing, beside his face (VOICE_FX in js/assistant.js). Only the current state's
    group shows; there is nothing beside him at rest. */
 .assistant-fx { display: none; overflow: visible; pointer-events: none; }
-:is(.assistant-bubble, .assistant-panel):not([data-voice-state="ready"]) .assistant-fx { display: block; }
+/* Anywhere that follows Uncle's state (chickyAssistant.follow): the launcher and panel, the dashboard's voice
+   box, "Your week", the forecast's Ask card and the tour bubble. */
+[data-voice-state]:not([data-voice-state="ready"]) .assistant-fx { display: block; }
 .assistant-fx g { display: none; }
 [data-voice-state="listening"] .fx-arcs,
 [data-voice-state="speaking"] .fx-bars,
@@ -80,6 +82,9 @@
 .fx-bars rect { fill: var(--coral); }
 .fx-cloud, .fx-puff { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
 .fx-dot { fill: var(--ink); }
+/* In a page's [data-voice-fx] slot (chickyAssistant.follow), they sit inline after Uncle's name. */
+[data-voice-fx] { display: inline-flex; flex: none; }
+[data-voice-fx] .assistant-fx { width: 32px; height: 32px; }
 /* On the launcher they sit to its left (the open panel is above it), mirrored to face away from the screen edge. */
 .assistant-bubble .assistant-fx { position: absolute; top: 4px; left: -46px; width: 40px; height: 40px; transform: scaleX(-1); }
 

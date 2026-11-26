@@ -47,6 +47,9 @@
 .dash-v2 .week-summary .card-title { color: var(--ink); }
 .week-summary-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
 .week-summary-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Uncle presents the week; his sound bars show while Play reads it out. */
+.week-summary-title { display: flex; align-items: center; gap: 10px; }
+.week-uncle { flex: none; width: 64px; height: 64px; margin: -10px 0 -10px -6px; }
 .week-summary-buttons[hidden] { display: none; }
 .week-summary-text { margin-top: 12px; max-width: 64ch; font-size: 20px; line-height: 1.6; }
 .week-summary .note { margin-top: 8px; color: var(--ink); font-size: var(--text-sm); }
@@ -236,6 +239,10 @@
   font: 17px/26px var(--font-ui);
 }
 .chat-box textarea::placeholder { color: var(--muted); opacity: 1; }
+/* Uncle heads the voice box: his face follows his voice state (chickyAssistant.follow), like the launcher's. */
+.chat-box-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.chat-box-head .assistant-face { width: 40px; height: 40px; }
+.chat-box-title { font: 600 var(--text-md)/1.3 var(--font-display); }
 .chat-toolbar { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .icon-button {
   display: grid;
@@ -257,7 +264,11 @@
 .attachment { position: relative; overflow: hidden; }
 .attachment input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .attachment:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
-.send { margin-left: auto; background: var(--accent-strong); }
+.chat-mic { color: var(--ink); }
+.chat-mic[aria-pressed="true"] { color: var(--surface); background: var(--error); }
+.chat-mic[aria-pressed="true"]:hover:not(:disabled) { background: var(--error); }
+.send { margin-left: auto; color: var(--surface); background: var(--accent-strong); }
+.icon-button svg { display: block; }
 .send:hover:not(:disabled) { background: var(--accent-hover); }
 .send img { filter: brightness(0) invert(1); }
 .send:disabled { background: var(--neutral-soft); }
