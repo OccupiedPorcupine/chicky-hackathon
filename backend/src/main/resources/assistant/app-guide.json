@@ -4,7 +4,7 @@
   "shared": [
     {
       "guideId": "assistant-button",
-      "description": "Round mic button in the bottom-right corner of every page. Opens the assistant, where the user can say or type their sales, ask about their own documents, or say \"remember that ...\" to save a note to Documents after confirming."
+      "description": "Uncle's round face, with a small mic badge, in the bottom-right corner of every page. Opens the assistant (Uncle), where the user can say or type their sales, ask about their own documents, or say \"remember that ...\" to save a note to Documents after confirming."
     }
   ],
   "pages": [
@@ -167,7 +167,7 @@
       "id": "record-sales",
       "summary": "Record today's (or another day's) sales by talking to or typing to the assistant.",
       "steps": [
-        { "page": "*", "guideId": "assistant-button", "message": "Tap this mic and say what you sold, like \"today chicken rice 42, char siew 30\". You'll see a card to check before anything is saved." }
+        { "page": "*", "guideId": "assistant-button", "message": "Tap Uncle here and say what you sold, like \"today chicken rice 42, char siew 30\". You'll see a card to check before anything is saved." }
       ]
     },
     {
