@@ -11,10 +11,28 @@
   const MUTED_KEY = "chicky-assistant-muted";
   // At most this many visible elements are described to the assistant with each message.
   const MAX_PAGE_ELEMENTS = 60;
+  // The assistant's name (issue #14). A placeholder until the name is decided; the backend keeps
+  // its own copy in AssistantPersona.NAME.
+  const ASSISTANT_NAME = "Uncle";
+  // Uncle's pictures (issue #6): his round avatar at rest, and one picture for each other voice state.
+  const UNCLE_IMAGES = "images/brand/uncle/";
+  const VOICE_STATES = ["ready", "listening", "thinking", "speaking"];
 
-  const MIC_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2Z"/></svg>';
+  const micIcon = size => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2Z"/></svg>`;
+  const MIC_ICON = micIcon(22);
   const SOUND_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.47 4.47 0 0 0 2.5-4ZM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54Z"/></svg>';
   const MUTED_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M16.5 12A4.5 4.5 0 0 0 14 8v2.18l2.45 2.45c.03-.2.05-.41.05-.63Zm2.5 0a6.97 6.97 0 0 1-.54 2.7l1.51 1.51A8.96 8.96 0 0 0 21 12a9 9 0 0 0-7-8.77v2.06A7 7 0 0 1 19 12ZM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25A6.92 6.92 0 0 1 14 18.7v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3ZM12 4 9.91 6.09 12 8.18V4Z"/></svg>';
+  // What Uncle is doing, drawn beside his face: ink arcs while listening, coral sound bars while
+  // speaking, a "…" bubble while thinking. CSS shows the group for the current data-voice-state.
+  const VOICE_FX = `<svg class="assistant-fx" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false">
+      <g class="fx-arcs"><path d="M12 14a3 6 0 0 1 0 12"/><path d="M17 9a5 11 0 0 1 0 22"/><path d="M22 4a7 16 0 0 1 0 32"/></g>
+      <g class="fx-bars"><rect x="5" y="15" width="4" height="10" rx="2"/><rect x="12" y="10" width="4" height="20" rx="2"/><rect x="19" y="6" width="4" height="28" rx="2"/><rect x="26" y="11" width="4" height="18" rx="2"/><rect x="33" y="15" width="4" height="10" rx="2"/></g>
+      <g class="fx-bubble"><circle class="fx-puff" cx="6" cy="35" r="2"/><circle class="fx-puff" cx="11" cy="29" r="3"/><ellipse class="fx-cloud" cx="24" cy="15" rx="14" ry="10"/><circle class="fx-dot" cx="17" cy="15" r="2.2"/><circle class="fx-dot" cx="24" cy="15" r="2.2"/><circle class="fx-dot" cx="31" cy="15" r="2.2"/></g>
+    </svg>`;
+  // Uncle's face: a round frame whose picture follows the voice state (see setVoiceState).
+  // The round avatar at rest: 64px, or the 512px one on sharper screens.
+  const AVATAR_SRCSET = `${UNCLE_IMAGES}avatar-64.webp 64w, ${UNCLE_IMAGES}avatar.webp 512w`;
+  const FACE = size => `<span class="assistant-face"><img src="${UNCLE_IMAGES}avatar-64.webp" srcset="${AVATAR_SRCSET}" sizes="${size}px" width="${size}" height="${size}" alt=""></span>`;
   const SEND_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M11 20V7.83l-5.59 5.58L4 12l8-8 8 8-1.41 1.41L13 7.83V20h-2Z"/></svg>';
 
   let status = { available: false, voice: false };
@@ -31,33 +49,45 @@
   let speechLimitShown = false;
   // The forecast on screen ({ dishId, date }), set by js/forecast.js, so "why so high?" refers to it.
   let shownForecast = null;
+  // Uncle's voice state, one of VOICE_STATES, on the launcher and panel as data-voice-state.
+  let voiceState = "ready";
+  const voiceListeners = new Set();
+  // The speech request whose audio is still being fetched, so Uncle looks busy until he talks.
+  let pendingSpeech = null;
 
   const bubble = element("button", "assistant-bubble", {
     type: "button",
     "data-guide-id": "assistant-button",
-    "aria-label": "Open assistant",
+    "aria-label": `Open ${ASSISTANT_NAME}, the voice assistant`,
     "aria-expanded": "false",
-    "aria-controls": "assistant-panel"
+    "aria-controls": "assistant-panel",
+    "data-voice-state": voiceState
   });
-  bubble.innerHTML = MIC_ICON;
+  bubble.innerHTML = `${FACE(56)}<span class="assistant-mic-badge">${micIcon(12)}</span>${VOICE_FX}`;
 
   const panel = element("section", "assistant-panel", {
     id: "assistant-panel",
     role: "dialog",
-    "aria-labelledby": "assistant-title",
+    "aria-labelledby": "assistant-title assistant-role",
+    "data-voice-state": voiceState,
     hidden: ""
   });
   panel.innerHTML = `
     <header class="assistant-header">
-      <h2 id="assistant-title">Chicky assistant</h2>
+      ${FACE(44)}
+      <div class="assistant-heading">
+        <h2 id="assistant-title">${ASSISTANT_NAME}</h2>
+        <p id="assistant-role" class="assistant-role">Voice assistant</p>
+      </div>
+      ${VOICE_FX}
       <button class="assistant-sound" type="button" hidden></button>
-      <button class="assistant-close" type="button" aria-label="Close assistant">&times;</button>
+      <button class="assistant-close" type="button" aria-label="Close ${ASSISTANT_NAME}">&times;</button>
     </header>
     <div class="assistant-log" role="log" aria-live="polite"></div>
     <p class="assistant-usage" hidden></p>
     <p class="assistant-status" role="status" aria-live="polite"></p>
     <form class="assistant-input">
-      <textarea rows="2" aria-label="Message to the assistant" placeholder="Say or type your sales, e.g. &ldquo;chicken rice 42&rdquo;"></textarea>
+      <textarea rows="2" aria-label="Message to ${ASSISTANT_NAME}" placeholder="Say or type your sales, e.g. &ldquo;chicken rice 42&rdquo;"></textarea>
       <button class="assistant-mic" type="button" aria-pressed="false" aria-label="Start voice input">${MIC_ICON}</button>
       <button class="assistant-send" type="submit" aria-label="Send">${SEND_ICON}</button>
     </form>`;
@@ -91,7 +121,17 @@
     play: text => speak(text, { evenIfMuted: true }),
     voiceAvailable: async () => await statusLoaded && Boolean(status.voice),
     stopSpeaking,
-    setForecast: forecast => { shownForecast = forecast; }
+    setForecast: forecast => { shownForecast = forecast; },
+    name: ASSISTANT_NAME,
+    // Uncle's voice state ("ready", "listening", "thinking" or "speaking"), for other places that show
+    // him (issue #15). The callback gets the current state now and every change after; call the
+    // returned function to stop.
+    get voiceState() { return voiceState; },
+    onVoiceState(callback) {
+      voiceListeners.add(callback);
+      callback(voiceState);
+      return () => voiceListeners.delete(callback);
+    }
   };
 
   init();
@@ -128,6 +168,7 @@
 
     connectDashboardChatBox();
     connectAskCards();
+    preloadVoicePictures();
   }
 
   // The dashboard's chat box is the large version of this widget: it sends through the same
@@ -192,7 +233,7 @@
   function setOpen(open) {
     panel.hidden = !open;
     bubble.setAttribute("aria-expanded", String(open));
-    bubble.setAttribute("aria-label", open ? "Close assistant" : "Open assistant");
+    bubble.setAttribute("aria-label", open ? `Close ${ASSISTANT_NAME}` : `Open ${ASSISTANT_NAME}, the voice assistant`);
     if (open) {
       input.focus();
     } else {
@@ -279,6 +320,43 @@
     busy = isBusy;
     statusLine.textContent = message;
     updateControls();
+    updateVoiceState();
+  }
+
+  // ---- Voice state ----
+
+  // Works out Uncle's state from what the widget is doing: recording beats working, which beats
+  // talking. Called whenever one of those changes; the text in .assistant-status is unchanged.
+  function updateVoiceState() {
+    const playing = currentAudio && !currentAudio.paused && !currentAudio.ended;
+    setVoiceState(recorder ? "listening" : busy || pendingSpeech !== null ? "thinking" : playing ? "speaking" : "ready");
+  }
+
+  function setVoiceState(next) {
+    if (next === voiceState) return;
+    voiceState = next;
+    [bubble, panel].forEach(node => { node.dataset.voiceState = next; });
+    [bubble, panel].forEach(node => {
+      const image = node.querySelector(".assistant-face img");
+      image.srcset = next === "ready" ? AVATAR_SRCSET : "";
+      image.src = `${UNCLE_IMAGES}${next === "ready" ? "avatar-64" : next}.webp`;
+    });
+    debug("voice state", next);
+    voiceListeners.forEach(callback => {
+      try {
+        callback(next);
+      } catch (error) {
+        warn("voice state listener failed:", error.message);
+      }
+    });
+  }
+
+  // Fetches the three state pictures once the page is idle, so the first change of state doesn't flash.
+  function preloadVoicePictures() {
+    const later = window.requestIdleCallback || (callback => setTimeout(callback, 2000));
+    later(() => VOICE_STATES.filter(state => state !== "ready").forEach(state => {
+      new Image().src = `${UNCLE_IMAGES}${state}.webp`;
+    }));
   }
 
   // ---- Spoken replies ----
@@ -299,12 +377,17 @@
     stopSpeaking();
     const request = speechRequest;
     const silenced = () => muted && !evenIfMuted;
-    if (!await statusLoaded || silenced() || !status.voice || !text) {
+    const notSpeaking = () => {
       debug("not speaking:", silenced() ? "muted" : !status?.voice ? "voice unavailable" : "nothing to say");
       return false;
-    }
+    };
+    if (silenced() || !text) return notSpeaking();
 
+    // Marked before the first await, so a reply goes straight from thinking to speaking.
+    pendingSpeech = request;
+    updateVoiceState();
     try {
+      if (!await statusLoaded || silenced() || !status.voice) return notSpeaking();
       const audio = await apiRequest("/api/assistant/speech", {
         method: "POST",
         body: JSON.stringify({ text: text.slice(0, 500) }),
@@ -318,6 +401,7 @@
       const url = URL.createObjectURL(audio);
       currentAudio = new Audio(url);
       currentAudio.addEventListener("ended", () => URL.revokeObjectURL(url));
+      ["playing", "pause", "ended"].forEach(type => currentAudio.addEventListener(type, updateVoiceState));
       await currentAudio.play();
       debug("playing speech", { bytes: audio.size, type: audio.type });
       return true;
@@ -331,14 +415,19 @@
         addMessage("assistant", error.message);
       }
       return false;
+    } finally {
+      if (pendingSpeech === request) pendingSpeech = null;
+      updateVoiceState();
     }
   }
 
   // Stops playback and any reply still being fetched.
   function stopSpeaking() {
     speechRequest++;
+    pendingSpeech = null;
     currentAudio?.pause();
     currentAudio = null;
+    updateVoiceState();
   }
 
   // What's on screen, so the assistant can point at things the app guide doesn't describe yet.
@@ -463,6 +552,7 @@
     micButton.setAttribute("aria-label", listening ? "Stop voice input" : "Start voice input");
     statusLine.textContent = listening ? "Listening… tap the mic again when you’re done." : "";
     updateControls();
+    updateVoiceState();
   }
 
   // Calls onSilence after SILENCE_MS of quiet that follows some speech.
