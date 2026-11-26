@@ -377,14 +377,17 @@
     stopSpeaking();
     const request = speechRequest;
     const silenced = () => muted && !evenIfMuted;
-    if (!await statusLoaded || silenced() || !status.voice || !text) {
+    const notSpeaking = () => {
       debug("not speaking:", silenced() ? "muted" : !status?.voice ? "voice unavailable" : "nothing to say");
       return false;
-    }
+    };
+    if (silenced() || !text) return notSpeaking();
 
+    // Marked before the first await, so a reply goes straight from thinking to speaking.
     pendingSpeech = request;
     updateVoiceState();
     try {
+      if (!await statusLoaded || silenced() || !status.voice) return notSpeaking();
       const audio = await apiRequest("/api/assistant/speech", {
         method: "POST",
         body: JSON.stringify({ text: text.slice(0, 500) }),
