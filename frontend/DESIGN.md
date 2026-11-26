@@ -81,6 +81,12 @@ them. It is the only place, with the first sign-in panel, where the two characte
 the big line). The right half opens with the logo lockup. On phones the lockup leads, the picture becomes a short
 banner (no lede, no chips) and the panel follows.
 
+**First sign-in.** A brand-new account (sign-up, or a first Google sign-in) sees the welcome panel (`#account-panel`)
+once instead of going straight to the Dashboard: a greeting, a line on what Chicky does, the "Meet Uncle" card, then
+"Go to your dashboard" and "Show me around" (a short Dashboard tour, handed to `js/guide.js` through its
+sessionStorage state). The account remembers it (`welcomeSeen` in the sign-in and profile responses,
+`POST /api/profile/welcome-seen`), so every later sign-in, on any device, lands on the Dashboard.
+
 ### Getting around
 
 **Every page must be reachable from every other page.** The rule:
