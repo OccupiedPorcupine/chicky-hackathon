@@ -8,6 +8,7 @@ const historyCaption = document.getElementById("history-caption");
 const historyCanvas = document.getElementById("history-chart");
 const dishSelect = document.getElementById("dish-select");
 const historyNote = document.getElementById("history-note");
+const historyChartArea = document.getElementById("history-chart").closest(".chart");
 const forecastStatus = document.getElementById("forecast-status");
 const forecastRange = document.getElementById("forecast-range");
 const forecastBasis = document.getElementById("forecast-basis");
@@ -76,24 +77,28 @@ async function updateHistoryChart() {
     const dishId = dishSelect.value;
     const dishName = dishSelect.selectedOptions[0]?.textContent ?? "";
     let history = { labels: [], dates: [], values: [], range: "" };
+    // Nothing to draw: Chicky over the chart, which keeps its height (js/motion.js, chickyState).
+    let state = null;
 
     if (dishId) {
         try {
             const sales = await getSales(dishId);
 
             if (sales.length === 0) {
-                historyNote.textContent = "No sales recorded for this dish yet.";
+                state = ["empty", "No sales recorded for this dish yet."];
             } else {
                 history = buildHistory(sales, currentView);
-                historyNote.textContent = history.recorded === 0
-                    ? "No sales recorded in this period."
-                    : "";
+                if (history.recorded === 0) state = ["empty", "No sales recorded in this period."];
             }
         } catch (error) {
             console.error(error);
-            historyNote.textContent = "Couldn’t load sales history.";
+            state = ["oops", "Couldn’t load sales history. Refresh the page to try again."];
         }
     }
+
+    historyNote.textContent = "";
+    if (state) chickyState.cover(historyChartArea, ...state);
+    else chickyState.uncover(historyChartArea);
 
     // The dish stays named under the chart while you move over it, with the unit and the days shown.
     historyCaption.textContent = history.range ? `${dishName} · Portions per day · ${history.range}` : "";
@@ -118,12 +123,14 @@ async function loadDishes() {
         console.error(error);
         dishSelect.replaceChildren(new Option("Couldn’t load dishes"));
         showStatus("Couldn’t load your dishes. Refresh the page to try again.", "error");
+        chickyState.cover(historyChartArea, "oops", "Your dishes couldn’t be loaded. Refresh the page to try again.");
         return;
     }
 
     if (dishes.length === 0) {
         dishSelect.replaceChildren(new Option("No dishes yet"));
-        historyNote.textContent = "Add a dish and its sales to see history here.";
+        chickyState.cover(historyChartArea, "empty", "No dishes yet. Import your sales and they appear here.",
+            { action: { label: "Import sales", href: "data.html" } });
         return;
     }
 

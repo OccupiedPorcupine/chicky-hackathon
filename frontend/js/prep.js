@@ -20,6 +20,7 @@ const BUFFER_KEY = "chicky-prep-buffer";
 
 let shownList = null;
 let stockIngredients = null;
+let stockFailed = false;   // stockIngredients is also null while it loads
 let prepRequest = 0;
 let ingredientsRequest = 0;
 const inventoryList = document.getElementById("inventory-list");
@@ -56,7 +57,11 @@ function round(value) {
   return Number(value.toFixed(value >= 100 ? 0 : 2)).toLocaleString("en-SG");
 }
 
-function emptyState(text) {
+// With a kind ("empty", "cheer", "oops", "cooking"), a card's whole content is the Chicky state (js/motion.js,
+// chickyState); without one it is a plain line, for notes that sit above real rows.
+const importSales = { label: "Import sales", href: "data.html" };
+function emptyState(text, kind, options) {
+  if (kind) return chickyState.create(kind, text, options);
   const empty = document.createElement("p");
   empty.className = "empty-state";
   empty.textContent = text;
@@ -89,14 +94,14 @@ function renderPrepList(list) {
   missingRecipes.textContent = "";
 
   if (list.closed) {
-    portionList.replaceChildren(emptyState(list.closed));
+    portionList.replaceChildren(emptyState(list.closed, "cheer"));
     ingredientList.replaceChildren(emptyState("Nothing to prepare."));
     return;
   }
 
   const skipped = list.skipped.map(skip => listRow(skip.dish, "–", skip.reason));
   if (!list.dishes.length && !skipped.length) {
-    portionList.replaceChildren(emptyState("Dishes you’ve sold in the last 4 weeks appear here. Record sales with the assistant or import them on the Data ingestion page."));
+    portionList.replaceChildren(emptyState("Dishes you’ve sold in the last 4 weeks appear here. Record sales with the assistant or import them.", "empty", { action: importSales }));
   } else {
     portionList.replaceChildren(...list.dishes.map(dish => listRow(
       dish.dish,
@@ -106,7 +111,7 @@ function renderPrepList(list) {
   }
 
   if (!list.ingredients.length) {
-    ingredientList.replaceChildren(emptyState("Add recipes below to see how much of each ingredient you need."));
+    ingredientList.replaceChildren(emptyState("Add recipes below to see how much of each ingredient you need.", "empty"));
   } else {
     // What to buy for the day first, then what comes out of stock.
     const groups = [
@@ -185,7 +190,7 @@ async function loadPrepList() {
   renderInventory();
   shareButton.disabled = true;
   showStatus("", null, prepStatus);
-  portionList.replaceChildren(emptyState("Working out the forecasts…"));
+  portionList.replaceChildren(emptyState("Working out the forecasts…", "cooking"));
   ingredientList.replaceChildren(emptyState("Loading…"));
   const buffer = prepBuffer.value === "" ? "" : prepBuffer.value === "top" ? "&rule=top" : `&bufferPercent=${prepBuffer.value}`;
   try {
@@ -197,7 +202,7 @@ async function loadPrepList() {
       window.location.href = "index.html";
       return;
     }
-    portionList.replaceChildren(emptyState("–"));
+    portionList.replaceChildren(emptyState("The prep list couldn’t be worked out.", "oops"));
     ingredientList.replaceChildren(emptyState("–"));
     showStatus(error.message || "Couldn’t work out the prep list. Try again in a moment.", "error", prepStatus);
   }
@@ -348,9 +353,9 @@ async function loadRecipes() {
     const recipes = await apiRequest("/api/recipes");
     recipeList.replaceChildren(...(recipes.length
       ? recipes.map(recipeRow)
-      : [emptyState("Your dishes appear here once you import sales or record them with the assistant.")]));
+      : [emptyState("Your dishes appear here once you import sales or record them with the assistant.", "empty", { action: importSales })]));
   } catch (error) {
-    if (error.status !== 401) showStatus("Recipes could not be loaded.", "error", recipeStatus);
+    if (error.status !== 401) recipeList.replaceChildren(emptyState("Recipes could not be loaded. Refresh the page to try again.", "oops"));
   }
 }
 
@@ -448,6 +453,7 @@ async function loadIngredients() {
     const ingredients = await apiRequest("/api/ingredients");
     if (request !== ingredientsRequest) return;
     stockIngredients = ingredients;
+    stockFailed = false;
     if (shownList) {
       renderPrepList(shownList);
     } else {
@@ -461,13 +467,13 @@ async function loadIngredients() {
     }));
     buyingList.replaceChildren(...(ingredients.length
       ? ingredients.map(buyingRow)
-      : [emptyState("Ingredients appear here once you add a recipe.")]));
+      : [emptyState("Ingredients appear here once you add a recipe.", "empty")]));
   } catch (error) {
     if (request !== ingredientsRequest) return;
     stockIngredients = null;
+    stockFailed = error.status !== 401;
     renderInventory();
-    showStatus("Stock could not be loaded.", "error", inventoryStatus);
-    if (error.status !== 401) buyingList.replaceChildren(emptyState("Ingredients could not be loaded."));
+    if (error.status !== 401) buyingList.replaceChildren(emptyState("Ingredients could not be loaded.", "oops"));
   }
 }
 
@@ -509,9 +515,9 @@ function stockField(label, type, value) {
 
 function renderInventory() {
   if (!stockIngredients?.length) {
-    inventoryList.replaceChildren(emptyState(stockIngredients
-      ? "Add a recipe to start counting stock."
-      : "Stock counts are unavailable."));
+    inventoryList.replaceChildren(stockIngredients ? emptyState("Add a recipe to start counting stock.", "empty")
+      : stockFailed ? emptyState("Stock counts couldn’t be loaded. Refresh the page to try again.", "oops")
+      : emptyState("Loading stock…"));
     return;
   }
 

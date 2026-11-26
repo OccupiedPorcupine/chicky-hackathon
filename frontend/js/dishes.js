@@ -130,16 +130,14 @@ async function loadPrices() {
     await apiRequest("/api/profile");
     const dishes = await apiRequest("/api/dishes");
     if (!dishes.length) {
-      const empty = document.createElement("p");
-      empty.className = "empty-state";
-      empty.textContent = "Your dishes appear here once you import sales or record them with the assistant.";
-      priceList.replaceChildren(empty);
+      chickyState.show(priceList, "empty", "Your dishes appear here once you import sales or record them with the assistant.",
+        { action: { label: "Import sales", href: "data.html" } });
       return;
     }
     priceList.replaceChildren(...dishes.map(priceRow));
   } catch (error) {
     if (error.status === 401) window.location.href = "index.html";
-    else showStatus("Dishes could not be loaded.", "error", priceStatus);
+    else chickyState.show(priceList, "oops", "Your dishes couldn’t be loaded. Refresh the page to try again.");
   }
 }
 

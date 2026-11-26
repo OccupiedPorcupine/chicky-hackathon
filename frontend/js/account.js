@@ -46,6 +46,8 @@ async function loadChats() {
 function renderChats(channels) {
   chatList.replaceChildren();
   if (!channels.length) {
+    // Plain text, not Chicky's state: this card is Uncle's (the chat bot speaks as him), and Chicky and Uncle appear
+    // together only to welcome people (#3).
     chatList.append(element("li", "empty-state", "No chat apps are set up on this server yet."));
     return;
   }

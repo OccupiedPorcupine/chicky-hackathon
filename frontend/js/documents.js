@@ -135,9 +135,7 @@ async function reindex(item, button) {
 
 function emptyState() {
   const item = document.createElement("li");
-  const message = document.createElement("p");
-  message.className = "empty-state";
-  message.textContent = "No documents yet. Add what you’d tell a new helper, and the assistant can answer from it. For example:";
+  const message = chickyState.create("empty", "No documents yet. Add what you’d tell a new helper, and the assistant can answer from it. For example:");
   const examples = document.createElement("ul");
   examples.className = "document-examples";
   [
@@ -170,8 +168,8 @@ async function loadDocuments() {
       window.location.href = "index.html";
       return;
     }
-    listNote.textContent = "Documents could not be loaded.";
-    showStatus(listStatus, error.message || "Try again in a moment.", "error");
+    listNote.textContent = "";
+    documentList.replaceChildren(chickyState.create("oops", "Your documents couldn’t be loaded. Refresh the page to try again.", { tag: "li" }));
   }
 }
 

@@ -31,7 +31,7 @@
 .document-actions p { margin: 0; color: var(--ink); }
 
 /* Ideas for a stall with no documents yet. */
-.document-examples { width: fit-content; max-width: 520px; margin: -16px auto 0; padding: 0 0 32px 20px; color: var(--muted); font-size: var(--text-sm); }
+.document-examples { width: fit-content; max-width: 520px; margin: 0 auto; padding: 0 0 24px 20px; color: var(--muted); font-size: var(--text-sm); }
 .document-examples li { margin-top: 8px; }
 
 @media (max-width: 760px) {
