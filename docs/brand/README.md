@@ -19,8 +19,8 @@ PNG masters live in `source/chicky/`, `source/uncle/`, and `source/logo/`.
 All masters use square RGBA canvases of at least 1024px. The app files live at
 `frontend/images/brand/chicky/` and `frontend/images/brand/uncle/`: 512px WebP,
 quality 85, under 80,000 bytes each. Uncle also has `avatar-64.webp`.
-The logo mark is supplied at `frontend/images/brand/chicky/head.png` (1024px);
-it and `source/logo/wordmark.png` remain PNG for the SVG work in #7.
+The logo's masters, `source/chicky/head.png` and `source/logo/wordmark.png`, stay PNG:
+`trace-logo.py` builds the SVGs in `frontend/images/brand/` from them (#7).
 
 All backgrounds are transparent. Uncle's avatar intentionally has a Cream fill
 inside the Ink circle, with transparency outside. The shared voice-state canvas
