@@ -173,6 +173,7 @@
     const slot = element.querySelector("[data-voice-fx]");
     if (slot && !slot.firstElementChild) slot.innerHTML = VOICE_FX;
     let busySeen = false;
+    let started = false;
     let stop = null;
     const show = state => {
       element.dataset.voiceState = state;
@@ -180,7 +181,9 @@
     };
     stop = window.chickyAssistant.onVoiceState(state => {
       show(state);
-      if (state !== "ready") busySeen = true;
+      // With once, only what happens after following starts counts: Uncle may already be talking (his greeting).
+      if (!started) started = true;
+      else if (state !== "ready") busySeen = true;
       else if (once && busySeen) stop?.();
     });
     return () => {
