@@ -153,9 +153,14 @@ h1 span { display: block; color: var(--accent-strong); }
   white-space: nowrap;
 }
 
+/* First sign-in welcome (#account-panel): who is signed in, what Chicky does, Uncle, then the way in. */
 .account-panel .eyebrow { margin-bottom: 8px; }
-.account-picture { width: 64px; height: 64px; margin-bottom: 16px; border-radius: 50%; object-fit: cover; }
-.account-email { margin: 4px 0 24px; color: var(--muted); font-size: var(--text-sm); }
+.account-panel h1 { margin-bottom: 16px; }
+.account-panel h1:focus { outline: none; }
+.welcome-person { display: flex; align-items: center; gap: 12px; }
+.account-picture { flex: none; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.account-name { font: 600 var(--text-lg)/1.3 var(--font-display); }
+.welcome-lede { margin: 4px 0 20px; }
 
 /* First sign-in: Uncle introduces himself as the voice assistant. */
 .meet-uncle {
@@ -171,7 +176,9 @@ h1 span { display: block; color: var(--accent-strong); }
 }
 .meet-uncle img { flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--yolk-soft); }
 .meet-uncle-title { font: 600 var(--text-md)/1.3 var(--font-display); }
-.logout-button { width: 100%; }
+.welcome-actions { display: grid; gap: 12px; }
+.welcome-actions .primary-button { justify-content: center; }
+.welcome-switch { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--divider); color: var(--muted); font-size: var(--text-sm); overflow-wrap: anywhere; }
 
 @media (max-width: 1050px) {
   .sign-in-card { grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; padding-right: 40px; }

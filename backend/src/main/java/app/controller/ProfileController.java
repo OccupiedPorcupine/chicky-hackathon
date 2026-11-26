@@ -1,8 +1,12 @@
 package app.controller;
 
+import java.time.Instant;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +40,23 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthenticatedUser user) {
         // Read from the database: the session's copy doesn't change when the email is confirmed.
-        boolean verified = appUserRepository.findById(user.id()).map(AppUser::isEmailVerified).orElse(false);
-        return ResponseEntity.ok(ProfileResponse.from(user, verified));
+        AppUser account = appUserRepository.findById(user.id()).orElse(null);
+        boolean verified = account != null && account.isEmailVerified();
+        // A missing row counts as seen, so nobody is held on the welcome.
+        boolean welcomeSeen = account == null || account.hasSeenWelcome();
+        return ResponseEntity.ok(ProfileResponse.from(user, verified, welcomeSeen));
+    }
+
+    @Operation(summary = "Mark the welcome as seen",
+            description = "Called when the first-sign-in welcome is shown, so every later sign-in, on any device, goes straight to the Dashboard.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Recorded (or already recorded)"),
+            @ApiResponse(responseCode = "401", description = "User is not authenticated", content = @Content)
+    })
+    @PostMapping("/welcome-seen")
+    @Transactional
+    public ResponseEntity<Void> welcomeSeen(@AuthenticationPrincipal AuthenticatedUser user) {
+        appUserRepository.findById(user.id()).ifPresent(account -> account.markWelcomeSeen(Instant.now()));
+        return ResponseEntity.noContent().build();
     }
 }

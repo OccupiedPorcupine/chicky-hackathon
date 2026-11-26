@@ -10,9 +10,10 @@ public record ProfileResponse(
         @Schema(description = "User display name", example = "Jane Doe") String name,
         @Schema(description = "URL of the user's profile picture", example = "https://example.com/profile.jpg") String pictureUrl,
         @Schema(description = "User role", example = "USER") String role,
-        @Schema(description = "Whether the user has confirmed their email address through the emailed link") boolean emailVerified
+        @Schema(description = "Whether the user has confirmed their email address through the emailed link") boolean emailVerified,
+        @Schema(description = "Whether the user has seen the first-sign-in welcome") boolean welcomeSeen
 ) {
-    public static ProfileResponse from(AuthenticatedUser user, boolean emailVerified) {
-        return new ProfileResponse(user.id(), user.email(), user.name(), user.pictureUrl(), user.role(), emailVerified);
+    public static ProfileResponse from(AuthenticatedUser user, boolean emailVerified, boolean welcomeSeen) {
+        return new ProfileResponse(user.id(), user.email(), user.name(), user.pictureUrl(), user.role(), emailVerified, welcomeSeen);
     }
 }

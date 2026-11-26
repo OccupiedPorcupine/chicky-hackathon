@@ -56,6 +56,9 @@ public class AppUser {
     // When the user proved they own the email address; null until then. See V19__account_tokens.sql.
     private Instant emailVerifiedAt;
 
+    // When the user saw the first-sign-in welcome; null until then. See V42__welcome_seen.sql.
+    private Instant welcomeSeenAt;
+
     protected AppUser() {
         // Required by JPA.
     }
@@ -106,6 +109,16 @@ public class AppUser {
 
     public boolean isEmailVerified() {
         return emailVerifiedAt != null;
+    }
+
+    public void markWelcomeSeen(Instant at) {
+        if (welcomeSeenAt == null) {
+            welcomeSeenAt = at;
+        }
+    }
+
+    public boolean hasSeenWelcome() {
+        return welcomeSeenAt != null;
     }
 
     public Long getId() {
