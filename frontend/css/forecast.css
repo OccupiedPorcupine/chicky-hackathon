@@ -45,6 +45,8 @@
 /* Ask about this forecast: replies show in the assistant panel */
 .chat-card { display: flex; flex: 1; flex-direction: column; gap: 12px; }
 .chat-card .card-title { margin-bottom: 0; }
+.chat-card-heading { display: flex; align-items: center; gap: 10px; }
+.chat-card-heading .assistant-face { width: 40px; height: 40px; }
 .chat-placeholder { color: var(--muted); font-size: var(--text-sm); }
 /* Suggested questions are pills, like the sheet's labels. The field gets its own row in this narrow column, so its
    placeholder isn't cut off, with Ask under it on the right. Uncle's avatar joins this card in #15. */

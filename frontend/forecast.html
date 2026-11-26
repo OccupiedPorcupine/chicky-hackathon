@@ -212,10 +212,15 @@
              with the forecast on screen, and the reply shows in the assistant panel. -->
         <section class="card side-card chat-card" data-guide-id="forecast-ask" data-assistant-ask>
 
-          <h2 class="card-title">Ask about this forecast</h2>
+          <!-- Uncle answers here; his face follows his voice state (chickyAssistant.follow in js/assistant.js). -->
+          <div class="chat-card-heading">
+            <span class="assistant-face"><img src="images/brand/uncle/avatar-64.webp" srcset="images/brand/uncle/avatar-64.webp 64w, images/brand/uncle/avatar.webp 512w" sizes="40px" width="40" height="40" alt=""></span>
+            <h2 class="card-title">Ask Uncle about this forecast</h2>
+            <span class="chat-card-fx" data-voice-fx></span>
+          </div>
 
           <p class="chat-placeholder">
-            Ask why a forecast is that number. Chicky answers only from the sales and holidays that went into it.
+            Ask why a forecast is that number. Uncle answers only from the sales and holidays that went into it.
           </p>
 
           <div class="chat-suggestions">
