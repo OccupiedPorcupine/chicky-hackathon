@@ -9,116 +9,122 @@ body {
 }
 
 .sign-in-card {
-  width: min(1204px, 100%);
-  min-height: 698px;
+  width: min(1180px, 100%);
+  min-height: 680px;
   display: grid;
-  grid-template-columns: minmax(0, 718px) minmax(280px, 1fr);
-  gap: 80px;
-  padding: 32px 72px 32px 32px;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 72px;
+  padding: 24px 64px 24px 24px;
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-card-hover);
 }
 
-/* The picture beside the form: Chicky's idea in one chart. Decorative (aria-hidden). */
+/* The welcome picture: Chicky and Uncle waving. Decorative (aria-hidden), the panels carry the words. */
 .sign-in-visual {
   position: relative;
   isolation: isolate;
-  min-height: 637px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 48px 48px 40px;
+  gap: 16px;
+  padding: 44px 44px 0;
   border-radius: var(--radius-lg);
   background: var(--wash-gradient);
 }
-.hero-blob {
-  position: absolute;
-  z-index: -1;
-  width: 360px;
+
+/* Two soft shapes: a yolk sun behind the pair and a coral pebble in the corner. */
+.hero-shape { position: absolute; z-index: -1; }
+.hero-shape-yolk {
+  right: -40px;
+  bottom: -150px;
+  width: 520px;
   aspect-ratio: 1;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.7;
+  background: radial-gradient(circle at 50% 45%, var(--yolk-soft) 0 58%, var(--yolk-tint) 58% 100%);
 }
-.hero-blob-yolk { top: -120px; left: -80px; background: var(--yolk-soft); }
-.hero-blob-coral { right: -120px; bottom: -140px; background: var(--coral-soft); }
-
-.hero-copy { max-width: 460px; }
-.hero-title { margin-top: 12px; font: 700 36px/1.15 var(--font-display); }
-.hero-lede { margin-top: 12px; color: var(--muted); }
-
-.hero-chart {
-  position: relative;
-  padding: 16px 16px 12px;
-  border: 1px solid color-mix(in srgb, var(--surface) 70%, transparent);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(8px);
+.hero-shape-coral {
+  top: -70px;
+  right: -60px;
+  width: 220px;
+  aspect-ratio: 1.15;
+  border-radius: 58% 42% 46% 54% / 52% 60% 40% 48%;
+  background: var(--coral-soft);
+  transform: rotate(-18deg);
 }
-.hero-chart-heading { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: var(--text-xs); }
-.hero-legend { display: inline-flex; align-items: center; gap: 6px; }
-.hero-legend i { display: inline-block; width: 14px; height: 0; margin-left: 6px; border-top: 2px solid var(--ink); }
-.hero-legend i.is-predicted { border-top: 2px dashed var(--accent); }
-.hero-chart svg { display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
-.hero-grid line { stroke: var(--divider); stroke-width: 1; }
-.hero-today { stroke: var(--border); stroke-dasharray: 3 4; }
-.hero-today-label { fill: var(--muted); font-size: 12px; }
-.hero-area { fill: url(#hero-wash); }
-#hero-wash stop { stop-color: var(--ink); }
-.hero-line { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
-.hero-forecast { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 7 6; stroke-linecap: round; }
-.hero-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
-.hero-ring { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
-.hero-dot, .hero-ring { transform-box: fill-box; transform-origin: center; }
 
-.hero-float {
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; max-width: 470px; }
+.hero-title { margin-top: 12px; font: 700 40px/1.1 var(--font-display); text-wrap: balance; }
+/* The "Huat tomorrow" pill. Shell on Coral is 3.1:1, so its text stays large (20px at 700 or more). */
+.hero-tagline {
+  margin-top: 16px;
+  padding: 2px 16px 0;
+  border-radius: var(--radius-pill);
+  background: var(--coral);
+  color: var(--shell);
+  font: 700 20px/1.5 var(--font-display);
+  transform: rotate(-2deg);
+}
+.hero-lede { margin-top: 16px; color: var(--muted); }
+
+/* data-lead="tagline": "Huat tomorrow" leads and the sentence supports it. */
+.hero-copy[data-lead="tagline"] .hero-tagline { order: 1; margin-top: 16px; padding: 4px 24px 0; font-size: 40px; line-height: 1.3; }
+.hero-copy[data-lead="tagline"] .hero-title { order: 2; margin-top: 20px; font-size: var(--text-lg); font-weight: 600; }
+.hero-copy[data-lead="tagline"] .hero-lede { order: 3; margin-top: 8px; }
+
+.hero-stage { position: relative; flex: 1; display: flex; align-items: flex-end; justify-content: center; min-height: 300px; }
+.hero-duo { display: block; width: min(400px, 100%); height: auto; margin-bottom: -18px; }
+
+/* Two small chips of what Chicky works out, beside the pair. */
+.hero-chip {
   position: absolute;
   display: grid;
-  gap: 4px;
-  padding: 14px 16px;
+  gap: 2px;
+  padding: 10px 14px;
   border: 1px solid var(--card-line);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-card-hover);
   font-size: var(--text-sm);
 }
-.hero-float .tag { margin-top: 4px; }
-.hero-float-label { color: var(--muted); font-size: var(--text-xs); }
-.hero-float-number { font-size: 28px; line-height: 1.1; }
-.hero-float-number small { color: var(--muted); font-size: var(--text-sm); }
-.hero-float-forecast { right: -20px; bottom: -56px; }
-.hero-float-prep { bottom: -84px; left: 28px; min-width: 230px; }
+.hero-chip-label { color: var(--muted); font-size: var(--text-xs); }
+.hero-chip-number { font: 700 24px/1.1 var(--font-display); }
+.hero-chip-number small { color: var(--muted); font: 400 var(--text-sm) var(--font-ui); }
+.hero-chip-forecast { left: 0; bottom: 120px; transform: rotate(-3deg); }
+.hero-chip-prep { right: 0; top: 24px; min-width: 190px; transform: rotate(2deg); }
 .hero-prep-row { display: flex; justify-content: space-between; gap: 16px; }
 .hero-prep-row span:last-child { color: var(--accent-strong); }
-.sign-in-visual .hero-chart { margin-bottom: 96px; }
 
-/* The sign-in page arrives complete: nothing draws in, rises or fades up. Only the slow drift of the two colour blobs
-   and the floating cards remains, and that is ambient, not tied to arriving on the page. */
+/* Arriving: the pair rises in and the chips follow (--duration-enter). Nothing moves after that,
+   and with reduced motion the picture is simply there. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-blob-yolk { animation: blob-drift 18s ease-in-out infinite alternate; }
-  .hero-blob-coral { animation: blob-drift 22s ease-in-out -6s infinite alternate-reverse; }
-  .hero-float-forecast { animation: float 7s ease-in-out infinite; }
-  .hero-float-prep { animation: float 8s ease-in-out -2s infinite reverse; }
+  .hero-duo { animation: rise-in var(--duration-enter) var(--ease-spring) both; }
+  .hero-chip { animation: chip-in var(--duration-enter) var(--ease-out) both; }
+  .hero-chip-prep { animation-delay: 140ms; }
+  .hero-chip-forecast { animation-delay: 240ms; }
+  .sign-in-side { animation: fade-up var(--duration-enter) var(--ease-out) 80ms both; }
 }
-@keyframes float { 50% { transform: translateY(-6px); } }
-@keyframes blob-drift { to { transform: translate(60px, 40px) scale(1.15); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(32px) scale(0.96); } }
+@keyframes chip-in { from { opacity: 0; translate: 0 12px; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } }
 
-.sign-in-panel { width: 280px; padding-top: 64px; }
+/* The form side: the logo lockup, then one of the six panels. */
+.sign-in-side { display: flex; flex-direction: column; padding-top: 40px; }
+
+/* The logo lockup (images/brand/logo-lockup.svg, 135:40). */
+.brand-lockup { display: block; align-self: flex-start; width: auto; height: 52px; margin-bottom: 36px; }
+
+.sign-in-panel { width: 100%; }
 
 h1 { margin-bottom: 24px; font-size: var(--text-xl); line-height: 1.1; }
 h1 span { display: block; color: var(--accent-strong); }
 
 .sign-in-form { display: grid; gap: 12px; }
-.forgot-password { width: fit-content; color: var(--muted); font-size: var(--text-xs); }
+.forgot-password { width: fit-content; color: var(--muted); font-size: var(--text-xs); text-decoration: none; }
 @media (pointer: coarse) {
   .forgot-password { display: inline-flex; align-items: center; min-height: 44px; margin: -13px 0; }
 }
 .sign-in-form .primary-button { margin-top: 8px; }
-.forgot-password { color: var(--muted); font-size: var(--text-xs); text-decoration: none; }
 .panel-lede { margin: -8px 0 24px; color: var(--muted); font-size: var(--text-sm); }
 .verify-continue { margin-top: 16px; }
 
@@ -132,13 +138,17 @@ h1 span { display: block; color: var(--accent-strong); }
 }
 .separator::before, .separator::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
+/* Google draws its own button in an iframe; centre it in the column. */
+.google-button-container { display: flex; justify-content: center; min-height: 44px; }
 .google-help { color: var(--muted); font-size: var(--text-sm); }
 
 .sign-up-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 40px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
   font-size: var(--text-sm);
   white-space: nowrap;
 }
@@ -147,21 +157,47 @@ h1 span { display: block; color: var(--accent-strong); }
 .account-picture { width: 64px; height: 64px; margin-bottom: 16px; border-radius: 50%; object-fit: cover; }
 .account-email { margin: 4px 0 24px; color: var(--muted); font-size: var(--text-sm); }
 
+/* First sign-in: Uncle introduces himself as the voice assistant. */
+.meet-uncle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px 12px 12px;
+  border: 1px solid var(--sand-line);
+  border-radius: var(--radius-lg);
+  background: var(--sand-soft);
+  font-size: var(--text-sm);
+}
+.meet-uncle img { flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--yolk-soft); }
+.meet-uncle-title { font: 600 var(--text-md)/1.3 var(--font-display); }
+.logout-button { width: 100%; }
+
 @media (max-width: 1050px) {
-  .sign-in-card { gap: 40px; padding-right: 40px; }
-  .sign-in-visual { padding: 40px 32px 32px; }
-  .hero-float-forecast { right: 20px; }
-  .hero-float-prep { right: 32px; }
+  .sign-in-card { grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; padding-right: 40px; }
+  .sign-in-visual { padding: 36px 28px 0; }
+  .hero-title { font-size: 32px; }
+  .hero-chip-forecast { display: none; }  /* it would cover Chicky's face in the narrower picture */
 }
 
-@media (max-width: 700px) {
+/* Phones: one column. The lockup leads, then the picture as a short banner, then the panel. The form
+   side's box is dropped (display: contents) so the lockup can sit above the picture. */
+@media (max-width: 760px) {
   body { padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
-  .sign-in-card { display: block; min-height: 0; padding: 24px; }
-  .sign-in-visual { min-height: 0; gap: 20px; padding: 24px 20px 20px; }
-  .hero-title { font-size: 26px; }
-  .hero-lede { font-size: var(--text-sm); }
-  .sign-in-visual .hero-chart { margin-bottom: 0; }
-  .hero-float { display: none; }
-  .sign-in-panel { width: min(100%, 340px); margin: 0 auto; padding: 32px 0 12px; }
+  .sign-in-card { display: flex; flex-direction: column; gap: 0; min-height: 0; padding: 20px 16px 24px; }
+  .sign-in-side { display: contents; }
+  .brand-lockup { order: -1; align-self: center; height: 44px; margin: 4px auto 24px; }
+  .sign-in-visual { padding: 20px 20px 0; gap: 4px; }
+  .hero-shape-yolk { width: 280px; right: -60px; bottom: -120px; }
+  .hero-shape-coral { width: 130px; top: -50px; right: -50px; }
+  .hero-title { margin-top: 8px; font-size: 26px; }
+  .hero-tagline { margin-top: 12px; font-size: 19px; }
+  .hero-copy[data-lead="tagline"] .hero-tagline { font-size: 32px; }
+  .hero-copy[data-lead="tagline"] .hero-title { font-size: var(--text-md); }
+  .hero-lede { display: none; }
+  .hero-stage { min-height: 0; margin-top: -36px; justify-content: flex-end; }
+  .hero-duo { width: 168px; margin-bottom: -8px; }
+  .hero-chip { display: none; }
+  .sign-in-panel { width: min(100%, 340px); margin: 0 auto; padding-top: 28px; }
   .sign-up-row { justify-content: center; }
 }

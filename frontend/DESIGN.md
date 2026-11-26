@@ -74,8 +74,12 @@ so nothing fixed or sticky ever covers the content: the sidebar is a column, the
 | ![Data ingestion](design/screenshots/data.png) | ![Sign in](design/screenshots/login.png) |
 
 The sign-in page (and its sign-up, forgot and reset views, all in `index.html`) shares the colours, type, cards and buttons but has no navigation and no smooth scrolling: one centred card on the soft brand gradient. Its
-left half is a decorative picture of what Chicky does: a sales line that draws itself, the dashed
-green forecast continuing it, and two cards (tomorrow's forecast, a prep-list nudge) floating over it.
+left half is the welcome picture: Chicky and Uncle waving (`images/brand/chicky/duo-wave.webp`) on a yolk sun, under
+the headline and the coral "Huat tomorrow" pill, with two small chips (tomorrow's forecast, a prep-list line) beside
+them. It is the only place, with the first sign-in panel, where the two characters appear together. `data-lead` on
+`.hero-copy` picks which line leads: `headline` (the sentence, with the pill under it) or `tagline` ("Huat tomorrow" as
+the big line). The right half opens with the logo lockup. On phones the lockup leads, the picture becomes a short
+banner (no lede, no chips) and the panel follows.
 
 ### Getting around
 
@@ -416,7 +420,7 @@ rising in, no figures counting up and no charts drawing in: a page's content is 
 and a figure is written as it is, so a number on screen is always the real number. Following a link goes straight to the
 page, with no wait for an animation, and that holds for Back and Forward and for every `prefers-reduced-motion` setting.
 Don't add `@view-transition`, a `view-transition-name`, an entrance animation or a delay before `location` changes.
-Nothing shimmers or drifts on its own either. The sign-in page's picture is the one exception: it still draws itself in.
+Nothing shimmers or drifts on its own either. The sign-in page's picture is the one exception: Chicky and Uncle rise in and the chips settle beside them, once.
 Animate only a response to something the user just did (below).
 
 **Loading text** (a `.note`, `.status-text`, `.empty-state` or `.lede` starting with "Loading" or "Checking") gets
@@ -606,8 +610,6 @@ The script mocks the API, so no backend or login is needed.
 
 ## Known gaps
 
-- The sign-in page's picture is drawn in HTML and SVG (a sample chart and two sample cards), not
-  real data. Swap it for artwork or a real screenshot once there is a logo and brand imagery.
 - Dashboard "Actions needed" items, the forecast "Ask about this forecast" card (disabled) and its
   "Local events" factor are placeholders that aren't connected yet. When they are, keep the
   components above.

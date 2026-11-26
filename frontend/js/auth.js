@@ -289,7 +289,8 @@ function initializeGoogleSignIn() {
       size: "large",
       shape: "rectangular",
       text: "signin_with",
-      width: 258
+      // As wide as the form column (Google allows up to 400px); 258px if it is hidden right now.
+      width: Math.min(400, container.clientWidth || 258)
     });
   }, () => {
     setStatus(document.querySelector("#login-status"), "Google sign-in could not be loaded.", "error");
