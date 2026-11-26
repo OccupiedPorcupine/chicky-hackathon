@@ -374,7 +374,7 @@ are the two references.
 
   | Kind | Picture | When |
   | --- | --- | --- |
-  | `empty` | `empty-egg` | Nothing here yet: no dishes, sales, sources, documents, chat apps |
+  | `empty` | `empty-egg` | Nothing here yet: no dishes, sales, sources or documents |
   | `cheer` | `empty-cheer` | Good news: nothing needs attention, nothing left over or sold out, a closed day |
   | `oops` | `state-oops` | A load failed: say what couldn't load and "Refresh the page to try again." |
   | `cooking` | `state-cooking` | A whole card or page is loading. Short "Loading…" text elsewhere stays text |
@@ -382,7 +382,8 @@ are the two references.
   Sizes: `compact` inside a card (the default), `large` for a whole page, `inline` beside a card's note.
   `chickyState.cover(chart, …)` lays a state over a chart so the card keeps its height; `uncover` when data arrives.
   Feedback on something the user just did (a save or upload that failed) stays inline `.status-text`, not a state.
-  Plain `.empty-state` text is for notes that sit above real rows.
+  Plain `.empty-state` text is for notes that sit above real rows, and for Uncle's surfaces (Your week, the Ask card,
+  Chat apps, the assistant): Chicky and Uncle appear together only to welcome people.
 - **Loading:** put the loading message in the element that will hold the data ("Loading sales…",
   `--` for a number). No spinners. Only say "Loading…" or "Checking…" while something is actually
   loading; a placeholder that isn't wired up says "Not connected yet".
