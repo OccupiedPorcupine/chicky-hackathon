@@ -66,6 +66,8 @@
             <h1 id="welcome-heading">Welcome</h1>
             <p class="lede">Review this week’s performance</p>
           </div>
+          <!-- Decorative: Chicky greets the user. The voice box below is Uncle's (#15), so Chicky stays up here. -->
+          <img class="welcome-chicky" src="images/brand/chicky/three-quarter.webp" alt="" width="112" height="112">
         </section>
 
         <!-- Sends to the voice assistant (js/assistant.js), which opens its panel to reply. -->
@@ -200,7 +202,10 @@
     <!-- Opened by Record sales, or a "You haven't logged sales" card for that day. -->
     <dialog class="record-dialog" id="record-dialog" aria-labelledby="record-heading" data-lenis-prevent>
       <form method="dialog" id="record-form">
-        <h2 id="record-heading">Record sales</h2>
+        <div class="record-heading">
+          <h2 id="record-heading">Record sales</h2>
+          <img class="record-chicky" src="images/brand/chicky/spot-receipt.webp" alt="" width="72" height="72">
+        </div>
         <p class="lede">Enter portions sold per dish, plus any sell-out time or leftovers. Leave a dish empty if it didn’t sell.</p>
         <div class="field record-date">
           <label for="record-date">Date</label>
