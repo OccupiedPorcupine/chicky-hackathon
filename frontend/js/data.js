@@ -67,10 +67,7 @@ function renderSources(sources) {
     : "No training sources uploaded yet";
 
   if (!sources.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty-state";
-    empty.textContent = "Upload the first data source to make it available for training.";
-    sourceList.append(empty);
+    chickyState.show(sourceList, "empty", "Upload the first data source to make it available for training.");
     return;
   }
 
@@ -122,7 +119,10 @@ async function loadSources() {
     renderSources(sources);
   } catch (error) {
     if (error.status === 401) window.location.href = "index.html";
-    else sourceSummary.textContent = "Couldn’t load your sources. Refresh the page to try again.";
+    else {
+      sourceSummary.textContent = "";
+      chickyState.show(sourceList, "oops", "Your sources couldn’t be loaded. Refresh the page to try again.");
+    }
   }
 }
 

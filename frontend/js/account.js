@@ -39,14 +39,14 @@ async function loadChats() {
     renderChats((await apiRequest("/api/chat-links")).channels);
   } catch (error) {
     if (error.status === 401) window.location.href = "index.html";
-    else showStatus("Chat apps could not be loaded.", "error");
+    else chatList.replaceChildren(chickyState.create("oops", "Chat apps couldn’t be loaded. Refresh the page to try again.", { tag: "li" }));
   }
 }
 
 function renderChats(channels) {
   chatList.replaceChildren();
   if (!channels.length) {
-    chatList.append(element("li", "empty-state", "No chat apps are set up on this server yet."));
+    chatList.append(chickyState.create("empty", "No chat apps are set up on this server yet.", { tag: "li" }));
     return;
   }
   channels.forEach(channel => chatList.append(chatRow(channel)));
