@@ -468,14 +468,35 @@ render if a page forgets `base.css`.
 | <img src="design/screenshots/assistant.png" alt="Assistant panel" width="360"> | ![Guided tour](design/screenshots/guide.png) |
 
 **Uncle is the assistant** (the voice; Chicky stays the app). The launcher is his round face
-(`images/brand/uncle/avatar-64.webp`) with a small ink mic badge, and the panel's header shows his face, his name
-(`ASSISTANT_NAME` in `js/assistant.js`, a placeholder until the name is decided) and "Voice assistant". His replies
-carry a small avatar; the user's bubbles are `--accent-strong`. The confirm card's Confirm and Cancel are the page's
-yolk-and-ink and outlined pills.
+(`images/brand/uncle/avatar-64.webp`) with a small ink mic badge. His name is `ASSISTANT_NAME` in `js/assistant.js`, a
+placeholder until it is decided. The user's bubbles are `--accent-strong`; the confirm card's Confirm and Cancel are the
+page's yolk-and-ink and outlined pills.
+
+**The panel is Uncle's stage** (issue #37):
+
+- **A floating, glowing window.** A Yolk and Coral glow (`.assistant-glow`, a blurred conic gradient) sits round its edge
+  and follows his voice state: dim and still when ready, breathing with the mic level while listening, a shimmer
+  travelling round it while thinking, pulsing with his voice while speaking. `js/assistant.js` feeds it `--voice-level`
+  (0–1). The panel springs up out of the launcher and closes back into it.
+- **Uncle on stage.** A big Uncle (`--uncle`: 180px, 140px on phones) stands behind his stall counter at the top,
+  breaking out over the window's edge. He bobs gently, and hops when his picture changes: `ready`, `listening`,
+  `thinking` or `speaking.webp` with the voice state, then at rest `pointing.webp` while a confirm card waits and
+  `presenting.webp` after an answer from an Ask card, from documents or with figures in it. Saving a confirm card makes
+  him hop with a little burst of Yolk and Coral off the counter.
+- **Talking.** His latest line is a speech bubble pointing at him. While a spoken reply plays, a Web Audio `AnalyserNode`
+  on the reply flips his mouth between `speaking.webp` and `ready.webp` (one canvas, so nothing jumps), drives the glow,
+  and reveals the words in step with the playback; if the browser won't start the audio context, a timer flaps the mouth
+  instead. With no audio (no voice on the server, or spoken replies off) the words appear one at a time with his mouth
+  flapping, which counts as `speaking`.
+- **Accessibility.** The bubble is `aria-hidden`: the log keeps every reply, whole, and only visually hides the one on
+  stage, so a screen reader hears each reply once. The status line, the confirm card, the mic and every
+  `data-guide-id` are as before.
+- **Reduced motion.** No glow pulse, bob, hop, mouth flap or confetti; pictures change and text appears at once.
+- **Phones.** A bottom sheet across the width, with a smaller stage; the launcher steps aside while it is open.
 
 **Voice states.** `js/assistant.js` sets `data-voice-state` on the launcher and the panel to `ready`, `listening`
-(recording), `thinking` (waiting for a reply, a transcript or speech) or `speaking` (audio playing, even with the
-panel closed, as in the tour or "Your week" Play). The state swaps Uncle's picture
+(recording), `thinking` (waiting for a reply, a transcript or speech) or `speaking` (audio playing or a reply being
+revealed, even with the panel closed, as in the tour or "Your week" Play). The launcher swaps Uncle's face
 (`images/brand/uncle/<state>.webp`; the avatar at rest) and shows one decoration beside him, drawn in SVG: ink arcs
 while listening, a "…" thought bubble while thinking and coral sound bars while speaking. They animate only under
 `prefers-reduced-motion: no-preference`. The words stay in `.assistant-status` for screen readers.
