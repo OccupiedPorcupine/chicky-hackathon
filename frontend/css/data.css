@@ -1,5 +1,6 @@
 /* Data ingestion layout. Shared tokens and components are in base.css. */
 #upload-form { margin-top: 16px; }
+.upload-chicky { width: 96px; height: 96px; margin-bottom: -4px; }
 
 .source-table { margin-top: 16px; border-top: 1px solid var(--divider); }
 .source-row {
@@ -17,7 +18,8 @@
 .source-header { min-height: 44px; color: var(--muted); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; }
 .source-name { min-width: 0; }
 .source-name strong, .source-name span { display: block; }
-.source-name strong { overflow: hidden; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.source-name strong { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.source-row .tag { justify-self: start; white-space: nowrap; }
 .source-name span { margin-top: 4px; color: var(--muted); font: var(--text-xs) ui-monospace, Menlo, monospace; }
 .source-import { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .source-import span { color: var(--muted); font-size: var(--text-xs); }
@@ -51,8 +53,14 @@
 .rest-days { margin-top: 24px; font-size: var(--text-sm); }
 .rest-days legend { margin-bottom: 8px; }
 .rest-day-list { display: flex; flex-wrap: wrap; gap: 8px; }
-.rest-day { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
-.rest-day:has(input:checked) { border-color: var(--accent-strong); background: var(--accent-soft); color: var(--accent-strong); }
+.rest-day {
+  display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-pill); cursor: pointer; transition: background-color var(--duration-fast);
+}
+.rest-day:hover { background: var(--accent-tint); }
+/* A rest day is "selected": Yolk-soft with Ink text and edge, like the current page in the menu. */
+.rest-day:has(input:checked) { border-color: var(--ink); background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+.rest-day input { accent-color: var(--ink); }
 .trading-hours-form { margin-top: 24px; font-size: var(--text-sm); }
 .trading-hours-form legend { margin-bottom: 4px; }
 .trading-hours-form .field-hint { margin: 0 0 12px; color: var(--muted); }
@@ -79,6 +87,7 @@
 
 @media (max-width: 760px) {
   .page-heading .tag { margin-top: 16px; }
+  .upload-chicky { width: 72px; height: 72px; }
   .source-header { display: none; }
   .source-row { grid-template-columns: 1fr auto; gap: 8px 16px; }
   .source-row > span:nth-child(2), .source-row > span:nth-child(3) { color: var(--muted); font-size: var(--text-xs); }
