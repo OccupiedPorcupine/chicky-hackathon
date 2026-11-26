@@ -314,6 +314,7 @@
     bubble.setAttribute("aria-expanded", String(open));
     bubble.setAttribute("aria-label", open ? `Close ${ASSISTANT_NAME}` : `Open ${ASSISTANT_NAME}, the voice assistant`);
     if (open) {
+      primeTalk();
       panel.classList.remove("is-closing");
       panel.hidden = false;
       input.focus();
@@ -378,6 +379,7 @@
   }
 
   async function send(text) {
+    primeTalk();
     const inputMode = fromVoice ? "voice" : "text";
     fromVoice = false;
     debug("sending message", { inputMode, characters: text.length, page: PAGE });
@@ -479,6 +481,8 @@
   // Reads text aloud, resolving to whether it played. Optional: the text is always shown, so failures
   // (no audio support, autoplay blocked after moving page) are ignored.
   async function speak(text, { evenIfMuted = false, reveal = false } = {}) {
+    // Called straight from Play and the tour's buttons, so this is still inside their click.
+    primeTalk();
     stopSpeaking();
     const request = speechRequest;
     const silenced = () => muted && !evenIfMuted;
@@ -591,6 +595,7 @@
   // ---- Voice input ----
 
   async function toggleRecording() {
+    primeTalk();
     if (recorder) {
       debug("mic tapped: stopping");
       stopReason = "tap";
@@ -1257,6 +1262,21 @@
   let stopReveal = () => {};
   let finishReveal = () => {};
 
+  // Creates or resumes the audio context for Uncle's talking inside a tap or click (Send, the mic, opening the
+  // panel, Play, a tour step), when browsers allow it to start, so it is already running when a spoken reply
+  // arrives later and the AnalyserNode is really used. Nothing with reduced motion, which has no mouth flap.
+  function primeTalk() {
+    if (reducedMotion.matches) return;
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      talkContext ??= new Context();
+      if (talkContext.state === "suspended") talkContext.resume().catch(() => {});
+    } catch (error) {
+      warn("couldn't prepare the talking animation:", error.name, error.message);
+    }
+  }
+
   // While audio plays: the glow and the mouth follow its loudness through an AnalyserNode, and the words of the
   // pending reply appear in step with the playback. If the browser won't run the audio context (it can start
   // suspended), the mouth flaps on a timer instead, so the audio is never routed through a silent graph.
@@ -1272,6 +1292,7 @@
       sayText.textContent = "";
     }
     let analyser = null;
+    let source = null;
     try {
       const Context = window.AudioContext || window.webkitAudioContext;
       talkContext ??= new Context();
@@ -1281,7 +1302,7 @@
       if (talkContext.state === "running") {
         analyser = talkContext.createAnalyser();
         analyser.fftSize = 1024;
-        const source = talkContext.createMediaElementSource(audio);
+        source = talkContext.createMediaElementSource(audio);
         source.connect(analyser);
         analyser.connect(talkContext.destination);
       }
@@ -1316,8 +1337,14 @@
       if (!audio.ended) frame = requestAnimationFrame(tick);
       else stop();
     };
+    let stopped = false;
     const stop = () => {
+      if (stopped) return;
+      stopped = true;
       cancelAnimationFrame(frame);
+      // This reply's nodes are done with; an audio element can't be wired up twice, so they'd only pile up.
+      source?.disconnect();
+      analyser?.disconnect();
       if (text) sayText.textContent = text;
       setMouth(true);
       setVoiceLevel(0);
