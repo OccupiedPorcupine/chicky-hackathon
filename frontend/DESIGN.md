@@ -367,8 +367,22 @@ are the two references.
   `.form-actions` row (see [Forms](#forms)) or under the thing it is about, with `.is-error` or
   `.is-success`. Progress messages ("Signing in…") have no modifier. **Don't use `alert()`.**
 - **Tags:** `.tag` (neutral), `.tag.is-active` (in use, selected), `.tag.is-warning` (needs a look).
-- **Empty states:** `.empty-state`, one sentence saying what will appear here and how to get it
-  ("Upload the first data source to make it available for training.").
+- **Empty, loading and error states with Chicky:** `chickyState` in `js/motion.js` renders a decorative Chicky
+  (`alt=""`), one sentence as real text and an optional action (a link or button, e.g. "Import sales"). Use it whenever a
+  card or page has nothing else to show; the sentence says what will appear and how to get it ("Upload the first data
+  source to make it available for training.").
+
+  | Kind | Picture | When |
+  | --- | --- | --- |
+  | `empty` | `empty-egg` | Nothing here yet: no dishes, sales, sources, documents, chat apps |
+  | `cheer` | `empty-cheer` | Good news: nothing needs attention, nothing left over or sold out, a closed day |
+  | `oops` | `state-oops` | A load failed: say what couldn't load and "Refresh the page to try again." |
+  | `cooking` | `state-cooking` | A whole card or page is loading. Short "Loading…" text elsewhere stays text |
+
+  Sizes: `compact` inside a card (the default), `large` for a whole page, `inline` beside a card's note.
+  `chickyState.cover(chart, …)` lays a state over a chart so the card keeps its height; `uncover` when data arrives.
+  Feedback on something the user just did (a save or upload that failed) stays inline `.status-text`, not a state.
+  Plain `.empty-state` text is for notes that sit above real rows.
 - **Loading:** put the loading message in the element that will hold the data ("Loading sales…",
   `--` for a number). No spinners. Only say "Loading…" or "Checking…" while something is actually
   loading; a placeholder that isn't wired up says "Not connected yet".
