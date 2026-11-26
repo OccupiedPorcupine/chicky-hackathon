@@ -12,6 +12,7 @@
   font-size: var(--text-sm);
 }
 .price-row .input { width: 100%; }
+.price-row:not(.price-header) > :first-child { font-weight: 600; }
 .price-field { display: grid; gap: 4px; }
 .price-caption { display: none; color: var(--muted); font-size: var(--text-xs); }
 .price-margin { color: var(--muted); }

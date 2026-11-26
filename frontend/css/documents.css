@@ -20,9 +20,11 @@
   border-bottom: 1px solid var(--divider);
   font-size: var(--text-sm);
 }
+.document-row { border-radius: var(--radius-sm); }
 .document-row:target, .document-row.is-editing { background: var(--accent-tint); }
+.document-row .tag { white-space: nowrap; }
 .document-name { min-width: 0; }
-.document-name strong { display: block; font-weight: 400; overflow-wrap: anywhere; }
+.document-name strong { display: block; font-weight: 600; overflow-wrap: anywhere; }
 .document-name span { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-xs); }
 .document-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; }
 .document-actions .text-button { min-height: 32px; }
