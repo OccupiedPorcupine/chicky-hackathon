@@ -79,7 +79,7 @@ def export():
         folder = APP / group
         folder.mkdir(parents=True, exist_ok=True)
         if name == 'head':
-            im.resize((1024, 1024), Image.Resampling.LANCZOS).save(folder / 'head.png')
+            # Source art for the logo only: trace-logo.py reads the master in source/chicky/.
             continue
         sizes = [(name, 512)]
         if id == 'uncle/avatar':
@@ -181,7 +181,7 @@ def prompt_log():
         'voice-state edit targets are listed per asset. Prompts below are the exact final '
         'strings sent to the tool.', '',
         'PNG masters are square, at least 1024px, RGBA. WebP exports are 512px, quality 85, '
-        'with a 64px avatar variant. `head.png` is also supplied at 1024px in the app path. '
+        'with a 64px avatar variant. `head.png` stays a master only, for trace-logo.py. '
         'The wordmark remains source art for #7; it is not a production SVG.', '',
         'Alignment cleanup: `lock-voice.py` preserves ready.png outside the generated '
         'expression/hand regions and applies one shared alpha matte. This prevents '
