@@ -48,7 +48,8 @@ Uncle, and five colours.
 Two characters from the asset sheet carry the brand, and each has one job:
 
 - **Chicky, the chick, is the face of the product.** The logo, the app icon, the sign-in page and the
-  spot illustrations on pages, and the empty, loading and error states.
+  spot illustrations on pages, and the empty, loading and error states (`chickyState`, see
+  [Feedback](#feedback)). Uncle's own cards keep plain text for those, so the two don't meet.
 - **Uncle, the hawker uncle, is the voice.** He appears wherever the app talks or listens: the
   assistant's launcher and panel, the dashboard's voice box, "Your week", the forecast's Ask card, the
   guided tour and the Telegram bot. His name is a placeholder (`ASSISTANT_NAME` in `js/assistant.js`,
@@ -66,9 +67,10 @@ transparent backgrounds, about 80 KB or less each. The PNG masters are in `docs/
 | `chicky/front.webp`, `chicky/side.webp` | Model views | Reference (style guide) |
 | `chicky/spot-receipt.webp` | Holding a receipt | Data ingestion's upload card and the dashboard's Record sales form |
 | `chicky/spot-prep.webp` | With a calendar and a crate | The prep list heading |
-| `chicky/empty-cheer.webp`, `chicky/empty-egg.webp` | Cheering; in the shell | Empty states |
-| `chicky/state-cooking.webp` | Cooking | Loading states |
-| `chicky/state-oops.webp` | Oops | Error states |
+| `chicky/empty-egg.webp` | In the shell | The `empty` state: nothing here yet (`chickyState`, see [Feedback](#feedback)) |
+| `chicky/empty-cheer.webp` | Cheering | The `cheer` state: good news, nothing to do |
+| `chicky/state-cooking.webp` | Cooking | The `cooking` state: a whole card or page loading |
+| `chicky/state-oops.webp` | Oops | The `oops` state: something couldn't load |
 | `chicky/duo-wave.webp` | Chicky and Uncle waving | The sign-in picture (the only duo) |
 | `uncle/avatar-64.webp`, `uncle/avatar.webp` | Round avatar, 64px and 512px | The assistant launcher and panel at rest, his replies, "Meet Uncle", Chat apps |
 | `uncle/listening.webp`, `uncle/thinking.webp`, `uncle/speaking.webp` | Voice states | Swapped in by `js/assistant.js` as he listens, thinks and speaks (see [Assistant and guided tour](#assistant-and-guided-tour)) |

@@ -272,7 +272,31 @@
         </section>
       </div>
     </section>
+
+    <section class="section" id="states">
+      <div class="section-heading">
+        <h2>Empty, loading and error states</h2>
+        <p>chickyState in js/motion.js: a decorative Chicky, one sentence of real text, and an optional action. Uncle’s cards keep plain text instead.</p>
+      </div>
+      <div class="grid-2">
+        <section class="card"><div class="headline"><h3 class="card-title">empty</h3><span class="note">Nothing here yet</span></div><div data-sg-state="empty" data-sg-message="No dishes yet. Add your first dish to start recording sales." data-sg-action="Add a dish"></div></section>
+        <section class="card"><div class="headline"><h3 class="card-title">cheer</h3><span class="note">Good news, nothing to do</span></div><div data-sg-state="cheer" data-sg-message="Nothing needs your attention right now."></div></section>
+        <section class="card"><div class="headline"><h3 class="card-title">cooking</h3><span class="note">A whole card or page loading</span></div><div data-sg-state="cooking" data-sg-message="Working out tomorrow’s prep list…"></div></section>
+        <section class="card"><div class="headline"><h3 class="card-title">oops</h3><span class="note">Something couldn’t load</span></div><div data-sg-state="oops" data-sg-message="Revenue could not be loaded. Refresh the page to try again."></div></section>
+      </div>
+      <div class="grid-2">
+        <section class="card"><div class="headline"><h3 class="card-title">large</h3><span class="note">A whole page with nothing to show</span></div><div data-sg-state="empty" data-sg-size="large" data-sg-message="No documents yet. Add your stall’s rules and supplier details."></div></section>
+        <section class="card"><div class="headline"><h3 class="card-title">inline</h3><span class="note">Beside a card’s note</span></div><div data-sg-state="cheer" data-sg-size="inline" data-sg-message="Nothing was left over this week."></div></section>
+      </div>
+    </section>
   </main>
   <script src="../js/motion.js"></script>
+  <script>
+    // The states above, drawn by the real component.
+    document.querySelectorAll("[data-sg-state]").forEach(slot => {
+      const { sgState, sgMessage, sgSize, sgAction } = slot.dataset;
+      chickyState.show(slot, sgState, sgMessage, { size: sgSize, action: sgAction && { label: sgAction, href: "#states" } });
+    });
+  </script>
 </body>
 </html>
