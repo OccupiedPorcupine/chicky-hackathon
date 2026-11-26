@@ -54,6 +54,19 @@
   const voiceListeners = new Set();
   // The speech request whose audio is still being fetched, so Uncle looks busy until he talks.
   let pendingSpeech = null;
+  // Uncle on the panel's stage (issue #37): his pose at rest after a reply ("pointing" at a confirm card,
+  // "presenting" an answer with figures), the reply being revealed word by word when there is no audio, the
+  // picture shown, and whether his mouth is shut mid-word.
+  let stagePose = null;
+  let revealing = false;
+  let shownPose = "ready";
+  let stageTalk = null;
+  let greeted = false;
+  // The next message comes from an "Ask about this forecast" card, so Uncle presents the answer.
+  let askedFromCard = false;
+  let closeTimer = 0;
+  let talkContext = null;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const bubble = element("button", "assistant-bubble", {
     type: "button",
@@ -72,25 +85,37 @@
     "data-voice-state": voiceState,
     hidden: ""
   });
+  // A glowing window with Uncle on a stage at the top, breaking out over its edge, and his latest line in a
+  // speech bubble. The bubble is a picture of the reply (aria-hidden): screen readers hear each reply once,
+  // whole, from the log below, where the line on stage is kept but visually hidden.
   panel.innerHTML = `
-    <header class="assistant-header">
-      ${FACE(44)}
-      <div class="assistant-heading">
-        <h2 id="assistant-title">${ASSISTANT_NAME}</h2>
-        <p id="assistant-role" class="assistant-role">Voice assistant</p>
+    <div class="assistant-glow" aria-hidden="true"></div>
+    <div class="assistant-uncle" aria-hidden="true">
+      <div class="assistant-uncle-body">
+        <img class="assistant-uncle-pose" src="${UNCLE_IMAGES}ready.webp" width="180" height="180" alt="" decoding="async">
+        <img class="assistant-uncle-mouth" src="${UNCLE_IMAGES}ready.webp" width="180" height="180" alt="" decoding="async">
       </div>
       ${VOICE_FX}
-      <button class="assistant-sound" type="button" hidden></button>
-      <button class="assistant-close" type="button" aria-label="Close ${ASSISTANT_NAME}">&times;</button>
-    </header>
-    <div class="assistant-log" role="log" aria-live="polite"></div>
-    <p class="assistant-usage" hidden></p>
-    <p class="assistant-status" role="status" aria-live="polite"></p>
-    <form class="assistant-input">
-      <textarea rows="2" aria-label="Message to ${ASSISTANT_NAME}" placeholder="Say or type your sales, e.g. &ldquo;chicken rice 42&rdquo;"></textarea>
-      <button class="assistant-mic" type="button" aria-pressed="false" aria-label="Start voice input">${MIC_ICON}</button>
-      <button class="assistant-send" type="submit" aria-label="Send">${SEND_ICON}</button>
-    </form>`;
+    </div>
+    <div class="assistant-window">
+      <header class="assistant-header">
+        <div class="assistant-heading">
+          <h2 id="assistant-title">${ASSISTANT_NAME}</h2>
+          <p id="assistant-role" class="assistant-role">Voice assistant</p>
+        </div>
+        <button class="assistant-sound" type="button" hidden></button>
+        <button class="assistant-close" type="button" aria-label="Close ${ASSISTANT_NAME}">&times;</button>
+        <div class="assistant-say" aria-hidden="true"><p class="assistant-say-text"></p></div>
+      </header>
+      <div class="assistant-log" role="log" aria-live="polite"></div>
+      <p class="assistant-usage" hidden></p>
+      <p class="assistant-status" role="status" aria-live="polite"></p>
+      <form class="assistant-input">
+        <textarea rows="2" aria-label="Message to ${ASSISTANT_NAME}" placeholder="Say or type your sales, e.g. &ldquo;chicken rice 42&rdquo;"></textarea>
+        <button class="assistant-mic" type="button" aria-pressed="false" aria-label="Start voice input">${MIC_ICON}</button>
+        <button class="assistant-send" type="submit" aria-label="Send">${SEND_ICON}</button>
+      </form>
+    </div>`;
 
   const log = panel.querySelector(".assistant-log");
   const statusLine = panel.querySelector(".assistant-status");
@@ -100,6 +125,10 @@
   const micButton = form.querySelector(".assistant-mic");
   const sendButton = form.querySelector(".assistant-send");
   const soundButton = panel.querySelector(".assistant-sound");
+  const uncleBody = panel.querySelector(".assistant-uncle-body");
+  const unclePose = panel.querySelector(".assistant-uncle-pose");
+  const sayBox = panel.querySelector(".assistant-say");
+  const sayText = panel.querySelector(".assistant-say-text");
 
   // Signed out (the page redirects) or the backend is down: no assistant.
   const statusLoaded = apiRequest("/api/assistant/status")
@@ -179,6 +208,7 @@
     addMessage("assistant", status.available
       ? "Tell me what you sold, like “today chicken rice 42, char siew 30”. I’ll show it to you before anything is saved."
       : "The assistant isn’t set up on this server yet.");
+    showSaying(log.querySelector(".assistant-message.is-on-stage")?.textContent ?? "");
     if (status.available) showUsage(status.usage);
     updateControls();
 
@@ -261,26 +291,47 @@
       askForm.addEventListener("submit", event => {
         event.preventDefault();
         setOpen(true);
+        askedFromCard = true;
         sendFromInput(askInput);
       });
       card.querySelectorAll("[data-question]").forEach(button => {
         button.addEventListener("click", () => {
           if (busy || !status.available) return;
           setOpen(true);
+          askedFromCard = true;
           send(button.dataset.question);
         });
       });
     });
   }
 
+  // The panel springs up out of the launcher, and closing plays it backwards (instant with reduced motion).
   function setOpen(open) {
-    panel.hidden = !open;
+    clearTimeout(closeTimer);
     bubble.setAttribute("aria-expanded", String(open));
     bubble.setAttribute("aria-label", open ? `Close ${ASSISTANT_NAME}` : `Open ${ASSISTANT_NAME}, the voice assistant`);
     if (open) {
+      panel.classList.remove("is-closing");
+      panel.hidden = false;
       input.focus();
+      // The first time he is opened, Uncle says his greeting.
+      if (!greeted) {
+        greeted = true;
+        const greeting = log.querySelector(".assistant-message.is-on-stage")?.textContent;
+        if (greeting && !busy && voiceState === "ready") revealTimed(greeting);
+      }
     } else {
       bubble.focus();
+      if (panel.hidden) return;
+      if (reducedMotion.matches) {
+        panel.hidden = true;
+      } else {
+        panel.classList.add("is-closing");
+        closeTimer = setTimeout(() => {
+          panel.hidden = true;
+          panel.classList.remove("is-closing");
+        }, 220);
+      }
     }
   }
 
@@ -329,6 +380,11 @@
     debug("sending message", { inputMode, characters: text.length, page: PAGE });
 
     addMessage("user", text);
+    const fromCard = askedFromCard;
+    askedFromCard = false;
+    stagePose = null;
+    finishReveal();
+    showThinking();
     setBusy(true, "Thinking…");
 
     try {
@@ -343,16 +399,19 @@
       addMessage("assistant", response.reply);
       if (response.sources?.length) addSources(response.sources);
       if (response.proposal) addConfirmCard(response.proposal);
+      stagePose = poseForReply(response, fromCard);
       if (response.guide?.length && window.chickyGuide) {
         // The tour reads its own steps aloud.
+        showSaying(response.reply);
         setOpen(false);
         window.chickyGuide.start(response.guide);
       } else {
-        speak(response.reply);
+        sayReply(response.reply);
       }
     } catch (error) {
       warn("message failed:", error.status, error.code, error.message);
       addMessage("error", errorMessage(error));
+      showSaying(errorMessage(error));
       if (error.code === "DAILY_LIMIT") markMessagesUsedUp();
     } finally {
       setBusy(false, "");
@@ -372,7 +431,7 @@
   // talking. Called whenever one of those changes; the text in .assistant-status is unchanged.
   function updateVoiceState() {
     const playing = currentAudio && !currentAudio.paused && !currentAudio.ended;
-    setVoiceState(recorder ? "listening" : busy || pendingSpeech !== null ? "thinking" : playing ? "speaking" : "ready");
+    setVoiceState(recorder ? "listening" : busy || pendingSpeech !== null ? "thinking" : playing || revealing ? "speaking" : "ready");
   }
 
   function setVoiceState(next) {
@@ -382,6 +441,8 @@
       node.dataset.voiceState = next;
       showFace(node, next);
     });
+    if (next !== "speaking" && next !== "listening") setVoiceLevel(0);
+    updateStage();
     debug("voice state", next);
     voiceListeners.forEach(callback => {
       try {
@@ -395,7 +456,7 @@
   // Fetches the three state pictures once the page is idle, so the first change of state doesn't flash.
   function preloadVoicePictures() {
     const later = window.requestIdleCallback || (callback => setTimeout(callback, 2000));
-    later(() => VOICE_STATES.filter(state => state !== "ready").forEach(state => {
+    later(() => [...VOICE_STATES.filter(state => state !== "ready"), "pointing", "presenting"].forEach(state => {
       new Image().src = `${UNCLE_IMAGES}${state}.webp`;
     }));
   }
@@ -414,7 +475,7 @@
 
   // Reads text aloud, resolving to whether it played. Optional: the text is always shown, so failures
   // (no audio support, autoplay blocked after moving page) are ignored.
-  async function speak(text, { evenIfMuted = false } = {}) {
+  async function speak(text, { evenIfMuted = false, reveal = false } = {}) {
     stopSpeaking();
     const request = speechRequest;
     const silenced = () => muted && !evenIfMuted;
@@ -443,10 +504,18 @@
       currentAudio = new Audio(url);
       currentAudio.addEventListener("ended", () => URL.revokeObjectURL(url));
       ["playing", "pause", "ended"].forEach(type => currentAudio.addEventListener(type, updateVoiceState));
+      const talk = await talkWith(currentAudio, reveal ? text : null);
+      if (request !== speechRequest) {
+        talk?.();
+        return false;
+      }
+      stageTalk = talk;
       await currentAudio.play();
       debug("playing speech", { bytes: audio.size, type: audio.type });
       return true;
     } catch (error) {
+      stageTalk?.();
+      stageTalk = null;
       // Text only. NotAllowedError means the browser blocked playback without a recent tap.
       warn("speech failed:", error.name, error.status ?? "", error.code ?? "", error.message);
       // Today's spoken replies are used up. Say so once; replies already heard today (cached on
@@ -468,6 +537,9 @@
     pendingSpeech = null;
     currentAudio?.pause();
     currentAudio = null;
+    stageTalk?.();
+    stageTalk = null;
+    finishReveal();
     updateVoiceState();
   }
 
@@ -626,6 +698,7 @@
       analyser.getFloatTimeDomainData(samples);
       const level = Math.sqrt(samples.reduce((total, sample) => total + sample * sample, 0) / samples.length);
       loudest = Math.max(loudest, level);
+      setVoiceLevel(level * 12);
 
       if (level > SPEECH_LEVEL) {
         if (!heardSpeech) debug("speech detected, level", level.toFixed(3));
@@ -1035,12 +1108,195 @@
   }
 
   function closeCard(card, message) {
+    if (stagePose === "pointing") {
+      stagePose = null;
+      updateStage();
+    }
     setCardEnabled(card, false);
     card.querySelector(".assistant-card-actions").remove();
     card.querySelectorAll(".assistant-remove").forEach(button => button.remove());
     const note = element("p", "assistant-card-note");
     note.textContent = message;
     card.append(note);
+  }
+
+  // ---- Uncle's stage (issue #37) ----
+
+  // Points at a confirm card; presents an answer from an Ask card, from documents, or with figures in it.
+  function poseForReply(response, fromCard) {
+    if (response.proposal) return "pointing";
+    const figures = /\d/.test(response.reply) && /portion|forecast|revenue|sold|sales|week|expect|\$/i.test(response.reply);
+    return fromCard || response.sources?.length || figures ? "presenting" : null;
+  }
+
+  // His picture: the voice state's, or at rest the pose the last reply asked for. A change of picture is a
+  // little hop (CSS; none with reduced motion).
+  function updateStage() {
+    const pose = voiceState === "ready" ? stagePose || "ready" : voiceState;
+    panel.dataset.stagePose = pose;
+    if (pose === shownPose) return;
+    shownPose = pose;
+    unclePose.src = `${UNCLE_IMAGES}${pose}.webp`;
+    if (!reducedMotion.matches) {
+      uncleBody.classList.remove("is-hopping");
+      void uncleBody.offsetWidth;
+      uncleBody.classList.add("is-hopping");
+    }
+    if (voiceState !== "speaking") setMouth(true);
+  }
+
+  // Mouth open shows speaking.webp; shut lays ready.webp over it (they share one canvas).
+  function setMouth(open) {
+    panel.classList.toggle("is-mouth-shut", !open);
+  }
+
+  // How loud Uncle (or the user, while listening) is, 0–1, for the glow. Still with reduced motion.
+  function setVoiceLevel(level) {
+    if (reducedMotion.matches) return;
+    panel.style.setProperty("--voice-level", Math.min(1, Math.max(0, level)).toFixed(2));
+  }
+
+  function showSaying(text) {
+    finishReveal();
+    sayBox.classList.remove("is-thinking");
+    sayText.textContent = text;
+  }
+
+  function showThinking() {
+    sayBox.classList.add("is-thinking");
+    sayText.textContent = "";
+  }
+
+  // A reply: read aloud when voice is on, the words appearing in step with the audio; otherwise revealed word
+  // by word with his mouth flapping. With reduced motion the whole reply appears at once.
+  function sayReply(text) {
+    sayBox.classList.remove("is-thinking");
+    if (muted || !status.voice) {
+      revealTimed(text);
+      return;
+    }
+    showThinking();
+    speak(text, { reveal: true }).then(played => {
+      if (!played) revealTimed(text);
+    });
+  }
+
+  // Word by word, with the mouth open for each word and shut between them.
+  function revealTimed(text) {
+    stopReveal();
+    sayBox.classList.remove("is-thinking");
+    if (reducedMotion.matches || !text) {
+      sayText.textContent = text;
+      return;
+    }
+    const words = text.split(/(\s+)/);
+    let shown = 0;
+    let timer = 0;
+    revealing = true;
+    updateVoiceState();
+    const step = () => {
+      if (shown >= words.length) {
+        finishReveal();
+        return;
+      }
+      const word = words[shown];
+      shown += 2;
+      sayText.textContent = words.slice(0, shown).join("");
+      sayText.scrollTop = sayText.scrollHeight;
+      const length = Math.min(260, Math.max(110, 50 + word.length * 32));
+      setMouth(true);
+      setVoiceLevel(0.55 + Math.random() * 0.35);
+      timer = setTimeout(() => {
+        setMouth(false);
+        setVoiceLevel(0.2);
+        timer = setTimeout(step, length * 0.4);
+      }, length * 0.6);
+    };
+    stopReveal = () => {
+      clearTimeout(timer);
+      stopReveal = () => {};
+    };
+    finishReveal = () => {
+      stopReveal();
+      sayText.textContent = text;
+      revealing = false;
+      setMouth(true);
+      setVoiceLevel(0);
+      updateVoiceState();
+      finishReveal = () => {};
+    };
+    step();
+  }
+  let stopReveal = () => {};
+  let finishReveal = () => {};
+
+  // While audio plays: the glow and the mouth follow its loudness through an AnalyserNode, and the words of the
+  // pending reply appear in step with the playback. If the browser won't run the audio context (it can start
+  // suspended), the mouth flaps on a timer instead, so the audio is never routed through a silent graph.
+  // Returns a function that stops it.
+  async function talkWith(audio, text) {
+    const words = text ? text.split(/(\s+)/) : null;
+    if (reducedMotion.matches) {
+      if (text) showSaying(text);
+      return null;
+    }
+    if (text) {
+      sayBox.classList.remove("is-thinking");
+      sayText.textContent = "";
+    }
+    let analyser = null;
+    try {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      talkContext ??= new Context();
+      if (talkContext.state !== "running") {
+        await Promise.race([talkContext.resume(), new Promise(resolve => setTimeout(resolve, 300))]);
+      }
+      if (talkContext.state === "running") {
+        analyser = talkContext.createAnalyser();
+        analyser.fftSize = 1024;
+        const source = talkContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(talkContext.destination);
+      }
+    } catch (error) {
+      warn("talking animation without the analyser:", error.name, error.message);
+      analyser = null;
+    }
+    debug("talking with", analyser ? "the analyser" : "a timer");
+    const samples = analyser ? new Float32Array(analyser.fftSize) : null;
+    let open = false;
+    let frame = 0;
+    let flipAt = 0;
+    const tick = now => {
+      let loudness;
+      if (analyser) {
+        analyser.getFloatTimeDomainData(samples);
+        loudness = Math.sqrt(samples.reduce((total, sample) => total + sample * sample, 0) / samples.length);
+        // Open above one level and shut below a lower one, so it flaps rather than flickers.
+        open = open ? loudness > 0.02 : loudness > 0.04;
+        setVoiceLevel(loudness * 6);
+      } else if (!audio.paused && now >= flipAt) {
+        open = !open;
+        flipAt = now + (open ? 120 + Math.random() * 90 : 70 + Math.random() * 60);
+        setVoiceLevel(open ? 0.7 : 0.25);
+      }
+      setMouth(audio.paused || open);
+      if (words && audio.duration > 0) {
+        const count = Math.ceil((audio.currentTime / audio.duration) * words.length);
+        sayText.textContent = words.slice(0, count).join("");
+        sayText.scrollTop = sayText.scrollHeight;
+      }
+      if (!audio.ended) frame = requestAnimationFrame(tick);
+      else stop();
+    };
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      if (text) sayText.textContent = text;
+      setMouth(true);
+      setVoiceLevel(0);
+    };
+    frame = requestAnimationFrame(tick);
+    return stop;
   }
 
   // ---- Helpers ----
@@ -1054,9 +1310,15 @@
     console.warn("[assistant]", ...details);
   }
 
+  // Uncle's latest line is the one on stage: it stays in the log for screen readers (read once, whole) but is
+  // only seen in the speech bubble; earlier lines show in the log as history.
   function addMessage(kind, text) {
     const message = element("p", `assistant-message ${kind}`);
     message.textContent = text;
+    if (kind === "assistant") {
+      log.querySelectorAll(".is-on-stage").forEach(line => line.classList.remove("is-on-stage"));
+      message.classList.add("is-on-stage");
+    }
     log.append(message);
     log.scrollTop = log.scrollHeight;
   }
