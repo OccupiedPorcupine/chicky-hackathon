@@ -459,6 +459,23 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 
 .empty-state { padding: 40px 4px; color: var(--muted); text-align: center; }
 
+/* Empty, loading and error states with Chicky (js/motion.js, chickyState): a picture, one sentence, an optional
+   action. "compact" sits inside a card, "large" fills a page, "inline" sits beside other content (a card's note).
+   The picture is decorative; the sentence carries the message. Nothing moves. */
+.state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px 12px; text-align: center; }
+.state-art { flex: none; width: 96px; height: 96px; object-fit: contain; }
+.state-message { max-width: 42ch; color: var(--muted); font-size: var(--text-sm); line-height: 1.5; }
+.state-action { margin-top: 4px; }
+.state.is-large { gap: 12px; padding: 48px 16px; }
+.state.is-large .state-art { width: 160px; height: 160px; }
+.state.is-large .state-message { color: var(--ink); font-size: var(--text-md); }
+.state.is-inline { flex-direction: row; justify-content: flex-start; gap: 10px; padding: 4px 0; text-align: left; }
+.state.is-inline .state-art { width: 44px; height: 44px; }
+/* An error is said in the ink colour, not muted, so it isn't mistaken for a hint. */
+.state[data-state="oops"] .state-message { color: var(--ink); }
+/* Over a chart: the card keeps its height, so nothing jumps when the data arrives. */
+.state.is-cover { position: absolute; inset: 0; z-index: 1; background: var(--surface); }
+
 /* Moving between pages is instant: no cross-fade, slide or view transition (DESIGN.md, "Motion"). */
 
 /* ---- Motion and polish (DESIGN.md, "Motion") ----

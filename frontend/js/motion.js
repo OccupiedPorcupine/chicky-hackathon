@@ -18,7 +18,7 @@ const chickyMotion = (() => {
 
   const LOADING = /^\s*(Loading|Checking)\b/;
   function markLoading(root = document) {
-    root.querySelectorAll(".note, .status-text, .empty-state, .lede").forEach(element => {
+    root.querySelectorAll(".note, .status-text, .empty-state, .state-message, .lede").forEach(element => {
       element.classList.toggle("is-loading", LOADING.test(element.textContent));
     });
   }
@@ -233,4 +233,65 @@ const chickyMotion = (() => {
   window.addEventListener("pageshow", event => { if (event.persisted) start(); });
 
   return { leave };
+})();
+
+// Empty, loading and error states with Chicky (issue #13; DESIGN.md, "Feedback"). A state is a picture, one sentence
+// and an optional action, and the sentence is real text: the picture is decorative (alt="").
+//   chickyState.show(container, "empty", "No dishes yet.", { action: { label: "Add a dish", href: "dishes.html" } })
+//   chickyState.create("oops", "Revenue could not be loaded.", { size: "inline" })  → an element to place yourself
+//   chickyState.cover(chartElement, "empty", "No sales recorded yet.")  → over a chart, which keeps its height;
+//   chickyState.uncover(chartElement) when the data arrives. A cover needs a positioned parent (.graph .chart is).
+// Kinds: "empty" (nothing here yet), "cheer" (good news: nothing to do, nothing left over), "oops" (it couldn't be
+// loaded) and "cooking" (a whole card or page is loading; short "Loading…" text elsewhere stays text).
+// Sizes: "compact" inside a card (the default), "large" for a whole page, "inline" for a note beside other content.
+const chickyState = (() => {
+  const ART = { empty: "empty-egg", cheer: "empty-cheer", oops: "state-oops", cooking: "state-cooking" };
+  const PIXELS = { compact: 96, large: 160, inline: 44 };
+  // Pictures are found next to this script, so pages in subfolders (the style guide) work too.
+  const base = new URL("../images/brand/chicky/", document.currentScript?.src || location.href);
+
+  function create(kind, message, { size = "compact", action, tag = "div" } = {}) {
+    const state = document.createElement(tag);
+    state.className = `state is-${size}`;
+    state.dataset.state = kind;
+    const art = document.createElement("img");
+    art.className = "state-art";
+    art.src = new URL(`${ART[kind] || ART.empty}.webp`, base).href;
+    art.alt = "";
+    art.width = art.height = PIXELS[size] || PIXELS.compact;
+    art.decoding = "async";
+    const text = document.createElement(tag === "span" ? "span" : "p");   // a <span> state can sit inside a <p>
+    text.className = "state-message";
+    text.textContent = message;
+    state.append(art, text);
+    if (action) {
+      const button = document.createElement(action.href ? "a" : "button");
+      button.className = "secondary-button state-action";
+      button.textContent = action.label;
+      if (action.href) button.href = action.href;
+      else { button.type = "button"; button.addEventListener("click", action.onClick); }
+      state.append(button);
+    }
+    return state;
+  }
+
+  function show(container, kind, message, options) {
+    const state = create(kind, message, options);
+    container.replaceChildren(state);
+    return state;
+  }
+
+  function cover(element, kind, message, options) {
+    uncover(element);
+    const state = create(kind, message, options);
+    state.classList.add("is-cover");
+    element.append(state);
+    return state;
+  }
+
+  function uncover(element) {
+    element.querySelector(":scope > .state.is-cover")?.remove();
+  }
+
+  return { create, show, cover, uncover };
 })();
