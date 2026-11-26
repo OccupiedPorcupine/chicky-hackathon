@@ -189,12 +189,16 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 
 .account-menu { margin-left: 0; }
 .account-menu .menu-panel { top: 56px; right: 0; left: auto; width: min(280px, calc(100vw - 32px)); padding: 16px; }
-.avatar {
-  display: grid; place-items: center; width: 44px; height: 44px;
-  border-radius: 50%; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 70%, transparent);
+/* The avatar: the user's initials (js/app-shell.js) on a Yolk circle, or a person icon until they load. */
+.avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+.avatar-initials {
+  display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
+  background: var(--yolk); color: var(--ink); font: 700 17px/1 var(--font-display); letter-spacing: 0.02em;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) 18%, transparent);
   transition: box-shadow var(--duration-fast);
 }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar:hover .avatar-initials, .account-menu[open] .avatar-initials { box-shadow: inset 0 0 0 2px var(--ink); }
+.avatar-person { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .account-label { display: none; }
 .account-name { overflow-wrap: anywhere; }
 .account-email { margin-bottom: 12px; color: var(--muted); font-size: var(--text-sm); overflow-wrap: anywhere; }
@@ -542,9 +546,9 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     display: flex; align-items: center; justify-content: flex-start; border-radius: var(--radius-lg); overflow: visible;
     background: color-mix(in srgb, var(--surface) 55%, transparent); box-shadow: none;
   }
-  .app-shell .avatar:hover, .app-shell .account-menu[open] .avatar { background: color-mix(in srgb, var(--surface) 85%, transparent); }
-  .app-shell .avatar img { flex: none; width: 40px; height: 40px; border-radius: 50%; }
-  .app-shell .account-label { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-md); }
+  .app-shell .avatar:hover, .app-shell .account-menu[open] .avatar { background: var(--accent-tint); }
+  .app-shell .avatar-initials { flex: none; width: 40px; height: 40px; }
+  .app-shell .account-label { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-md); font-weight: 600; }
   .app-shell .account-menu .menu-panel { top: auto; bottom: calc(100% + 8px); left: 0; right: 0; width: auto; }
 
   .app-shell .page { grid-column: 2; grid-row: 1; padding: 40px 92px calc(104px + env(safe-area-inset-bottom)) 40px; gap: 28px; }
