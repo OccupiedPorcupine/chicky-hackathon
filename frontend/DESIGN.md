@@ -418,10 +418,22 @@ yolk-and-ink and outlined pills.
 panel closed, as in the tour or "Your week" Play). The state swaps Uncle's picture
 (`images/brand/uncle/<state>.webp`; the avatar at rest) and shows one decoration beside him, drawn in SVG: ink arcs
 while listening, a "…" thought bubble while thinking and coral sound bars while speaking. They animate only under
-`prefers-reduced-motion: no-preference`. The words stay in `.assistant-status` for screen readers. Anything else
-that shows Uncle follows the same state through `window.chickyAssistant.onVoiceState(callback)` (it gets the
-current state at once and each change after, and returns a function that stops it) or reads
-`window.chickyAssistant.voiceState`; don't work it out again.
+`prefers-reduced-motion: no-preference`. The words stay in `.assistant-status` for screen readers.
+
+**Uncle elsewhere.** Wherever the app talks or listens, Uncle is there in the same state:
+
+| Where | Uncle | Follows |
+| --- | --- | --- |
+| Dashboard voice box ("Tell Uncle your sales") | Round face, like the launcher | Always; its mic is `aria-pressed` while he listens |
+| "Your week" | Presenting (`presenting.webp`) | Only its own Play, until he is back to ready |
+| Forecast "Ask Uncle about this forecast" | Round face | Always |
+| Guided tour bubble | Pointing (`pointing.webp`) | While the tour runs, so the sound bars show as he reads a step |
+
+Each one calls `window.chickyAssistant.follow(element, { once })`: it sets the element's `data-voice-state`, swaps the
+picture in an `.assistant-face` inside it, and fills a `[data-voice-fx]` slot with the decorations. It returns a function
+that stops following. For anything else, `window.chickyAssistant.onVoiceState(callback)` (the current state at once,
+then each change; returns a function that stops it) and `window.chickyAssistant.voiceState` expose the state. Don't
+work it out again.
 
 The tour is the app's most animated surface; see [Motion](#motion).
 
@@ -563,8 +575,9 @@ wide in Safari, and `frontend/tests/phone-check.cjs` checks that the main flows 
   `env(safe-area-inset-*)`.
 - **Nothing pinned may cover a control at the bottom of the page.** The page's bottom padding keeps
   the last controls clear of the assistant button.
-- **Tables reflow.** Below 600px the assistant's confirm card puts each dish on its own line, with
-  its date, portions and remove button beneath, instead of squeezing four columns.
+- **Tables reflow.** Below 600px the assistant's confirm card puts each dish and its remove button
+  on one line, with the date and portions beneath, so the date shows the whole year, instead of
+  squeezing four columns.
 
 **Home-screen app.** `manifest.webmanifest`, the icons in `images/icons/` and the `apple-touch-icon`
 link let people add Chicky to their home screen, where it opens full screen. Every page links them;
