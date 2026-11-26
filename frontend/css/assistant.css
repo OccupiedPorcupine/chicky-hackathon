@@ -355,13 +355,15 @@
   .assistant-bubble { right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); }
   .assistant-panel { right: calc(16px + env(safe-area-inset-right)); bottom: calc(84px + env(safe-area-inset-bottom)); }
 
-  /* Too narrow for four columns: each entry puts the dish on its own line, with the date, portions
-     and remove button below it. The inputs keep their own labels ("Date for Chicken rice"). */
+  /* Too narrow for four columns: each entry puts the dish and its remove button on one line, with the
+     date and portions below, so the date gets the room to show the whole year (#29). The inputs keep
+     their own labels ("Date for Chicken rice"). */
   .assistant-entries thead { display: none; }
   .assistant-entries tr {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 88px auto;
-    grid-template-areas: "dish dish dish" "date portions remove";
+    grid-template-columns: minmax(0, 1fr) 80px;
+    grid-template-areas: "dish remove" "date portions";
+    align-items: start;
     gap: 6px 8px;
     padding: 10px 0;
     border-top: 1px solid var(--divider);
@@ -374,7 +376,7 @@
   .assistant-entries td:nth-child(2) { grid-area: dish; font-weight: 600; }
   .assistant-entries td:nth-child(2) :is(.assistant-heard, .assistant-tag) { font-weight: 400; }
   .assistant-entries td:nth-child(3) { grid-area: portions; }
-  .assistant-entries td:nth-child(4) { grid-area: remove; }
+  .assistant-entries td:nth-child(4) { grid-area: remove; justify-self: end; }
 }
 
 /* Touch screens: 44px tap targets, and 16px text in fields so iOS doesn't zoom in (see base.css). */
