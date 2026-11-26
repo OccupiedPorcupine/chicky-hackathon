@@ -129,6 +129,8 @@
 .ranked li { margin-inline: -8px; padding-inline: 8px; border-radius: var(--radius-sm); transition: background-color var(--duration-fast); }
 @media (hover: hover) and (pointer: fine) { .ranked li:hover { background: var(--accent-tint); } }
 .ranked li span:last-child { margin-left: auto; color: var(--muted); font-size: var(--text-sm); text-align: right; }
+/* When a dish sold out is worth acting on: the warning colour (coral-strong, 5.9:1 on Shell, 5.3:1 on the hover tint). */
+#sold-out-dishes li span:last-child { color: var(--warning); }
 .money .ranked + .note { margin-top: 10px; }
 
 /* ---- Revenue by day: 53 weeks of columns, Monday to Sunday down each column, like GitHub ---- */
