@@ -1,0 +1,188 @@
+{
+  "png_masters": 21,
+  "webp_exports": 20,
+  "webp_limit_bytes": 80000,
+  "largest_webp_bytes": 44622,
+  "exports": [
+    {
+      "path": "frontend/images/brand/uncle/ready.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 26310,
+      "sha256": "2378a6e5b6cab74c6aca8e87c2a8756898986bfae681f8fc0f34d43276b11800"
+    },
+    {
+      "path": "frontend/images/brand/uncle/listening.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 26546,
+      "sha256": "71cc0fc5db76bc80040fdd3cf88e80bb37d11bfa3d83937b053b47361c637f75"
+    },
+    {
+      "path": "frontend/images/brand/uncle/speaking.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 26444,
+      "sha256": "24c53c9b9050ce0eed28dbb080db5784368a9cfb5a8e7f9e444d17dd4baa8857"
+    },
+    {
+      "path": "frontend/images/brand/uncle/thinking.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 27698,
+      "sha256": "edf6201c79ad7c824438a34bc8803a472db780dee76ec2c2012a3f3a4f5ffcdd"
+    },
+    {
+      "path": "frontend/images/brand/chicky/front.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 25712,
+      "sha256": "02cad74041e842ca22c29466c7984ceb831fe221761356757372b0ff6d1218e5"
+    },
+    {
+      "path": "frontend/images/brand/chicky/three-quarter.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 25722,
+      "sha256": "d8ea760b0ef9cc4c23d3ba67f811d2bb5777ff842f9cd53e35f6100716d19a88"
+    },
+    {
+      "path": "frontend/images/brand/chicky/side.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 21624,
+      "sha256": "ee9d747e2def978c511f4947bada747371555822b631fa7eebd922247e9ce4a9"
+    },
+    {
+      "path": "frontend/images/brand/chicky/spot-receipt.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 27698,
+      "sha256": "889bf33c77a6c4e29d19130fdafb04ac66ced40aa4b0c9a413adc61c5208712e"
+    },
+    {
+      "path": "frontend/images/brand/chicky/spot-prep.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 36328,
+      "sha256": "617fe4af8fc7ccfe2b70cd1595648b0bd79ff155b11707657cc86ae796a7f143"
+    },
+    {
+      "path": "frontend/images/brand/chicky/duo-wave.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 44622,
+      "sha256": "096657d9d0a47bf82b14f9e237358dce4bfc61cdecf09414d818f6cdba9dd67f"
+    },
+    {
+      "path": "frontend/images/brand/chicky/empty-egg.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 24492,
+      "sha256": "785188897b83ada5c314669b390b50ce413de36b4fa5a40dd4a2c945a91bb62f"
+    },
+    {
+      "path": "frontend/images/brand/chicky/empty-cheer.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 30870,
+      "sha256": "1ed089884f0bb23c236b635f0abefcb87ead36291980ad71515c8446daa3c598"
+    },
+    {
+      "path": "frontend/images/brand/chicky/state-oops.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 28862,
+      "sha256": "24e8843574022186fd5da88cda446d04ca64f4074003ebd66b9a49eec87682e9"
+    },
+    {
+      "path": "frontend/images/brand/chicky/state-cooking.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 30658,
+      "sha256": "f19bf29a4c04da7c8c02bb02238dcd2fb7dba5f28c6f8d130a7f43076660b336"
+    },
+    {
+      "path": "frontend/images/brand/uncle/avatar.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 32128,
+      "sha256": "012136f1241a90c8c595015900f0272400fca52dd61a23735636dfdb8525117b"
+    },
+    {
+      "path": "frontend/images/brand/uncle/avatar-64.webp",
+      "dimensions": [
+        64,
+        64
+      ],
+      "bytes": 2650,
+      "sha256": "f208a4fb8e6bdc283d718fa848f748696dca7e7d3d39559af7c29c1441537cf3"
+    },
+    {
+      "path": "frontend/images/brand/uncle/front.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 31142,
+      "sha256": "631bacabee6b3aebe5aef96c6638b133c51a7dd0a70bc81d786f37a96dd04595"
+    },
+    {
+      "path": "frontend/images/brand/uncle/three-quarter.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 31388,
+      "sha256": "4073e2f225615a5bb61faef8cbd9e3b4bf199d8c077838620ea81c5bc82431c5"
+    },
+    {
+      "path": "frontend/images/brand/uncle/presenting.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 34774,
+      "sha256": "866cbc9527d68ca022cab47d90b152366b09a600fa0f6823faca8c26061f7c56"
+    },
+    {
+      "path": "frontend/images/brand/uncle/pointing.webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 33008,
+      "sha256": "3c6d17520dbeeec03822daf0cd4e41a01031cdfb72c555fb3df9c2c1d9b410e6"
+    }
+  ]
+}

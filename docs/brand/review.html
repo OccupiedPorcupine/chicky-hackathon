@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chicky character art review</title>
+<style>
+  :root{--ink:#103f40;--cream:#fff4dd;--shell:#fffdf5;--coral:#f26350;--yolk:#ffc629}
+  *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+  main{max-width:1200px;margin:auto;padding:32px 24px 64px}h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:0 0 16px}h2{margin:32px 0 16px;font-size:24px}
+  .eyebrow{font-weight:800;letter-spacing:.1em;font-size:12px}.intro{max-width:760px}.reference{width:min(100%,600px);height:auto;display:block;border:1px solid var(--ink);border-radius:16px}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}button{border:1px solid var(--ink);background:var(--shell);color:var(--ink);font:inherit;min-height:44px;padding:8px 16px;border-radius:24px;cursor:pointer}button[aria-pressed=true]{background:var(--ink);color:var(--shell)}button:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.grid.poses{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}figure{margin:0;border:1px solid var(--ink);border-radius:16px;padding:12px;background:var(--surface,var(--cream));overflow:hidden}figure img{width:100%;height:auto;aspect-ratio:1;object-fit:contain;display:block}figcaption{font:13px/1.4 ui-monospace,monospace;overflow-wrap:anywhere;margin-top:8px}a{color:var(--ink)}.surface-shell{--surface:var(--shell)}.surface-ink{--surface:var(--ink)}.surface-ink figcaption a{color:var(--shell)}.swap{width:256px;max-width:100%;display:block}.small{font-size:14px}#before-view{display:none}body.before #after-view{display:none}body.before #before-view{display:block}
+  @media(max-width:600px){main{padding:24px 16px 48px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid.poses{grid-template-columns:repeat(2,minmax(0,1fr))}figure{padding:8px}figcaption{font-size:11px}}
+</style>
+<main>
+  <p class="eyebrow">CHICKY / HUAT TOMORROW</p>
+  <h1>Character art, ready for the app.</h1>
+  <p class="intro">Chicky is the brand mascot. Uncle is the voice assistant. Review the same transparent artwork on Cream, Shell and Ink, and switch Uncle's expressions in one fixed frame.</p>
+  <section id="before-view"><h2>Before: original combined reference</h2><img class="reference" src="asset-sheet.png" width="1536" height="1024" alt="Original Chicky and Uncle brand sheet"><p>No individual character exports were present at these paths.</p></section>
+  <div id="after-view">
+    <div class="controls" aria-label="Review background"><button data-surface="cream" aria-pressed="true">Cream</button><button data-surface="shell" aria-pressed="false">Shell</button><button data-surface="ink" aria-pressed="false">Ink edge check</button></div>
+    <h2>Uncle's four voice states</h2><p class="small">Identical canvas, alpha silhouette, hair and outer shoulder pixels. No decorations; the app can draw its own.</p>
+    <div class="grid" id="states"></div>
+    <h2>Switch in place</h2><figure style="max-width:300px"><img id="voice" class="swap" src="../../frontend/images/brand/uncle/ready.webp" width="512" height="512" alt="Uncle in ready state"><figcaption id="current">ready</figcaption></figure>
+    <div class="controls" id="voice-controls" aria-label="Voice expression"></div>
+    <h2>Chicky</h2><div class="grid poses" id="chicky"></div>
+    <h2>Uncle</h2><div class="grid poses" id="uncle"></div>
+    <h2>Logo source art for #7</h2><div class="grid poses" id="logo"></div>
+    <h2>Original brand reference</h2><img class="reference" src="asset-sheet.png" width="1536" height="1024" alt="Original brand asset sheet">
+    <p><a href="contact-sheet.png">Cream contact sheet</a> · <a href="contact-sheet-shell.png">Shell contact sheet</a> · <a href="review/voice-alignment.png">50% voice overlays</a> · <a href="PROMPTS.md">Exact prompts</a></p>
+  </div>
+</main>
+<script>
+const params=new URLSearchParams(location.search); if(params.has('before')) document.body.classList.add('before');
+const states=['ready','listening','speaking','thinking'];
+function card(parent,group,name,source=false){const figure=document.createElement('figure');const image=document.createElement('img');image.src=source?`source/${group}/${name}.png`:`../../frontend/images/brand/${group}/${name}.webp`;image.width=512;image.height=512;image.alt='';const caption=document.createElement('figcaption');const link=document.createElement('a');link.href=`source/${group}/${name}.png`;link.textContent=`${group}/${name}.png`;caption.append(link);figure.append(image,caption);document.getElementById(parent).append(figure)}
+states.forEach(name=>{card('states','uncle',name);const b=document.createElement('button');b.textContent=name;b.setAttribute('aria-pressed',String(name==='ready'));b.onclick=()=>{document.getElementById('voice').src=`../../frontend/images/brand/uncle/${name}.webp`;document.getElementById('voice').alt=`Uncle in ${name} state`;document.getElementById('current').textContent=name;document.querySelectorAll('#voice-controls button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};document.getElementById('voice-controls').append(b)});
+['front','three-quarter','side','spot-receipt','spot-prep','duo-wave','empty-egg','empty-cheer','state-oops','state-cooking'].forEach(n=>card('chicky','chicky',n));
+['avatar','front','three-quarter','presenting','pointing'].forEach(n=>card('uncle','uncle',n));
+card('logo','chicky','head',true);card('logo','logo','wordmark',true);
+document.querySelectorAll('[data-surface]').forEach(b=>b.onclick=()=>{document.body.classList.remove('surface-shell','surface-ink');if(b.dataset.surface!=='cream')document.body.classList.add(`surface-${b.dataset.surface}`);document.querySelectorAll('[data-surface]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
+</script>
+</html>

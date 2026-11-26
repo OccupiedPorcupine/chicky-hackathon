@@ -1,0 +1,30 @@
+[
+  {
+    "width": 1280,
+    "before": true,
+    "missingImages": 0,
+    "horizontalOverflow": false,
+    "screenshot": "before-1280.png"
+  },
+  {
+    "width": 1280,
+    "before": false,
+    "missingImages": 0,
+    "horizontalOverflow": false,
+    "screenshot": "after-1280.png"
+  },
+  {
+    "width": 360,
+    "before": true,
+    "missingImages": 0,
+    "horizontalOverflow": false,
+    "screenshot": "before-360.png"
+  },
+  {
+    "width": 360,
+    "before": false,
+    "missingImages": 0,
+    "horizontalOverflow": false,
+    "screenshot": "after-360.png"
+  }
+]
