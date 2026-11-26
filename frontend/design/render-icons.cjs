@@ -1,4 +1,5 @@
-// Builds the favicon and home-screen icons in frontend/images/icons/ from the logo in images/brand/.
+// Builds the favicon and home-screen icons in frontend/images/icons/ from the logo in images/brand/,
+// and the link preview, images/brand/og-card.png, from design/og-card.html.
 // Run from the repo root after changing a logo SVG (Playwright as in capture-screenshots.cjs):
 //   PW=/tmp/chicky-pw/node_modules/playwright node frontend/design/render-icons.cjs
 //
@@ -43,6 +44,12 @@ const outputs = [
     await page.screenshot({ path: path.join(icons, file), omitBackground: transparent });
     console.log(file, size);
   }
+  // The link preview (og:image): Chicky and the wordmark on Cream, from design/og-card.html.
+  await page.setViewportSize({ width: 1200, height: 630 });
+  await page.goto("file://" + path.join(__dirname, "og-card.html"));
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: path.join(brand, "og-card.png") });
+  console.log("og-card.png", "1200x630");
   await browser.close();
 })().catch(error => {
   console.error(error);
