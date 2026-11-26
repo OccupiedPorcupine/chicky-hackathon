@@ -280,9 +280,14 @@ function isClosed(isoDate, { restDays, closedDates }) {
 
 // Nothing to chart: Chicky over each chart (they keep their height), with the way forward on the first one.
 function showEmpty(message, kind = "empty", action) {
-  document.getElementById("waste-note").textContent = "";
-  document.getElementById("sold-out-note").textContent = kind === "empty" ? "Sell-outs you record appear here." : "";
-  if (kind === "empty") noteState("waste-note", "empty", "Record leftovers and sell-outs to see them here.");
+  // Leftovers and Sold out never load in this case, so each says why it is empty rather than staying blank.
+  if (kind === "oops") {
+    noteState("waste-note", "oops", "Leftovers couldn’t be loaded.");
+    noteState("sold-out-note", "oops", "Sell-outs couldn’t be loaded.");
+  } else {
+    noteState("waste-note", "empty", "Record leftovers to see them here.");
+    noteState("sold-out-note", "empty", "Sell-outs you record appear here.");
+  }
   ["demand-note", "dish-note", "revenue-note"].forEach(id => { document.getElementById(id).textContent = ""; });
   chickyState.cover(document.querySelector("#demand-chart").closest(".chart"), kind, message, { action });
   chickyState.cover(document.querySelector("#dish-chart").closest(".chart"), kind, message);
