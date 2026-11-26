@@ -820,6 +820,7 @@
         if (savedClosures.length) parts.push(`${savedClosures.length} ${savedClosures.length === 1 ? "opening day" : "opening days"}`);
         closeCard(card, `Saved ${parts.join(" and ")}.`);
         window.dispatchEvent(new CustomEvent("chicky:sales-saved", { detail: result.saved }));
+        celebrate();
         if (savedClosures.length) {
           window.dispatchEvent(new CustomEvent("chicky:closures-saved", { detail: savedClosures }));
         }
@@ -893,6 +894,7 @@
         const saved = result.priceChange;
         closeCard(card, `Saved: ${saved.dishName} is ${money.format(Number(saved.price))} from ${when}.`);
         window.dispatchEvent(new CustomEvent("chicky:prices-saved", { detail: saved }));
+        celebrate();
       } catch (error) {
         addMessage("error", errorMessage(error));
         if (error.status === 409 || error.status === 404) {
@@ -975,6 +977,7 @@
         link.textContent = result.note.title;
         saved.append(link, ".");
         window.dispatchEvent(new CustomEvent("chicky:documents-saved", { detail: result.note }));
+        celebrate();
       } catch (error) {
         addMessage("error", errorMessage(error));
         if (error.status === 409 || error.status === 404) {
@@ -1143,6 +1146,27 @@
       uncleBody.classList.add("is-hopping");
     }
     if (voiceState !== "speaking") setMouth(true);
+  }
+
+  // Saved: Uncle hops and a little burst of Yolk and Coral pops off his counter. Nothing with reduced motion.
+  function celebrate() {
+    if (reducedMotion.matches || panel.hidden) return;
+    uncleBody.classList.remove("is-hopping");
+    void uncleBody.offsetWidth;
+    uncleBody.classList.add("is-hopping");
+    const burst = element("div", "assistant-confetti", { "aria-hidden": "true" });
+    for (let i = 0; i < 14; i++) {
+      const bit = element("span");
+      const angle = (-165 + Math.random() * 150) * Math.PI / 180;
+      const distance = 70 + Math.random() * 80;
+      bit.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+      bit.style.setProperty("--dy", `${Math.sin(angle) * distance}px`);
+      bit.style.setProperty("--spin", `${Math.round(Math.random() * 540 - 270)}deg`);
+      bit.style.animationDelay = `${Math.round(Math.random() * 80)}ms`;
+      burst.append(bit);
+    }
+    panel.append(burst);
+    setTimeout(() => burst.remove(), 1300);
   }
 
   // Mouth open shows speaking.webp; shut lays ready.webp over it (they share one canvas).

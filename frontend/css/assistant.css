@@ -258,6 +258,32 @@
 }
 @keyframes say-dots { 50% { opacity: 0.35; } }
 
+/* A saved confirm card: a little burst of Yolk and Coral off Uncle's counter (js/assistant.js, celebrate). */
+.assistant-confetti {
+  position: absolute;
+  top: calc(var(--uncle) * 0.12);
+  left: calc(var(--uncle) * 0.62);
+  z-index: 3;
+  pointer-events: none;
+}
+.assistant-confetti span {
+  position: absolute;
+  width: 10px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--yolk);
+  opacity: 0;
+  animation: confetti-pop 1.1s var(--ease-out) both;
+}
+.assistant-confetti span:nth-child(3n) { background: var(--coral); }
+.assistant-confetti span:nth-child(3n + 1) { width: 8px; height: 8px; border-radius: 50%; }
+.assistant-confetti span:nth-child(4n) { background: var(--accent); }
+@keyframes confetti-pop {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(var(--spin)); }
+}
+
 .assistant-sound {
   display: grid;
   place-items: center;
