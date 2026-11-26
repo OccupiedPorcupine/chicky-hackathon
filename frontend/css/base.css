@@ -37,8 +37,11 @@
   --heat-2: #479589;
   --heat-3: #226e66;
   --heat-4: var(--ink);
-  --header-gradient: linear-gradient(90deg, var(--yolk-soft) 0%, var(--yolk-tint) 55%, var(--cream) 100%);
-  --sidebar-gradient: linear-gradient(180deg, var(--yolk-soft) 0%, var(--yolk-tint) 52%, var(--cream) 100%);
+  /* The app shell (#8): the sidebar and the phone's top bar are Shell panels with ink text, like the sheet's panels on
+     its Cream page. The current page is a Yolk pill with ink text (7.4:1). */
+  --sidebar: var(--shell);
+  --sidebar-line: var(--card-line);
+  --nav-current: var(--yolk);
   /* A soft wash behind a page's opening panel (the dashboard's hero, the sign-in picture). */
   --wash-gradient: linear-gradient(135deg, var(--yolk-tint) 0%, var(--shell) 55%, var(--sand-soft) 100%);
   --sand: #f7e3bc;           /* warm sand, the base of --sand-soft and --sand-line */
@@ -142,7 +145,7 @@ html.lenis, html.lenis body { height: auto; }
   position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; gap: 8px; min-height: 64px;
   padding: max(12px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 12px max(24px, env(safe-area-inset-left));
-  background: var(--header-gradient);
+  background: var(--sidebar); border-bottom: 1px solid var(--sidebar-line);
 }
 .topbar :focus-visible { outline-color: var(--ink); }
 /* The brand link is the logo lockup (images/brand/logo-lockup.svg); its alt text, "Chicky", names the link. */
@@ -163,12 +166,13 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 
 .navigation summary {
   display: flex; align-items: center; gap: 8px; width: auto; height: 44px; padding: 0 14px 0 12px;
-  border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface) 55%, transparent);
+  border: 1px solid var(--sidebar-line); border-radius: var(--radius-pill); background: var(--page); color: var(--ink);
   transition: background var(--duration-fast);
 }
-.navigation summary:hover { background: color-mix(in srgb, var(--surface) 80%, transparent); }
+.navigation summary:hover { background: var(--accent-tint); }
+.navigation[open] > summary { background: var(--accent-soft); }
 .navigation summary .nav-icon { width: 22px; height: 22px; }
-.menu-label { font-size: var(--text-md); }
+.menu-label { font-size: var(--text-md); font-weight: 600; }
 .navigation .menu-panel {
   position: fixed; top: calc(max(12px, env(safe-area-inset-top)) + 56px); left: 12px; right: 12px; width: auto;
   display: grid; gap: 4px; padding: 10px; box-shadow: var(--shadow-float);
@@ -176,16 +180,13 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 }
 .navigation a {
   position: relative; display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 0 14px;
-  border-radius: var(--radius-lg); color: var(--ink); font-size: 17px; text-decoration: none;
+  border-radius: var(--radius-pill); color: var(--ink); font-size: 17px; font-weight: 600; text-decoration: none;
   transition: background-color var(--duration-fast), color var(--duration-fast);
 }
 .navigation a:hover:not([aria-current="page"]) { background: var(--accent-tint); }
-.navigation a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-hover); }
-.navigation a[aria-current="page"]::before {
-  content: ""; position: absolute; left: 0; top: 50%; width: 4px; height: 24px; border-radius: 0 4px 4px 0;
-  background: var(--accent-strong); transform: translateY(-50%);
-}
-.nav-icon { flex: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.navigation a[aria-current="page"] { background: var(--nav-current); color: var(--ink); }
+/* 2px strokes sit with Nunito 600 and the logo's rounded outline; 1.7 looked thin beside them. */
+.nav-icon { flex: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 .account-menu { margin-left: 0; }
 .account-menu .menu-panel { top: 56px; right: 0; left: auto; width: min(280px, calc(100vw - 32px)); padding: 16px; }
@@ -524,8 +525,8 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     position: sticky; top: 0; height: 100vh; height: 100dvh;
     flex-direction: column; align-items: stretch; gap: 6px; min-height: 0;
     padding: max(20px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-    background: var(--sidebar-gradient); animation: none;
-    border-right: 1px solid rgb(16 63 64 / 9%);
+    background: var(--sidebar); animation: none;
+    border-bottom: 0; border-right: 1px solid var(--sidebar-line);
   }
   .app-shell .brand { margin: 0 0 14px; padding: 4px 6px; }
   .app-shell .brand-logo { height: 52px; }
@@ -537,14 +538,12 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     border: 0; border-radius: 0; background: transparent; box-shadow: none; animation: none;
   }
   .app-shell .navigation a { min-height: 48px; }
-  .app-shell .navigation a:hover:not([aria-current="page"]) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
-  .app-shell .navigation a[aria-current="page"] { background: var(--surface); box-shadow: 0 1px 2px rgb(16 63 64 / 10%), 0 4px 14px rgb(16 63 64 / 10%); }
 
   .app-shell .account-menu { margin-top: auto; }
   .app-shell .avatar {
-    width: 100%; height: auto; padding: 10px 12px; gap: 12px;
-    display: flex; align-items: center; justify-content: flex-start; border-radius: var(--radius-lg); overflow: visible;
-    background: color-mix(in srgb, var(--surface) 55%, transparent); box-shadow: none;
+    width: 100%; height: auto; padding: 8px 12px 8px 8px; gap: 12px;
+    display: flex; align-items: center; justify-content: flex-start; border-radius: var(--radius-pill);
+    transition: background var(--duration-fast);
   }
   .app-shell .avatar:hover, .app-shell .account-menu[open] .avatar { background: var(--accent-tint); }
   .app-shell .avatar-initials { flex: none; width: 40px; height: 40px; }
