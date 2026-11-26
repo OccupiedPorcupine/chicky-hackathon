@@ -52,7 +52,7 @@ Every signed-in page has the same skeleton, and it is the dashboard's:
 ```
 body.app-shell
   a.skip-link      "Skip to main content", first Tab stop
-  header.topbar    Chicky wordmark · details.navigation (nav.menu-panel) · details.account-menu
+  header.topbar    Chicky logo (a.brand) · details.navigation (nav.menu-panel) · details.account-menu
   main.page        max 1180px wide, centred, tabindex="-1" so the skip link can land on it
     .page-heading  h1 + p.lede (optional tag or action on the right)
     content        cards, 24px apart
@@ -92,7 +92,7 @@ green forecast continuing it, and two cards (tomorrow's forecast, a prep-list nu
 - **Account** lives in the avatar menu (the foot of the sidebar; top right on a phone): the user's name, email, a link
   to the Account page and Log out, which returns to the sign-in page. Account is not in the list, so no link is current
   there. Signing in lands on the Dashboard.
-- The wordmark links to the Dashboard.
+- The logo links to the Dashboard.
 
 `js/app-shell.js` keeps the sidebar's menu open on wide screens and manages the `<details>` menus below that: one open
 at a time, closed on an outside click or Escape. It also sets `.has-sidebar` on `<html>`.
@@ -129,7 +129,7 @@ scripts use the tokens (`color-mix()` with a token is fine for a translucent sha
 | `--muted` | `#6b604d` | Secondary text: ledes, captions, notes, placeholders. A warm taupe |
 | `--subtle` | `#a7a592` | Decorative or switched-off icons. Never text (fails contrast) |
 | `--accent` | `#2a766f` | Interactive marks: focus ring, selected outlines, predictions, icon fills, the tour's highlight ring. Not text |
-| `--accent-strong` | `#17605b` | Accent **behind or as text**: user chat bubbles, send buttons, links, success text, the wordmark |
+| `--accent-strong` | `#17605b` | Accent **behind or as text**: user chat bubbles, send buttons, links, success text |
 | `--accent-hover` | `= --ink` | Hover on `--accent-strong` fills |
 | `--accent-soft` | `= --yolk-soft` `#ffe7a1` | Selected state (current menu item, active tag, rest-day toggle), the primary button at rest |
 | `--accent-tint` | `= --yolk-tint` `#fff1c9` | Hover state on light surfaces, the chip behind a card's icon |
@@ -235,6 +235,27 @@ data tables collapse further at 520px. Keep a 16px side gutter on phones and nev
 ## Components
 
 All of these are in `base.css` and shown in the style guide. Prefer them to new classes.
+
+### Logo
+
+The logo files are in `images/brand/` and come from the asset sheet (`docs/brand/asset-sheet.png`).
+
+| File | What | Use for |
+| --- | --- | --- |
+| `logo-lockup.svg` | Chicky's head and the wordmark side by side | The header's brand link on every page, the sign-in card |
+| `logo-mark.svg` | Chicky's head in the eggshell, with the burst | Anywhere 40px or bigger: home-screen icons, the link preview |
+| `logo-mark-small.svg` | The head simplified, with no burst, cheeks or fine lines | 16–32px: the favicon (`images/icons/icon.svg` is a copy) |
+| `wordmark.svg` | "chicky" in Baloo 2 ExtraBold, as outlines, on the Coral swoosh | Text-only placements |
+| `huat-pill.svg` | The "HUAT TOMORROW" Coral pill | Optional, beside the wordmark or in a hero. Never on its own as the logo |
+| `og-card.png` | 1200 × 630 link preview: Chicky and the wordmark on Cream | `og:image` in `index.html` |
+
+- The brand link is `<a class="brand" href="dashboard.html"><img class="brand-logo" src="images/brand/logo-lockup.svg" alt="Chicky" …></a>`.
+  The image's alt text names the link, so don't add a second "Chicky" in text.
+- Keep the logo on Cream, Shell or Yolk-soft. Don't recolour it, add a shadow, or put it on Ink.
+- Chicky is the brand; Uncle never stands in for the logo, and the logo isn't the user's avatar.
+- `docs/brand/trace-logo.py` traces the mark and sets the wordmark again from the masters in
+  `docs/brand/source/`. `design/render-icons.cjs` then builds the favicon, the home-screen icons
+  and `og-card.png` (from `design/og-card.html`). Run both after changing the logo.
 
 ### Page heading
 
@@ -515,10 +536,10 @@ wide in Safari, and `frontend/tests/phone-check.cjs` checks that the main flows 
 - **Tables reflow.** Below 600px the assistant's confirm card puts each dish on its own line, with
   its date, portions and remove button beneath, instead of squeezing four columns.
 
-**Home-screen app.** `manifest.webmanifest`, the icons in `images/icons/` (from `icon.svg`, rendered
-by `design/render-icons.cjs`) and the `apple-touch-icon` link let people add Chicky to their home
-screen, where it opens full screen. Every page links them; copy the block under "Home-screen app" in
-a page's `<head>` into new pages. The icon is a placeholder until there's a logo.
+**Home-screen app.** `manifest.webmanifest`, the icons in `images/icons/` and the `apple-touch-icon`
+link let people add Chicky to their home screen, where it opens full screen. Every page links them;
+copy the block under "Home-screen app" in a page's `<head>` into new pages. The icons are built from
+the logo by `design/render-icons.cjs` (see [Logo](#logo)).
 
 ## Interaction states
 
