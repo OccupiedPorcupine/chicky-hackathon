@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600..800&family=Nunito:wght@400..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/assistant.css">
   <style>
     /* Layout for this page only. Everything it shows comes from base.css. */
     .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
@@ -22,6 +23,27 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 20px; }
     .ui-font { font-family: var(--font-ui); }
     .display-font { font-family: var(--font-display); }
+    .logos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; }
+    .logo-tile { display: grid; gap: 10px; align-content: start; padding: 20px; border: 1px solid var(--card-line); border-radius: var(--radius-lg); font-size: var(--text-xs); }
+    .logo-tile.on-cream { background: var(--cream); }
+    .logo-tile.on-shell { background: var(--shell); }
+    .logo-tile.on-yolk { background: var(--yolk-soft); }
+    .logo-tile img { display: block; height: 48px; width: auto; max-width: 100%; object-fit: contain; object-position: left; }
+    .logo-tile code, .figure code { color: var(--muted); }
+    .figures { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 20px; }
+    .figure { margin: 0; display: grid; gap: 6px; justify-items: center; padding: 12px; border: 1px solid var(--card-line); border-radius: var(--radius-lg); background: var(--surface); font-size: var(--text-xs); text-align: center; overflow-wrap: anywhere; }
+    .figure img { display: block; width: 120px; height: 120px; }
+    .figure.is-wide { grid-column: span 2; }
+    .figure.is-wide img { width: 200px; height: 200px; }
+    .sub-heading { margin-top: 32px; font: 600 var(--text-md)/1.3 var(--font-display); }
+    /* Uncle's voice states, as the assistant draws them (css/assistant.css), at two sizes. */
+    .voice-states { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; margin-top: 20px; }
+    .voice-state { display: grid; gap: 10px; align-content: start; justify-items: center; padding: 16px; border: 1px solid var(--card-line); border-radius: var(--radius-lg); background: var(--surface); font-size: var(--text-xs); text-align: center; }
+    .voice-state .portrait { display: flex; align-items: flex-start; gap: 4px; }
+    .voice-state .portrait > img { display: block; width: 120px; height: 120px; }
+    .voice-state .launcher { display: flex; align-items: center; gap: 6px; }
+    .voice-state .assistant-face { width: 56px; height: 56px; }
+    .voice-state strong { font: 600 var(--text-sm) var(--font-display); }
   </style>
 </head>
 <body class="app-shell">
@@ -100,14 +122,89 @@
         <p>Baloo 2 for the wordmark and headings; Nunito at weight 400 for everything people read.</p>
       </div>
       <div class="type-scale">
-        <p><code>--text-number 40</code><span style="font-size: var(--text-number); line-height: 1">838</span></p>
-        <p><code>--text-xl 32</code><span class="display-font" style="font-size: var(--text-xl); font-weight: 700">Page title</span></p>
+        <p><code>.number 44</code><span style="font-size: 44px; line-height: 1">838</span></p>
+        <p><code>.page-heading h1 36</code><span class="display-font" style="font-size: 36px; font-weight: 700">Page title</span></p>
+        <p><code>--text-xl 32</code><span class="display-font" style="font-size: var(--text-xl); font-weight: 700">Sign-in heading</span></p>
         <p><code>--text-lg 20</code><span class="display-font" style="font-size: var(--text-lg); font-weight: 600">Section heading</span></p>
         <p><code>--text-md 16</code><span>Body text and card titles</span></p>
         <p><code>--text-sm 14</code><span style="font-size: var(--text-sm)">Controls, labels, table cells</span></p>
         <p><code>--text-xs 12</code><span style="font-size: var(--text-xs); color: var(--muted)">Captions and metadata</span></p>
         <p><code>--font-display</code><span class="display-font" style="font-weight: 800">Baloo 2: chicky, huat tomorrow</span></p>
         <p><code>--font-ui</code><span class="ui-font">Nunito: body, controls, charts, the assistant · 播放中文</span></p>
+      </div>
+    </section>
+
+    <section class="section" id="logo">
+      <div class="section-heading">
+        <h2>Logo</h2>
+        <p>From the asset sheet, in images/brand/. Keep it on Cream, Shell or Yolk-soft; never recolour it or put it on Ink.</p>
+      </div>
+      <div class="logos">
+        <div class="logo-tile on-shell"><img src="../images/brand/logo-lockup.svg" alt="Chicky logo lockup" width="162" height="48"><p>Lockup: the header and the sign-in card<br><code>logo-lockup.svg</code></p></div>
+        <div class="logo-tile on-cream"><img src="../images/brand/wordmark.svg" alt="Chicky wordmark" height="48"><p>Wordmark, text-only placements<br><code>wordmark.svg</code></p></div>
+        <div class="logo-tile on-yolk"><img src="../images/brand/logo-mark.svg" alt="Chicky mark" width="48" height="48"><p>Mark, 40px and up: app icons, link preview<br><code>logo-mark.svg</code></p></div>
+        <div class="logo-tile on-shell"><img src="../images/brand/logo-mark-small.svg" alt="Chicky small mark" width="32" height="32" style="height: 32px"><p>Small mark, 16–32px: the favicon<br><code>logo-mark-small.svg</code></p></div>
+        <div class="logo-tile on-cream"><img src="../images/brand/huat-pill.svg" alt="Huat tomorrow" height="40" style="height: 40px"><p>Tagline pill, beside the wordmark; never the logo on its own<br><code>huat-pill.svg</code></p></div>
+      </div>
+    </section>
+
+    <section class="section" id="characters">
+      <div class="section-heading">
+        <h2>Characters</h2>
+        <p>Chicky is the face of the product; Uncle is the voice. They appear together only to welcome people. Every picture is decorative (alt=""), 512px WebP.</p>
+      </div>
+      <h3 class="sub-heading">Chicky</h3>
+      <div class="figures">
+        <figure class="figure"><img src="../images/brand/chicky/front.webp" alt="" width="120" height="120"><figcaption>Front<br><code>chicky/front.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/three-quarter.webp" alt="" width="120" height="120"><figcaption>Three-quarter: dashboard welcome<br><code>chicky/three-quarter.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/side.webp" alt="" width="120" height="120"><figcaption>Side<br><code>chicky/side.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/spot-receipt.webp" alt="" width="120" height="120"><figcaption>Spot: receipt<br><code>chicky/spot-receipt.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/spot-prep.webp" alt="" width="120" height="120"><figcaption>Spot: prep<br><code>chicky/spot-prep.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/empty-cheer.webp" alt="" width="120" height="120"><figcaption>Empty: cheering<br><code>chicky/empty-cheer.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/empty-egg.webp" alt="" width="120" height="120"><figcaption>Empty: in the shell<br><code>chicky/empty-egg.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/state-cooking.webp" alt="" width="120" height="120"><figcaption>Loading: cooking<br><code>chicky/state-cooking.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/chicky/state-oops.webp" alt="" width="120" height="120"><figcaption>Error: oops<br><code>chicky/state-oops.webp</code></figcaption></figure>
+      </div>
+      <h3 class="sub-heading">Uncle</h3>
+      <div class="figures">
+        <figure class="figure"><img src="../images/brand/uncle/front.webp" alt="" width="120" height="120"><figcaption>Front<br><code>uncle/front.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/uncle/three-quarter.webp" alt="" width="120" height="120"><figcaption>Three-quarter<br><code>uncle/three-quarter.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/uncle/avatar.webp" alt="" width="120" height="120"><figcaption>Round avatar: launcher, replies<br><code>uncle/avatar.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/uncle/pointing.webp" alt="" width="120" height="120"><figcaption>Pointing: tour bubble<br><code>uncle/pointing.webp</code></figcaption></figure>
+        <figure class="figure"><img src="../images/brand/uncle/presenting.webp" alt="" width="120" height="120"><figcaption>Presenting: Your week<br><code>uncle/presenting.webp</code></figcaption></figure>
+      </div>
+      <h3 class="sub-heading">Together, only to welcome</h3>
+      <div class="figures">
+        <figure class="figure is-wide"><img src="../images/brand/chicky/duo-wave.webp" alt="" width="200" height="200"><figcaption>Sign-in picture and first sign-in<br><code>chicky/duo-wave.webp</code></figcaption></figure>
+      </div>
+    </section>
+
+    <section class="section" id="voice-states">
+      <div class="section-heading">
+        <h2>Uncle’s voice states</h2>
+        <p>data-voice-state on the launcher, the panel and anything that follows him (chickyAssistant.follow). Each state swaps his picture and shows one decoration; they animate only without reduced motion. The words stay in the status line for screen readers.</p>
+      </div>
+      <div class="voice-states">
+        <div class="voice-state" data-voice-state="ready">
+          <div class="portrait"><img src="../images/brand/uncle/ready.webp" alt="" width="120" height="120"><span data-voice-fx><svg class="assistant-fx" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false"><g class="fx-arcs"><path d="M12 14a3 6 0 0 1 0 12"/><path d="M17 9a5 11 0 0 1 0 22"/><path d="M22 4a7 16 0 0 1 0 32"/></g><g class="fx-bars"><rect x="5" y="15" width="4" height="10" rx="2"/><rect x="12" y="10" width="4" height="20" rx="2"/><rect x="19" y="6" width="4" height="28" rx="2"/><rect x="26" y="11" width="4" height="18" rx="2"/><rect x="33" y="15" width="4" height="10" rx="2"/></g><g class="fx-bubble"><circle class="fx-puff" cx="6" cy="35" r="2"/><circle class="fx-puff" cx="11" cy="29" r="3"/><ellipse class="fx-cloud" cx="24" cy="15" rx="14" ry="10"/><circle class="fx-dot" cx="17" cy="15" r="2.2"/><circle class="fx-dot" cx="24" cy="15" r="2.2"/><circle class="fx-dot" cx="31" cy="15" r="2.2"/></g></svg></span></div>
+          <div class="launcher"><span class="assistant-face"><img src="../images/brand/uncle/avatar-64.webp" alt="" width="56" height="56"></span></div>
+          <p><strong>Ready</strong><br>At rest: the round avatar on the launcher, nothing beside him</p>
+        </div>
+        <div class="voice-state" data-voice-state="listening">
+          <div class="portrait"><img src="../images/brand/uncle/listening.webp" alt="" width="120" height="120"><span data-voice-fx><svg class="assistant-fx" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false"><g class="fx-arcs"><path d="M12 14a3 6 0 0 1 0 12"/><path d="M17 9a5 11 0 0 1 0 22"/><path d="M22 4a7 16 0 0 1 0 32"/></g><g class="fx-bars"><rect x="5" y="15" width="4" height="10" rx="2"/><rect x="12" y="10" width="4" height="20" rx="2"/><rect x="19" y="6" width="4" height="28" rx="2"/><rect x="26" y="11" width="4" height="18" rx="2"/><rect x="33" y="15" width="4" height="10" rx="2"/></g><g class="fx-bubble"><circle class="fx-puff" cx="6" cy="35" r="2"/><circle class="fx-puff" cx="11" cy="29" r="3"/><ellipse class="fx-cloud" cx="24" cy="15" rx="14" ry="10"/><circle class="fx-dot" cx="17" cy="15" r="2.2"/><circle class="fx-dot" cx="24" cy="15" r="2.2"/><circle class="fx-dot" cx="31" cy="15" r="2.2"/></g></svg></span></div>
+          <div class="launcher"><span class="assistant-face"><img src="../images/brand/uncle/listening.webp" alt="" width="56" height="56"></span></div>
+          <p><strong>Listening</strong><br>Recording: ink arcs</p>
+        </div>
+        <div class="voice-state" data-voice-state="thinking">
+          <div class="portrait"><img src="../images/brand/uncle/thinking.webp" alt="" width="120" height="120"><span data-voice-fx><svg class="assistant-fx" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false"><g class="fx-arcs"><path d="M12 14a3 6 0 0 1 0 12"/><path d="M17 9a5 11 0 0 1 0 22"/><path d="M22 4a7 16 0 0 1 0 32"/></g><g class="fx-bars"><rect x="5" y="15" width="4" height="10" rx="2"/><rect x="12" y="10" width="4" height="20" rx="2"/><rect x="19" y="6" width="4" height="28" rx="2"/><rect x="26" y="11" width="4" height="18" rx="2"/><rect x="33" y="15" width="4" height="10" rx="2"/></g><g class="fx-bubble"><circle class="fx-puff" cx="6" cy="35" r="2"/><circle class="fx-puff" cx="11" cy="29" r="3"/><ellipse class="fx-cloud" cx="24" cy="15" rx="14" ry="10"/><circle class="fx-dot" cx="17" cy="15" r="2.2"/><circle class="fx-dot" cx="24" cy="15" r="2.2"/><circle class="fx-dot" cx="31" cy="15" r="2.2"/></g></svg></span></div>
+          <div class="launcher"><span class="assistant-face"><img src="../images/brand/uncle/thinking.webp" alt="" width="56" height="56"></span></div>
+          <p><strong>Thinking</strong><br>Waiting for a reply, a transcript or speech: a “…” bubble</p>
+        </div>
+        <div class="voice-state" data-voice-state="speaking">
+          <div class="portrait"><img src="../images/brand/uncle/speaking.webp" alt="" width="120" height="120"><span data-voice-fx><svg class="assistant-fx" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true" focusable="false"><g class="fx-arcs"><path d="M12 14a3 6 0 0 1 0 12"/><path d="M17 9a5 11 0 0 1 0 22"/><path d="M22 4a7 16 0 0 1 0 32"/></g><g class="fx-bars"><rect x="5" y="15" width="4" height="10" rx="2"/><rect x="12" y="10" width="4" height="20" rx="2"/><rect x="19" y="6" width="4" height="28" rx="2"/><rect x="26" y="11" width="4" height="18" rx="2"/><rect x="33" y="15" width="4" height="10" rx="2"/></g><g class="fx-bubble"><circle class="fx-puff" cx="6" cy="35" r="2"/><circle class="fx-puff" cx="11" cy="29" r="3"/><ellipse class="fx-cloud" cx="24" cy="15" rx="14" ry="10"/><circle class="fx-dot" cx="17" cy="15" r="2.2"/><circle class="fx-dot" cx="24" cy="15" r="2.2"/><circle class="fx-dot" cx="31" cy="15" r="2.2"/></g></svg></span></div>
+          <div class="launcher"><span class="assistant-face"><img src="../images/brand/uncle/speaking.webp" alt="" width="56" height="56"></span></div>
+          <p><strong>Speaking</strong><br>Reading aloud, even with the panel closed: coral sound bars</p>
+        </div>
       </div>
     </section>
 

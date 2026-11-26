@@ -64,7 +64,7 @@ transparent backgrounds, about 80 KB or less each. The PNG masters are in `docs/
 | --- | --- | --- |
 | `chicky/three-quarter.webp` | Waving, three-quarter | The dashboard's welcome heading, the link preview card |
 | `chicky/front.webp`, `chicky/side.webp` | Model views | Reference (style guide) |
-| `chicky/spot-receipt.webp` | Holding a receipt | Spot illustrations on Data ingestion and the dashboard |
+| `chicky/spot-receipt.webp` | Holding a receipt | Data ingestion's upload card and the dashboard's Record sales form |
 | `chicky/spot-prep.webp` | With a calendar and a crate | The prep list heading |
 | `chicky/empty-cheer.webp`, `chicky/empty-egg.webp` | Cheering; in the shell | Empty states |
 | `chicky/state-cooking.webp` | Cooking | Loading states |
@@ -75,7 +75,7 @@ transparent backgrounds, about 80 KB or less each. The PNG masters are in `docs/
 | `uncle/ready.webp` | At rest | The voice-state set's rest pose (style guide); the app uses the round avatar at rest |
 | `uncle/pointing.webp` | Pointing | The guided tour's bubble |
 | `uncle/presenting.webp` | Presenting | "Your week" on the dashboard |
-| `uncle/front.webp`, `uncle/three-quarter.webp` | Model views | Reference; three-quarter is also on the link preview card |
+| `uncle/front.webp`, `uncle/three-quarter.webp` | Model views | Reference (style guide) |
 
 Rules for every picture:
 
