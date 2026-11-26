@@ -27,8 +27,8 @@ Chicky is a planning tool for hawker and F&B owners. It should feel calm, warm a
 hand-made, not like an analytics dashboard. The look comes from the brand asset sheet
 ([docs/brand/asset-sheet.png](../docs/brand/asset-sheet.png)): Chicky the chick, and five colours.
 
-- **Warm, quiet surfaces.** A cream page (`--page`, Cream), shell cards with a soft shadow, and
-  one gradient: the sidebar (and the top bar on phones), which runs from soft yolk to cream.
+- **Warm, quiet surfaces.** A cream page (`--page`, Cream), shell cards with a soft shadow, and a
+  Shell sidebar (the top bar on phones) with ink text, edged by a thin line like the sheet's panels.
   Cream is the page and Shell the cards, not the other way round: the lighter card lifts off the
   warmer page the way white cards did on the old cream page, and a page of cream cards reads
   heavy and yellow.
@@ -59,7 +59,7 @@ body.app-shell
 assistant bubble   added by js/assistant.js, bottom right
 ```
 
-The same markup is the **left sidebar** at 1100px and wider (248px, full height, the yolk-to-cream gradient, the
+The same markup is the **left sidebar** at 1100px and wider (248px, full height, Shell with a thin `--sidebar-line` edge, the
 menu always open) and a **top bar with a Menu sheet** below that. One set of links serves both, so the guided
 tour finds the same targets either way. The page grid is `body.app-shell { grid-template-columns: var(--sidebar-w) 1fr }`,
 so nothing fixed or sticky ever covers the content: the sidebar is a column, the top bar is in the flow, and
@@ -87,13 +87,16 @@ banner (no lede, no chips) and the panel follows.
 
 - **Top-level pages** (Dashboard, Demand forecast, Prep list, Data ingestion, Dishes, Documents) are listed in the sidebar
   (the Menu button on a phone) on **every** signed-in page, in that order, with those labels and these inline-SVG
-  icons (`.nav-icon`, `currentColor`). The current page is in the list too, with `aria-current="page"` (which draws the
-  ink bar and yolk tint); the others get `data-guide-id="nav-<page>"` so the guided tour can point at them. The markup is
+  icons (`.nav-icon`, `currentColor`). The current page is in the list too, with `aria-current="page"` (which draws it as a
+  Yolk pill, `--nav-current`, with ink text); the others get `data-guide-id="nav-<page>"` so the guided tour can point at them. The markup is
   identical on every page apart from which link is current, so copy the header from `dashboard.html`.
 - **Subpages** (a page that only makes sense inside another, such as one dish's history) don't go
   in the menu. Link to them from their parent page, and give them a way back: a "← Dashboard"
   style text link above the `h1`, naming the parent.
-- **Account** lives in the avatar menu (the foot of the sidebar; top right on a phone): the user's name, email, a link
+- **Account** lives in the avatar menu (the foot of the sidebar; top right on a phone). The avatar is the user's initials
+  on a Yolk circle (`.avatar-initials`, filled in by `js/app-shell.js` from their name, or their email if there's no name),
+  with a person icon until the profile loads. It is never a photo, and never Chicky: Chicky is the brand, not the user.
+  The menu holds the user's name, email, a link
   to the Account page and Log out, which returns to the sign-in page. Account is not in the list, so no link is current
   there. Signing in lands on the Dashboard.
 - The logo links to the Dashboard.
@@ -147,7 +150,8 @@ scripts use the tokens (`color-mix()` with a token is fine for a translucent sha
 | `--error` / `--error-soft` | `#a3193f` / `#fbe6ea` | Error text / error message background. A crimson, so it never reads as coral |
 | `--warning` / `--warning-soft` | `= --coral-strong` / `= --coral-soft` `#fde4da` | Needs-attention tags such as "New dish" and "Sold out by 13:10" |
 | `--heat-1` … `--heat-4` | `#7fbbaf` `#479589` `#226e66` `= --ink` | One ink-green ramp for magnitude: the revenue heatmap, and the ranked bars and treemap tiles on the dashboard |
-| `--header-gradient` / `--sidebar-gradient` | yolk-soft → yolk-tint → cream | The top bar on phones / the sidebar |
+| `--sidebar` / `--sidebar-line` | `= --shell` / `= --card-line` | The sidebar and the phone's top bar, and the line along their inner edge |
+| `--nav-current` | `= --yolk` | The current page in the menu: a pill with ink text (7.4:1) |
 | `--wash-gradient` | yolk-tint → shell → sand-soft | The panel a page opens with: the dashboard's hero, the sign-in picture |
 | `--focus-halo`, `--backdrop`, `--scrim` | translucent accent / ink | The ring round a focused field, behind a dialog, behind the tour's spotlight |
 

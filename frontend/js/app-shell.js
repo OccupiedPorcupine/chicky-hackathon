@@ -42,10 +42,21 @@
     .then(profile => {
       account.querySelector(".account-name").textContent = profile.name || "Signed in";
       account.querySelectorAll("[data-account-label]").forEach(label => { label.textContent = profile.name || "Account"; });
+      const letters = initials(profile.name, profile.email);
+      if (letters) account.querySelectorAll("[data-account-initials]").forEach(avatar => { avatar.textContent = letters; });
       account.querySelector(".account-email").textContent = profile.email || "";
       if (profile.emailVerified === false) showUnconfirmedEmail();
     })
     .catch(() => {});
+
+  // The avatar is the user's initials on a Yolk circle: the first letters of their first and last names ("Mei Ling" is
+  // "ML", "Ahmad" is "A"), or of their email when there's no name. Chicky is the brand, so never the user's picture.
+  // Until the profile loads, or when there's nothing to go on, the circle keeps its person icon.
+  function initials(name, email) {
+    const words = (name || "").trim().split(/\s+/).filter(Boolean);
+    const sources = words.length > 1 ? [words[0], words[words.length - 1]] : words.length ? words : [(email || "").trim()];
+    return sources.map(word => word.match(/[\p{L}\p{N}]/u)?.[0] || "").join("").toLocaleUpperCase();
+  }
 
   // Until the emailed link is opened: a note under the email, with a way to send it again.
   function showUnconfirmedEmail() {
