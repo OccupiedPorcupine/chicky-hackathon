@@ -42,9 +42,9 @@ function formatRange(from, to) {
     : `${day(from)} ${month(from)} – ${day(to)} ${month(to)}`;
 }
 
-// Bars by rank: the leader darkest, then the brand teal. (The treemap uses lighter tints of the same
+// Bars by rank, on the heatmap's ink-green ramp: the leader darkest, then one step lighter each. (The treemap uses lighter tints of the same
 // hue for its small tiles, because they carry text.)
-const barColor = rank => rank === 0 ? cssVar("--heat-4") : rank === 1 ? cssVar("--teal-strong") : cssVar("--teal");
+const barColor = rank => rank === 0 ? cssVar("--heat-4") : rank === 1 ? cssVar("--heat-3") : cssVar("--heat-2");
 
 // The by-dish tooltip is an element, not canvas drawing, so it can sit beside the hovered row without ever
 // covering the dish names on the left, and stay inside the card and the window.
@@ -152,7 +152,7 @@ function drawDemandChart({ labels, dates, values }) {
 function drawDishChart(ranked, range) {
   resetChart("dish-chart");
   const canvas = document.getElementById("dish-chart");
-  const ink = cssVar("--ink"), teal = cssVar("--teal");
+  const ink = cssVar("--ink");
   const total = sum(ranked.map(dish => dish.value));
 
   // Row height: a few dishes get generous rows at the top of the card; many get tighter rows, the card grows up
@@ -596,13 +596,13 @@ function layoutMosaic(items, box) {
   return pinwheel(items, box) ?? squarify(items, box);
 }
 
-// Tile colours by rank: the leader is the darkest teal, then the brand teal, then ever lighter tints of it
+// Tile colours by rank, on the heatmap's ink-green ramp: the leader darkest, then the next step, then ever lighter tints
 // (the text on all of them is at least 4.5:1).
 function tileColors(rank) {
-  if (rank === 0) return { background: cssVar("--heat-4"), color: "#fff" };
-  if (rank === 1) return { background: cssVar("--teal-strong"), color: "#fff" };
+  if (rank === 0) return { background: cssVar("--heat-4"), color: cssVar("--surface") };
+  if (rank === 1) return { background: cssVar("--heat-3"), color: cssVar("--surface") };
   const strength = [0.4, 0.32, 0.26, 0.21, 0.17][rank - 2] ?? 0.14;
-  return { background: `color-mix(in srgb, ${cssVar("--teal")} ${strength * 100}%, #fff)`, color: cssVar("--ink") };
+  return { background: `color-mix(in srgb, ${cssVar("--heat-2")} ${strength * 100}%, ${cssVar("--surface")})`, color: cssVar("--ink") };
 }
 
 const percentOf = value => {

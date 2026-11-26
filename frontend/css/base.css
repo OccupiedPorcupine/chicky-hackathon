@@ -1,48 +1,67 @@
 /* Chicky design tokens and shared components. Load before any page stylesheet.
    The rules behind these values are in frontend/DESIGN.md: change them there and here together. */
 :root {
-  /* Colour */
-  --ink: #425664;            /* text, icons, recorded data */
-  --muted: #66767f;          /* secondary text; 4.6:1 on --page */
-  --subtle: #9aa6af;         /* decorative or switched-off icons only, never text */
-  --teal: #1ba098;           /* brand accent: focus ring, selected outlines, predictions, icon fills */
-  --teal-strong: #0f7d77;    /* teal behind or as text: buttons, user bubbles, success text */
-  --teal-hover: #0b6a65;
-  --teal-soft: #d9efec;      /* selected state */
-  --teal-tint: #ebf6f5;      /* hover state */
-  --neutral-soft: #f1f4f5;   /* neutral hover, assistant bubbles, inactive tags */
-  --border: #d8dce1;         /* control and card outlines */
-  --divider: #e6e8eb;        /* rules between rows and sections */
-  --page: #fffcf5;           /* warm cream page background */
-  --surface: #fff;           /* cards, controls, menus */
-  --surface-muted: #fbfcfc;  /* inset areas: drop zone, cards inside the assistant */
-  --error: #b3261e;
-  --error-soft: #fdecea;
-  --warning: #7a4b00;
-  --warning-soft: #fff1d6;
-  /* Sequential teal for magnitude (the dashboard's revenue heatmap), light to dark. Validated
-     as an ordinal ramp on --surface: one hue, even steps, the lightest at 2.09:1. */
-  --heat-1: #74c1b8;
-  --heat-2: #36a499;
-  --heat-3: #12827a;
-  --heat-4: #0a5c57;
-  --header-gradient: linear-gradient(90deg, #a9dcd6 0%, #dfe5dc 55%, #f5e3d2 100%);
-  --sidebar-gradient: linear-gradient(180deg, #a9dcd6 0%, #dfe5dc 52%, #f5e3d2 100%);
-  --sand: #f5e3d2;           /* the sand end of the header gradient */
-  --sand-soft: #fbf4ec;      /* sand, lightened for large surfaces; ink text only (muted drops under 4.5:1 on it) */
-  --sand-line: #efe2d3;
-  --card-line: #efe9df;      /* the outline of cards and sections */
-  /* The primary button: a light teal pill that a dark teal circle fills from the pointer. */
-  --move-surface: var(--teal-soft);   /* resting */
-  --move-ink: var(--heat-4);          /* text, outline and the expanding fill: the darkest teal */
-  --move-light: var(--teal-tint);     /* text and arrow once the fill has covered the button */
+  /* Colour. The five brand colours come from the asset sheet (docs/brand/asset-sheet.png); every other colour is
+     derived from them. The pairs that may carry text, and their contrast, are in DESIGN.md ("Colour"). */
+  --yolk: #ffc629;           /* fills only, never text: 1.4:1 on cream */
+  --yolk-soft: #ffe7a1;      /* selected state, the primary button at rest */
+  --yolk-tint: #fff1c9;      /* hover state */
+  --coral: #f26350;          /* callouts: fills and large type only (3.1:1 on shell) */
+  --coral-strong: #b23a24;   /* coral as small text: 4.9:1 on --coral-soft */
+  --coral-soft: #fde4da;
+  --cream: #fff4dd;
+  --shell: #fffdf5;
+
+  --ink: #103f40;            /* text, icons, recorded data: 10.6:1 on --page */
+  --muted: #6b604d;          /* secondary text, a warm taupe: 5.6:1 on --page, 5.0:1 on --accent-soft */
+  --subtle: #a7a592;         /* decorative or switched-off icons only, never text */
+  /* Interactive: an ink green for marks and links, yolk fills (with ink text) for selected and hovered items. */
+  --accent: #2a766f;         /* focus ring, selected outlines, predictions, icon fills: 4.4:1 or more on every light fill */
+  --accent-strong: #17605b;  /* accent behind or as text: buttons, user bubbles, links, success text */
+  --accent-hover: var(--ink);
+  --accent-soft: var(--yolk-soft);
+  --accent-tint: var(--yolk-tint);
+  --neutral-soft: #f7edd8;   /* neutral hover, assistant bubbles, inactive tags */
+  --border: #e2d3b3;         /* control and card outlines */
+  --divider: #efe4cb;        /* rules between rows and sections */
+  --page: var(--cream);      /* the page background */
+  --surface: var(--shell);   /* cards, controls, menus */
+  --surface-muted: #fff9ec;  /* inset areas: drop zone, cards inside the assistant */
+  --error: #a3193f;          /* a crimson, kept well away from coral's orange-red */
+  --error-soft: #fbe6ea;
+  --warning: var(--coral-strong);       /* needs attention: "New dish", "Sold out by 13:10" */
+  --warning-soft: var(--coral-soft);
+  /* Sequential ink green for magnitude (the dashboard's revenue heatmap and its ranked tiles and bars), light to
+     dark. Validated as an ordinal ramp on --surface: one hue, even lightness steps, the lightest at 2.14:1. */
+  --heat-1: #7fbbaf;
+  --heat-2: #479589;
+  --heat-3: #226e66;
+  --heat-4: var(--ink);
+  --header-gradient: linear-gradient(90deg, var(--yolk-soft) 0%, var(--yolk-tint) 55%, var(--cream) 100%);
+  --sidebar-gradient: linear-gradient(180deg, var(--yolk-soft) 0%, var(--yolk-tint) 52%, var(--cream) 100%);
+  /* A soft wash behind a page's opening panel (the dashboard's hero, the sign-in picture). */
+  --wash-gradient: linear-gradient(135deg, var(--yolk-tint) 0%, var(--shell) 55%, var(--sand-soft) 100%);
+  --sand: #f7e3bc;           /* warm sand, the base of --sand-soft and --sand-line */
+  --sand-soft: #fcefd2;      /* sand, lightened for large surfaces */
+  --sand-line: #f1dfb8;
+  --card-line: #eadbb9;      /* the outline of cards and sections */
+  --focus-halo: color-mix(in srgb, var(--accent) 22%, transparent);   /* the soft ring around a focused field */
+  --scrim: rgb(8 31 32 / 58%);                                      /* behind the guided tour's spotlight */
+  --backdrop: color-mix(in srgb, var(--ink) 38%, transparent);       /* behind a modal dialog */
+  /* The primary button: a yolk pill with an ink outline that an ink circle fills from the pointer. */
+  --move-surface: var(--accent-soft);   /* resting */
+  --move-ink: var(--ink);               /* text, outline and the expanding fill */
+  --move-light: var(--shell);           /* text and arrow once the fill has covered the button */
   --move-duration: 500ms;
   --sidebar-w: 248px;
   --gutter: 24px;
 
   /* Type */
-  --font-display: "Kaisei HarunoUmi", Georgia, "Times New Roman", serif;
-  --font-ui: Inter, Arial, sans-serif;
+  /* Baloo 2 for the wordmark and headings (the sheet's heavy rounded voice); Nunito for everything people read. Neither
+     has Chinese, so both fall back to the system's CJK face (the dashboard's 播放中文). */
+  --font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC";
+  --font-display: "Baloo 2", Nunito, var(--font-cjk), system-ui, sans-serif;
+  --font-ui: Nunito, var(--font-cjk), system-ui, sans-serif;
   --text-xs: 12px;
   --text-sm: 14px;
   --text-md: 16px;
@@ -56,9 +75,9 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-pill: 999px;
-  --shadow-card: 0 1px 2px rgb(66 86 100 / 7%), 0 6px 20px rgb(66 86 100 / 8%);
-  --shadow-card-hover: 0 2px 4px rgb(66 86 100 / 8%), 0 14px 32px rgb(66 86 100 / 14%);
-  --shadow-menu: 0 8px 24px rgb(66 86 100 / 13%);
+  --shadow-card: 0 1px 2px rgb(16 63 64 / 7%), 0 6px 20px rgb(16 63 64 / 8%);
+  --shadow-card-hover: 0 2px 4px rgb(16 63 64 / 8%), 0 14px 32px rgb(16 63 64 / 14%);
+  --shadow-menu: 0 8px 24px rgb(16 63 64 / 13%);
   --shadow-float: 0 8px 24px rgb(0 0 0 / 18%);
   --control-height: 40px;
 
@@ -80,13 +99,14 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--page);
-  font: var(--text-md)/1.5 var(--font-display);
+  font: var(--text-md)/1.5 var(--font-ui);
 }
 h1, h2, h3, p { margin: 0; }
-h1, h2, h3 { font-weight: 400; line-height: 1.25; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.25; }
+h1 { font-weight: 700; }
 button, input, select, textarea { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px;
@@ -94,8 +114,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ---- Browser surfaces in the brand (selection, caret, scrollbars) and tidy line breaks ---- */
-::selection { background: var(--teal-soft); color: var(--ink); }
-textarea, .input { caret-color: var(--teal-strong); }
+::selection { background: var(--accent-soft); color: var(--ink); }
+textarea, .input { caret-color: var(--accent-strong); }
 .chart, .heatmap-scroll { scrollbar-width: thin; scrollbar-color: var(--subtle) transparent; }
 :is(h1, h2) { text-wrap: balance; }
 :is(.lede, .note, .status-text) { text-wrap: pretty; }
@@ -112,7 +132,7 @@ html.lenis, html.lenis body { height: auto; }
 .skip-link {
   position: absolute; z-index: 100; top: -120px; left: 16px;
   padding: 10px 16px; border-radius: var(--radius-md);
-  background: var(--surface); color: var(--teal-strong); box-shadow: var(--shadow-float);
+  background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow-float);
 }
 .skip-link:focus { top: max(12px, env(safe-area-inset-top)); }
 .page:focus { outline: none; }
@@ -125,8 +145,8 @@ html.lenis, html.lenis body { height: auto; }
   background: var(--header-gradient);
 }
 .topbar :focus-visible { outline-color: var(--ink); }
-.brand { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-right: auto; color: var(--teal-strong); font-size: 26px; line-height: 1; text-decoration: none; }
-.brand-mark { width: 32px; height: 32px; border-radius: 9px; box-shadow: 0 1px 3px rgb(66 86 100 / 25%); }
+.brand { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-right: auto; color: var(--accent-strong); font: 800 26px/1 var(--font-display); text-decoration: none; }
+.brand-mark { width: 32px; height: 32px; border-radius: 9px; box-shadow: 0 1px 3px rgb(16 63 64 / 25%); }
 /* Both header menus are <details>: js/app-shell.js closes them on an outside click or Escape. */
 .topbar details { position: relative; }
 .topbar details.navigation { position: static; }
@@ -142,11 +162,11 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 
 .navigation summary {
   display: flex; align-items: center; gap: 8px; width: auto; height: 44px; padding: 0 14px 0 12px;
-  border-radius: var(--radius-lg); background: rgb(255 255 255 / 55%);
+  border-radius: var(--radius-lg); background: color-mix(in srgb, var(--surface) 55%, transparent);
   transition: background var(--duration-fast);
 }
-.navigation summary:hover { background: rgb(255 255 255 / 80%); }
-.navigation summary img { width: 22px; height: 22px; opacity: 0.75; }
+.navigation summary:hover { background: color-mix(in srgb, var(--surface) 80%, transparent); }
+.navigation summary .nav-icon { width: 22px; height: 22px; }
 .menu-label { font-size: var(--text-md); }
 .navigation .menu-panel {
   position: fixed; top: calc(max(12px, env(safe-area-inset-top)) + 56px); left: 12px; right: 12px; width: auto;
@@ -158,11 +178,11 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
   border-radius: var(--radius-lg); color: var(--ink); font-size: 17px; text-decoration: none;
   transition: background-color var(--duration-fast), color var(--duration-fast);
 }
-.navigation a:hover:not([aria-current="page"]) { background: var(--teal-tint); }
-.navigation a[aria-current="page"] { background: var(--teal-soft); color: var(--teal-hover); }
+.navigation a:hover:not([aria-current="page"]) { background: var(--accent-tint); }
+.navigation a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-hover); }
 .navigation a[aria-current="page"]::before {
   content: ""; position: absolute; left: 0; top: 50%; width: 4px; height: 24px; border-radius: 0 4px 4px 0;
-  background: var(--teal-strong); transform: translateY(-50%);
+  background: var(--accent-strong); transform: translateY(-50%);
 }
 .nav-icon { flex: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -170,7 +190,7 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 .account-menu .menu-panel { top: 56px; right: 0; left: auto; width: min(280px, calc(100vw - 32px)); padding: 16px; }
 .avatar {
   display: grid; place-items: center; width: 44px; height: 44px;
-  border-radius: 50%; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 2px rgb(255 255 255 / 70%);
+  border-radius: 50%; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 70%, transparent);
   transition: box-shadow var(--duration-fast);
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -194,10 +214,10 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .page-heading h1 { font-size: 36px; line-height: 1.2; }
 .lede { margin-top: 6px; color: var(--muted); }
-.eyebrow { color: var(--teal-strong); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; }
+.eyebrow { color: var(--accent-strong); font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase; }
 
 /* Sections (a closing area of a page: a long list or a table) look like cards. */
-.section { padding: 24px 28px; border: 1px solid var(--card-line); border-radius: var(--radius-xl); background: var(--surface); box-shadow: 0 1px 2px rgb(66 86 100 / 6%); }
+.section { padding: 24px 28px; border: 1px solid var(--card-line); border-radius: var(--radius-xl); background: var(--surface); box-shadow: 0 1px 2px rgb(16 63 64 / 6%); }
 .section-heading h2 { font-size: var(--text-lg); }
 .section-heading p { margin-top: 4px; color: var(--muted); font-size: var(--text-sm); }
 
@@ -205,7 +225,7 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 .card {
   position: relative; padding: 24px 28px;
   border: 1px solid var(--card-line); border-radius: var(--radius-xl);
-  background: var(--surface); box-shadow: 0 1px 2px rgb(66 86 100 / 6%);
+  background: var(--surface); box-shadow: 0 1px 2px rgb(16 63 64 / 6%);
 }
 .card-title { margin-bottom: 12px; font-size: var(--text-md); }
 .card:has(> .card-icon) .card-title { padding-right: 48px; }
@@ -217,11 +237,11 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 .headline .unit { font-size: var(--text-md); color: var(--muted); }
 .headline .note { display: block; margin-top: 2px; color: var(--muted); }
 
-/* A small teal chip at the corner of a figure card. Decorative. */
+/* A small yolk chip at the corner of a figure card. Decorative. */
 .card-icon {
   position: absolute; top: 18px; right: 18px; z-index: 1;
   display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px;
-  background: var(--teal-tint); color: var(--teal-strong);
+  background: var(--accent-tint); color: var(--accent-strong);
 }
 .card-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -235,11 +255,11 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
   }
   [data-spotlight]::before {
     z-index: -1;
-    background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(27 160 152 / 7%), transparent 70%);
+    background: radial-gradient(220px circle at var(--spot-x, 50%) var(--spot-y, 50%), color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%);
   }
   [data-spotlight]::after {
     padding: 1px;
-    background: radial-gradient(170px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgb(27 160 152 / 50%), transparent 70%);
+    background: radial-gradient(170px circle at var(--spot-x, 50%) var(--spot-y, 50%), color-mix(in srgb, var(--accent) 50%, transparent), transparent 70%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
@@ -259,13 +279,13 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 /* A tooltip that is an element (not canvas drawing), placed by js so it stays clear of labels (the by-dish chart). */
 .chart-tip {
   position: absolute; z-index: 6; display: grid; gap: 2px; max-width: 250px; padding: 8px 12px;
-  border-radius: var(--radius-md); background: var(--ink); color: #fff; font-size: 13px; pointer-events: none;
+  border-radius: var(--radius-md); background: var(--ink); color: var(--surface); font-size: 13px; pointer-events: none;
 }
 .chart-tip strong { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 400; overflow-wrap: anywhere; }
-.tip-swatch { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--swatch); box-shadow: 0 0 0 1px rgb(255 255 255 / 70%); }
+.tip-swatch { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--swatch); box-shadow: 0 0 0 1px color-mix(in srgb, var(--surface) 70%, transparent); }
 
-/* Buttons. The primary button is the approved "Record sales" look: a light teal pill with a dark teal outline. On hover,
-   focus or press a dark teal circle grows from where the pointer entered (the centre for keyboard and touch) until it
+/* Buttons. The primary button is the approved "Record sales" look: a yolk pill with an ink outline. On hover,
+   focus or press an ink circle grows from where the pointer entered (the centre for keyboard and touch) until it
    covers the button, and the text turns light. js/motion.js sets the circle's origin and size and toggles .is-filled; only
    the circle's transform animates. Secondary buttons stay plain, and destructive ones are text buttons. */
 .primary-button,
@@ -311,12 +331,12 @@ details[open] > .menu-panel { animation: menu-in var(--duration-fast) var(--ease
 }
 .button-arrow { flex: none; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .secondary-button { border: 1px solid var(--border); background: var(--surface); color: var(--ink); }
-.secondary-button:hover { background: var(--teal-tint); }
+.secondary-button:hover { background: var(--accent-tint); }
 .text-button {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--teal-strong);
+  color: var(--accent-strong);
   font-size: var(--text-sm);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -377,7 +397,7 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 /* Inline feedback. Add .is-error or .is-success; never use alert(). */
 .status-text { min-height: 1.5em; margin-top: 8px; color: var(--muted); font-size: var(--text-sm); }
 .status-text.is-error { color: var(--error); }
-.status-text.is-success { color: var(--teal-strong); }
+.status-text.is-success { color: var(--accent-strong); }
 
 /* The last row of every form: its status on the left, its buttons on the right with the primary
    button last. On phones the status takes its own line above the buttons. */
@@ -409,12 +429,12 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
   cursor: pointer;
   transition: border-color var(--duration-fast), background var(--duration-fast);
 }
-.drop-zone:hover, .drop-zone.dragging { border-color: var(--teal); background: var(--teal-tint); }
-.drop-zone:focus-within { outline: 2px solid var(--teal); outline-offset: 2px; }
+.drop-zone:hover, .drop-zone.dragging { border-color: var(--accent); background: var(--accent-tint); }
+.drop-zone:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .drop-zone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .drop-zone strong { font-weight: 400; }
 .drop-hint { color: var(--muted); font-size: var(--text-sm); }
-.upload-mark { width: 28px; height: 28px; color: var(--teal-strong); }
+.upload-mark { width: 28px; height: 28px; color: var(--accent-strong); }
 
 /* Small labels, e.g. "Used by active model" */
 .tag {
@@ -426,7 +446,7 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
   color: var(--muted);
   font-size: var(--text-xs);
 }
-.tag.is-active { background: var(--teal-soft); color: var(--teal-strong); }
+.tag.is-active { background: var(--accent-soft); color: var(--accent-strong); }
 .tag.is-warning { background: var(--warning-soft); color: var(--warning); }
 
 .empty-state { padding: 40px 4px; color: var(--muted); text-align: center; }
@@ -445,18 +465,18 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     box-shadow var(--duration-fast) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
 }
-.secondary-button:hover:not(:disabled) { border-color: #b9dcd8; box-shadow: 0 4px 12px rgb(66 86 100 / 8%); transform: translateY(-1px); }
+.secondary-button:hover:not(:disabled) { border-color: var(--yolk); box-shadow: 0 4px 12px rgb(16 63 64 / 8%); transform: translateY(-1px); }
 .secondary-button:active:not(:disabled) { box-shadow: none; transform: translateY(0) scale(0.97); transition-duration: 60ms; }
-.text-button { text-decoration-color: rgb(15 125 119 / 40%); transition: text-decoration-color var(--duration-fast), color var(--duration-fast); }
-.text-button:hover:not(:disabled) { color: var(--teal-hover); text-decoration-color: currentColor; }
+.text-button { text-decoration-color: color-mix(in srgb, var(--accent-strong) 40%, transparent); transition: text-decoration-color var(--duration-fast), color var(--duration-fast); }
+.text-button:hover:not(:disabled) { color: var(--accent-hover); text-decoration-color: currentColor; }
 .segmented button { transition: background-color var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast); }
 .segmented button:hover:not([aria-pressed="true"]) { color: var(--ink); }
 .tag { transition: background-color var(--duration-fast), color var(--duration-fast); }
 
 .input { transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background-color var(--duration-fast); }
 .input:hover:not(:disabled, :focus) { border-color: var(--subtle); }
-/* Replaces the outline on fields: a teal border (3.2:1) plus a soft halo. */
-.input:focus-visible { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgb(27 160 152 / 22%); }
+/* Replaces the outline on fields: an accent border (4.4:1) plus a soft halo. */
+.input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-halo); }
 
 /* Status lines settle in when they report a result. */
 .status-text:is(.is-success, .is-error):not(:empty) { animation: status-in var(--duration-base) var(--ease-out); }
@@ -500,7 +520,7 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     flex-direction: column; align-items: stretch; gap: 6px; min-height: 0;
     padding: max(20px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
     background: var(--sidebar-gradient); animation: none;
-    border-right: 1px solid rgb(66 86 100 / 9%);
+    border-right: 1px solid rgb(16 63 64 / 9%);
   }
   .app-shell .brand { margin: 0 0 14px; padding: 4px 10px; font-size: 28px; }
   .app-shell .brand-mark { width: 38px; height: 38px; border-radius: 11px; }
@@ -512,16 +532,16 @@ fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
     border: 0; border-radius: 0; background: transparent; box-shadow: none; animation: none;
   }
   .app-shell .navigation a { min-height: 48px; }
-  .app-shell .navigation a:hover:not([aria-current="page"]) { background: rgb(255 255 255 / 55%); }
-  .app-shell .navigation a[aria-current="page"] { background: var(--surface); box-shadow: 0 1px 2px rgb(66 86 100 / 10%), 0 4px 14px rgb(66 86 100 / 10%); }
+  .app-shell .navigation a:hover:not([aria-current="page"]) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+  .app-shell .navigation a[aria-current="page"] { background: var(--surface); box-shadow: 0 1px 2px rgb(16 63 64 / 10%), 0 4px 14px rgb(16 63 64 / 10%); }
 
   .app-shell .account-menu { margin-top: auto; }
   .app-shell .avatar {
     width: 100%; height: auto; padding: 10px 12px; gap: 12px;
     display: flex; align-items: center; justify-content: flex-start; border-radius: var(--radius-lg); overflow: visible;
-    background: rgb(255 255 255 / 55%); box-shadow: none;
+    background: color-mix(in srgb, var(--surface) 55%, transparent); box-shadow: none;
   }
-  .app-shell .avatar:hover, .app-shell .account-menu[open] .avatar { background: rgb(255 255 255 / 85%); }
+  .app-shell .avatar:hover, .app-shell .account-menu[open] .avatar { background: color-mix(in srgb, var(--surface) 85%, transparent); }
   .app-shell .avatar img { flex: none; width: 40px; height: 40px; border-radius: 50%; }
   .app-shell .account-label { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-md); }
   .app-shell .account-menu .menu-panel { top: auto; bottom: calc(100% + 8px); left: 0; right: 0; width: auto; }

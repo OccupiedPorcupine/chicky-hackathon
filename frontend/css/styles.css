@@ -4,8 +4,8 @@ body {
   place-items: center;
   padding: max(32px, env(safe-area-inset-top)) 32px max(32px, env(safe-area-inset-bottom));
   background:
-    linear-gradient(125.87deg, rgb(222 185 146 / 20%) 0%, rgb(27 160 152 / 20%) 65.4%, rgb(250 240 220 / 20%) 100%),
-    var(--surface);
+    linear-gradient(125.87deg, color-mix(in srgb, var(--yolk) 20%, transparent) 0%, color-mix(in srgb, var(--accent) 12%, transparent) 65.4%, color-mix(in srgb, var(--coral) 12%, transparent) 100%),
+    var(--page);
 }
 
 .sign-in-card {
@@ -32,7 +32,7 @@ body {
   gap: 32px;
   padding: 48px 48px 40px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(150deg, #e3f3f0 0%, #f6f4ec 55%, #f8eadc 100%);
+  background: var(--wash-gradient);
 }
 .hero-blob {
   position: absolute;
@@ -43,35 +43,36 @@ body {
   filter: blur(60px);
   opacity: 0.7;
 }
-.hero-blob-teal { top: -120px; left: -80px; background: #a9dcd6; }
-.hero-blob-sand { right: -120px; bottom: -140px; background: #f5d9bd; }
+.hero-blob-yolk { top: -120px; left: -80px; background: var(--yolk-soft); }
+.hero-blob-coral { right: -120px; bottom: -140px; background: var(--coral-soft); }
 
 .hero-copy { max-width: 460px; }
-.hero-title { margin-top: 12px; font-size: 36px; line-height: 1.15; }
+.hero-title { margin-top: 12px; font: 700 36px/1.15 var(--font-display); }
 .hero-lede { margin-top: 12px; color: var(--muted); }
 
 .hero-chart {
   position: relative;
   padding: 16px 16px 12px;
-  border: 1px solid rgb(255 255 255 / 70%);
+  border: 1px solid color-mix(in srgb, var(--surface) 70%, transparent);
   border-radius: var(--radius-lg);
-  background: rgb(255 255 255 / 72%);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(8px);
 }
 .hero-chart-heading { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: var(--text-xs); }
 .hero-legend { display: inline-flex; align-items: center; gap: 6px; }
 .hero-legend i { display: inline-block; width: 14px; height: 0; margin-left: 6px; border-top: 2px solid var(--ink); }
-.hero-legend i.is-predicted { border-top: 2px dashed var(--teal); }
+.hero-legend i.is-predicted { border-top: 2px dashed var(--accent); }
 .hero-chart svg { display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
 .hero-grid line { stroke: var(--divider); stroke-width: 1; }
 .hero-today { stroke: var(--border); stroke-dasharray: 3 4; }
 .hero-today-label { fill: var(--muted); font-size: 12px; }
 .hero-area { fill: url(#hero-wash); }
+#hero-wash stop { stop-color: var(--ink); }
 .hero-line { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
-.hero-forecast { fill: none; stroke: var(--teal); stroke-width: 2.5; stroke-dasharray: 7 6; stroke-linecap: round; }
-.hero-dot { fill: var(--teal); stroke: #fff; stroke-width: 2; }
-.hero-ring { fill: none; stroke: var(--teal); stroke-width: 2; opacity: 0; }
+.hero-forecast { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 7 6; stroke-linecap: round; }
+.hero-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.hero-ring { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; }
 .hero-dot, .hero-ring { transform-box: fill-box; transform-origin: center; }
 
 .hero-float {
@@ -79,7 +80,7 @@ body {
   display: grid;
   gap: 4px;
   padding: 14px 16px;
-  border: 1px solid #f0ece4;
+  border: 1px solid var(--card-line);
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-card-hover);
@@ -92,14 +93,14 @@ body {
 .hero-float-forecast { right: -20px; bottom: -56px; }
 .hero-float-prep { bottom: -84px; left: 28px; min-width: 230px; }
 .hero-prep-row { display: flex; justify-content: space-between; gap: 16px; }
-.hero-prep-row span:last-child { color: var(--teal-strong); }
+.hero-prep-row span:last-child { color: var(--accent-strong); }
 .sign-in-visual .hero-chart { margin-bottom: 96px; }
 
 /* The sign-in page arrives complete: nothing draws in, rises or fades up. Only the slow drift of the two colour blobs
    and the floating cards remains, and that is ambient, not tied to arriving on the page. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-blob-teal { animation: blob-drift 18s ease-in-out infinite alternate; }
-  .hero-blob-sand { animation: blob-drift 22s ease-in-out -6s infinite alternate-reverse; }
+  .hero-blob-yolk { animation: blob-drift 18s ease-in-out infinite alternate; }
+  .hero-blob-coral { animation: blob-drift 22s ease-in-out -6s infinite alternate-reverse; }
   .hero-float-forecast { animation: float 7s ease-in-out infinite; }
   .hero-float-prep { animation: float 8s ease-in-out -2s infinite reverse; }
 }
@@ -109,7 +110,7 @@ body {
 .sign-in-panel { width: 280px; padding-top: 64px; }
 
 h1 { margin-bottom: 24px; font-size: var(--text-xl); line-height: 1.1; }
-h1 span { display: block; color: var(--teal-strong); }
+h1 span { display: block; color: var(--accent-strong); }
 
 .sign-in-form { display: grid; gap: 12px; }
 .forgot-password { width: fit-content; color: var(--muted); font-size: var(--text-xs); }

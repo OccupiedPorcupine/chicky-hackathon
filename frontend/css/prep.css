@@ -48,7 +48,7 @@
   list-style: none;
 }
 .recipe summary::-webkit-details-marker { display: none; }
-.recipe summary:hover { background: var(--teal-tint); }
+.recipe summary:hover { background: var(--accent-tint); }
 /* Chevron, as on drop-downs: points down when closed, up when open. */
 .recipe summary::after {
   content: "";

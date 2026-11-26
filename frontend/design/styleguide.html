@@ -6,7 +6,7 @@
   <title>Style guide · Chicky</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Kaisei+HarunoUmi&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600..800&family=Nunito:wght@400..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/base.css">
   <style>
     /* Layout for this page only. Everything it shows comes from base.css. */
@@ -21,13 +21,14 @@
     .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 20px; }
     .ui-font { font-family: var(--font-ui); }
+    .display-font { font-family: var(--font-display); }
   </style>
 </head>
 <body class="app-shell">
   <header class="topbar">
     <a class="brand" href="#colour"><img class="brand-mark" src="../images/icons/icon.svg" alt="" width="32" height="32"><span>Chicky</span></a>
     <details class="navigation" open>
-      <summary aria-label="Menu"><img src="../images/dashboard/sidebar.svg" alt=""><span class="menu-label" aria-hidden="true">Menu</span></summary>
+      <summary aria-label="Menu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9.5 3.5v17"/></svg><span class="menu-label" aria-hidden="true">Menu</span></summary>
       <nav class="menu-panel" aria-label="Main navigation">
         <a href="#colour" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Dashboard</span></a>
         <a href="#type"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg><span>Demand forecast</span></a>
@@ -61,38 +62,51 @@
     <section class="section" id="colour">
       <div class="section-heading">
         <h2>Colour</h2>
-        <p>Teal is the only accent. Text is ink or muted, never pure black.</p>
+        <p>Ink for text and recorded data, the ink-green accent for what is interactive or predicted, yolk fills for selected and hover, coral for callouts. Yolk and coral are never small text.</p>
       </div>
       <div class="swatches">
-        <div class="swatch"><span style="background: var(--ink)"></span><p>Ink<br><code>--ink #425664</code></p></div>
-        <div class="swatch"><span style="background: var(--muted)"></span><p>Muted<br><code>--muted #66767f</code></p></div>
-        <div class="swatch"><span style="background: var(--subtle)"></span><p>Subtle<br><code>--subtle #9aa6af</code></p></div>
-        <div class="swatch"><span style="background: var(--teal)"></span><p>Teal<br><code>--teal #1ba098</code></p></div>
-        <div class="swatch"><span style="background: var(--teal-strong)"></span><p>Teal strong<br><code>--teal-strong #0f7d77</code></p></div>
-        <div class="swatch"><span style="background: var(--teal-soft)"></span><p>Teal soft<br><code>--teal-soft #d9efec</code></p></div>
-        <div class="swatch"><span style="background: var(--teal-tint)"></span><p>Teal tint<br><code>--teal-tint #ebf6f5</code></p></div>
-        <div class="swatch"><span style="background: var(--neutral-soft)"></span><p>Neutral soft<br><code>--neutral-soft #f1f4f5</code></p></div>
-        <div class="swatch"><span style="background: var(--page)"></span><p>Page<br><code>--page #fffcf5</code></p></div>
-        <div class="swatch"><span style="background: var(--border)"></span><p>Border<br><code>--border #d8dce1</code></p></div>
-        <div class="swatch"><span style="background: var(--error)"></span><p>Error<br><code>--error #b3261e</code></p></div>
-        <div class="swatch"><span style="background: var(--warning-soft)"></span><p>Warning soft<br><code>--warning-soft #fff1d6</code></p></div>
-        <div class="swatch"><span style="background: var(--header-gradient)"></span><p>Header<br><code>--header-gradient</code></p></div>
+        <div class="swatch"><span style="background: var(--ink)"></span><p>Ink<br><code>--ink #103f40</code></p></div>
+        <div class="swatch"><span style="background: var(--yolk)"></span><p>Yolk<br><code>--yolk #ffc629</code></p></div>
+        <div class="swatch"><span style="background: var(--coral)"></span><p>Coral<br><code>--coral #f26350</code></p></div>
+        <div class="swatch"><span style="background: var(--cream)"></span><p>Cream (page)<br><code>--cream #fff4dd</code></p></div>
+        <div class="swatch"><span style="background: var(--shell)"></span><p>Shell (surface)<br><code>--shell #fffdf5</code></p></div>
+        <div class="swatch"><span style="background: var(--muted)"></span><p>Muted<br><code>--muted #6b604d</code></p></div>
+        <div class="swatch"><span style="background: var(--subtle)"></span><p>Subtle<br><code>--subtle #a7a592</code></p></div>
+        <div class="swatch"><span style="background: var(--accent)"></span><p>Accent<br><code>--accent #2a766f</code></p></div>
+        <div class="swatch"><span style="background: var(--accent-strong)"></span><p>Accent strong<br><code>--accent-strong #17605b</code></p></div>
+        <div class="swatch"><span style="background: var(--accent-soft)"></span><p>Accent soft (yolk)<br><code>--accent-soft #ffe7a1</code></p></div>
+        <div class="swatch"><span style="background: var(--accent-tint)"></span><p>Accent tint (yolk)<br><code>--accent-tint #fff1c9</code></p></div>
+        <div class="swatch"><span style="background: var(--coral-strong)"></span><p>Coral strong<br><code>--coral-strong #b23a24</code></p></div>
+        <div class="swatch"><span style="background: var(--coral-soft)"></span><p>Coral soft<br><code>--coral-soft #fde4da</code></p></div>
+        <div class="swatch"><span style="background: var(--neutral-soft)"></span><p>Neutral soft<br><code>--neutral-soft #f7edd8</code></p></div>
+        <div class="swatch"><span style="background: var(--sand-soft)"></span><p>Sand soft<br><code>--sand-soft #fcefd2</code></p></div>
+        <div class="swatch"><span style="background: var(--border)"></span><p>Border<br><code>--border #e2d3b3</code></p></div>
+        <div class="swatch"><span style="background: var(--divider)"></span><p>Divider<br><code>--divider #efe4cb</code></p></div>
+        <div class="swatch"><span style="background: var(--error)"></span><p>Error<br><code>--error #a3193f</code></p></div>
+        <div class="swatch"><span style="background: var(--error-soft)"></span><p>Error soft<br><code>--error-soft #fbe6ea</code></p></div>
+        <div class="swatch"><span style="background: var(--heat-1)"></span><p>Heat 1<br><code>--heat-1 #7fbbaf</code></p></div>
+        <div class="swatch"><span style="background: var(--heat-2)"></span><p>Heat 2<br><code>--heat-2 #479589</code></p></div>
+        <div class="swatch"><span style="background: var(--heat-3)"></span><p>Heat 3<br><code>--heat-3 #226e66</code></p></div>
+        <div class="swatch"><span style="background: var(--heat-4)"></span><p>Heat 4<br><code>--heat-4 = ink</code></p></div>
+        <div class="swatch"><span style="background: var(--sidebar-gradient)"></span><p>Sidebar<br><code>--sidebar-gradient</code></p></div>
+        <div class="swatch"><span style="background: var(--wash-gradient)"></span><p>Wash<br><code>--wash-gradient</code></p></div>
       </div>
     </section>
 
     <section class="section" id="type">
       <div class="section-heading">
         <h2>Type</h2>
-        <p>Kaisei HarunoUmi at weight 400 for the app. Inter for the assistant’s own surfaces.</p>
+        <p>Baloo 2 for the wordmark and headings; Nunito at weight 400 for everything people read.</p>
       </div>
       <div class="type-scale">
         <p><code>--text-number 40</code><span style="font-size: var(--text-number); line-height: 1">838</span></p>
-        <p><code>--text-xl 32</code><span style="font-size: var(--text-xl)">Page title</span></p>
-        <p><code>--text-lg 20</code><span style="font-size: var(--text-lg)">Section heading</span></p>
+        <p><code>--text-xl 32</code><span class="display-font" style="font-size: var(--text-xl); font-weight: 700">Page title</span></p>
+        <p><code>--text-lg 20</code><span class="display-font" style="font-size: var(--text-lg); font-weight: 600">Section heading</span></p>
         <p><code>--text-md 16</code><span>Body text and card titles</span></p>
         <p><code>--text-sm 14</code><span style="font-size: var(--text-sm)">Controls, labels, table cells</span></p>
         <p><code>--text-xs 12</code><span style="font-size: var(--text-xs); color: var(--muted)">Captions and metadata</span></p>
-        <p><code>--font-ui</code><span class="ui-font">Inter: Chicky assistant, guided tour</span></p>
+        <p><code>--font-display</code><span class="display-font" style="font-weight: 800">Baloo 2: chicky, huat tomorrow</span></p>
+        <p><code>--font-ui</code><span class="ui-font">Nunito: body, controls, charts, the assistant · 播放中文</span></p>
       </div>
     </section>
 

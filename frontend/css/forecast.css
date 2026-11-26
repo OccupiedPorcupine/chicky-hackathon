@@ -36,7 +36,7 @@
 .factor { padding-right: 12px; }
 .factor + .factor { padding: 0 0 0 12px; border-left: 1px solid var(--divider); }
 .side-card h3 { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); }
-.side-card h3 svg { flex: none; width: 16px; height: 16px; color: var(--teal-strong); }
+.side-card h3 svg { flex: none; width: 16px; height: 16px; color: var(--accent-strong); }
 .side-card h3 + p { margin-top: 4px; color: var(--muted); font-size: var(--text-sm); }
 .extra-context { display: grid; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--divider); }
 

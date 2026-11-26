@@ -20,7 +20,7 @@
   border-bottom: 1px solid var(--divider);
   font-size: var(--text-sm);
 }
-.document-row:target, .document-row.is-editing { background: var(--teal-tint); }
+.document-row:target, .document-row.is-editing { background: var(--accent-tint); }
 .document-name { min-width: 0; }
 .document-name strong { display: block; font-weight: 400; overflow-wrap: anywhere; }
 .document-name span { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-xs); }

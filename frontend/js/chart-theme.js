@@ -1,12 +1,13 @@
 // Chart.js styling from the design tokens in css/base.css, so every chart matches the app.
-// Load after Chart.js and base.css. Recorded data is ink; predictions are teal and dashed
+// Load after Chart.js and base.css. Recorded data is ink; predictions are the accent green, dashed
 // (see DESIGN.md, "Charts").
 const chickyChart = (() => {
   const token = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const ink = token("--ink");
-  const teal = token("--teal");
+  const accent = token("--accent");
+  const light = token("--surface");   // the ring around point markers
 
-  Chart.defaults.font.family = token("--font-display");
+  Chart.defaults.font.family = token("--font-ui");
   Chart.defaults.font.size = 12;
   Chart.defaults.color = token("--muted");
   Chart.defaults.borderColor = token("--divider");
@@ -221,7 +222,7 @@ const chickyChart = (() => {
     borderWidth: 2,
     tension: 0.35,
     pointBackgroundColor: ink,
-    pointBorderColor: "#fff",
+    pointBorderColor: light,
     pointBorderWidth: 1.5,
     pointRadius: 3.5,
     pointHoverRadius: 6,
@@ -230,7 +231,7 @@ const chickyChart = (() => {
 
   // ---- A line chart of recorded values ----
   // The dashboard's demand card and the forecast's history card draw the same chart: recorded values are ink (as on every
-  // chart), with a faint teal wash under the line; the brand teal marks the highest value (written above it) and whatever
+  // chart), with a faint accent wash under the line; the accent marks the highest value (written above it) and whatever
   // is under the pointer or keyboard focus; the axes are quiet (no axis lines, light gridlines); and the tooltip gives the
   // day in full, the value and how it compares with the average of the days shown. A missing day (null) is a gap.
   // Hover and tap come from pointer(), arrow keys from keyboard(), so neither depends on the plot area or the hover.
@@ -244,20 +245,20 @@ const chickyChart = (() => {
     canvas.chickyKeyboard?.dispose();
     canvas.chickyPointer?.dispose();
     Chart.getChart(canvas)?.destroy();
-    const tealStrong = token("--teal-strong");
+    const accentStrong = token("--accent-strong");
 
     const shown = values.filter(value => value !== null);
     const average = shown.length ? shown.reduce((a, b) => a + b, 0) / shown.length : 0;
     const top = shown.length ? Math.max(...shown) : 0;
     const peak = top > 0 ? values.indexOf(top) : -1;
 
-    // A teal wash that fades towards the axis.
+    // An accent wash that fades towards the axis.
     const wash = context => {
       const { chart } = context;
       if (!chart.chartArea) return "transparent";
       const gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
-      gradient.addColorStop(0, `${teal}40`);
-      gradient.addColorStop(1, `${teal}00`);
+      gradient.addColorStop(0, `${accent}40`);
+      gradient.addColorStop(1, `${accent}00`);
       return gradient;
     };
 
@@ -272,11 +273,11 @@ const chickyChart = (() => {
           backgroundColor: wash,
           borderWidth: 2.5,
           pointRadius: context => context.dataIndex === peak ? 6 : 3,
-          pointBackgroundColor: context => context.dataIndex === peak ? teal : ink,
-          pointBorderColor: "#fff",
+          pointBackgroundColor: context => context.dataIndex === peak ? accent : ink,
+          pointBorderColor: light,
           pointBorderWidth: 2,
           pointHoverRadius: 7,
-          pointHoverBackgroundColor: teal,
+          pointHoverBackgroundColor: accent,
           pointHitRadius: 24
         }]
       },
@@ -319,7 +320,7 @@ const chickyChart = (() => {
           const active = chart.tooltip?.getActiveElements?.() ?? [];
           if (active.length) {
             ctx.save();
-            ctx.strokeStyle = `${teal}99`;
+            ctx.strokeStyle = `${accent}99`;
             ctx.lineWidth = 1;
             ctx.setLineDash([3, 4]);
             ctx.beginPath();
@@ -332,7 +333,7 @@ const chickyChart = (() => {
           if (peak >= 0 && !active.some(item => item.index === peak)) {
             const point = chart.getDatasetMeta(0).data[peak];
             ctx.save();
-            ctx.fillStyle = tealStrong;
+            ctx.fillStyle = accentStrong;
             ctx.font = `${Chart.defaults.font.size + 2}px ${Chart.defaults.font.family}`;
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
@@ -355,14 +356,14 @@ const chickyChart = (() => {
     recordedLine,
     recordedBar: {
       backgroundColor: ink,
-      hoverBackgroundColor: token("--teal-strong"),
+      hoverBackgroundColor: token("--accent-strong"),
       borderRadius: 6,
       borderSkipped: false,
       maxBarThickness: 32
     },
     predictedLine: {
-      borderColor: teal,
-      backgroundColor: teal,
+      borderColor: accent,
+      backgroundColor: accent,
       borderWidth: 2,
       borderDash: [6, 5],
       tension: 0.3,
