@@ -278,14 +278,18 @@ function isClosed(isoDate, { restDays, closedDates }) {
   return restDays.includes(weekday) || closedDates.some(closed => closed.date === isoDate);
 }
 
-function showEmpty(message) {
+// Nothing to chart: Chicky over each chart (they keep their height), with the way forward on the first one.
+function showEmpty(message, kind = "empty", action) {
   document.getElementById("waste-note").textContent = "";
-  document.getElementById("sold-out-note").textContent = "";
-  document.getElementById("demand-note").textContent = message;
-  document.getElementById("dish-note").textContent = message;
-  document.getElementById("revenue-note").textContent = message;
-  setTreemapMessage(message);
+  document.getElementById("sold-out-note").textContent = kind === "empty" ? "Sell-outs you record appear here." : "";
+  if (kind === "empty") noteState("waste-note", "empty", "Record leftovers and sell-outs to see them here.");
+  ["demand-note", "dish-note", "revenue-note"].forEach(id => { document.getElementById(id).textContent = ""; });
+  chickyState.cover(document.querySelector("#demand-chart").closest(".chart"), kind, message, { action });
+  chickyState.cover(document.querySelector("#dish-chart").closest(".chart"), kind, message);
+  setTreemapMessage(message, kind);
 }
+
+const openRecordSales = { label: "Record sales", onClick: () => document.getElementById("record-open").click() };
 
 async function loadDashboard() {
   const profile = await requireLogin();
@@ -301,7 +305,8 @@ async function loadDashboard() {
   const dishes = await apiRequest("/api/dishes");
 
   if (dishes.length === 0) {
-    showEmpty("No dishes yet. Add one to see your sales here.");
+    showEmpty("No dishes yet. Import your sales, or record them, and your dishes appear here.", "empty",
+      { label: "Import sales", href: "data.html" });
     return;
   }
 
@@ -317,7 +322,7 @@ async function loadDashboard() {
     .at(-1);
 
   if (!latestDate) {
-    showEmpty("No sales recorded yet.");
+    showEmpty("No sales recorded yet.", "empty", openRecordSales);
     return;
   }
 
@@ -358,11 +363,11 @@ async function loadDashboard() {
   loadRevenue(firstDay, latestDate).catch(error => {
     console.error(error);
     document.getElementById("revenue-note").textContent = "Revenue could not be loaded.";
-    setTreemapMessage("Revenue could not be loaded.");
+    setTreemapMessage("Revenue could not be loaded.", "oops");
   });
   loadWaste(firstDay, latestDate).catch(error => {
     console.error(error);
-    document.getElementById("waste-note").textContent = "Leftovers could not be loaded.";
+    noteState("waste-note", "oops", "Leftovers could not be loaded.");
   });
 
   // Most demand first; dishes with the same demand stay in name order.
@@ -436,7 +441,7 @@ let treemapTiles = [];    // what is on screen, in the same order (each with its
 let treemapDrawn = "";    // which dishes are on screen, so that resizing only moves them
 
 // Shows a message where the tiles would be: loading, nothing sold yet, or prices missing.
-function setTreemapMessage(message) {
+function setTreemapMessage(message, kind) {
   treemapDishes = [];
   treemapTiles = [];
   treemapDrawn = "";
@@ -444,7 +449,8 @@ function setTreemapMessage(message) {
   treemapKey.replaceChildren();
   treemapKey.hidden = true;
   hideTreemapTip();
-  treemapEmpty.textContent = message;
+  if (kind) chickyState.show(treemapEmpty, kind, message);
+  else treemapEmpty.textContent = message;
   treemapEmpty.hidden = false;
 }
 
@@ -463,7 +469,7 @@ function renderTreemap(dishes, total) {
   const dishTotal = sum(dishes.map(dish => dish.value));
   if (Math.abs(dishTotal - total) > 0.005) console.warn(`Dish revenue (${dishTotal}) doesn't add up to the total (${total}).`);
   if (!dishes.length) {
-    setTreemapMessage("No revenue in these 7 days.");
+    setTreemapMessage("No revenue in these 7 days.", "empty");
     return;
   }
   const dollars = apportionDollars(dishes.map(dish => dish.value), Math.round(dishTotal));
@@ -754,13 +760,15 @@ async function loadWaste(from, to) {
   document.getElementById("waste-total").textContent = waste.daysRecorded ? count.format(waste.leftoverPortions) : "--";
 
   if (!waste.daysRecorded) {
-    note.textContent = "Record leftovers and sell-outs to see them here.";
+    noteState("waste-note", "empty", "Record leftovers and sell-outs to see them here.");
   } else {
     const withLeftovers = waste.dishes.filter(dish => dish.leftoverPortions > 0);
     const cost = waste.leftoverCost === null ? null
       : `${money.format(Number(waste.leftoverCost))} of food not sold${waste.leftoversWithoutCost ? " (dishes without a cost left out)" : ""}`;
     const most = withLeftovers.slice(0, 3).map(dish => `${dish.name} (${dish.leftoverPortions})`).join(", ");
-    note.textContent = [cost, most].filter(Boolean).join(" · ") || "No leftovers recorded.";
+    const summary = [cost, most].filter(Boolean).join(" · ");
+    if (summary) note.textContent = summary;
+    else noteState("waste-note", "cheer", "No leftovers recorded.");
   }
 
   const soldOut = waste.dishes.filter(dish => dish.soldOutDays > 0).sort((a, b) => b.soldOutDays - a.soldOutDays);
@@ -774,9 +782,13 @@ async function loadWaste(from, to) {
     item.append(name, detail);
     return item;
   }));
-  document.getElementById("sold-out-note").textContent = soldOut.length
-    ? "More people wanted it than you made."
-    : "No dish sold out.";
+  if (soldOut.length) document.getElementById("sold-out-note").textContent = "More people wanted it than you made.";
+  else noteState("sold-out-note", "cheer", "No dish sold out.");
+}
+
+// A card's one-line note, as a small Chicky beside the sentence.
+function noteState(id, kind, message) {
+  document.getElementById(id).replaceChildren(chickyState.create(kind, message, { size: "inline", tag: "span" }));
 }
 
 // ---- Revenue by day: a GitHub-style heatmap ----
@@ -856,7 +868,7 @@ function renderHeatmap(daily, today) {
   const total = days.reduce((sum, day) => sum + valueOf(day), 0);
   const note = document.getElementById("heatmap-note");
   if (!values.length) {
-    note.textContent = "No sales in the last 53 weeks yet.";
+    noteState("heatmap-note", "empty", "No sales in the last 53 weeks yet.");
   } else if (byRevenue) {
     note.textContent = `${wholeMoney.format(total)} in 53 weeks · best day ${wholeMoney.format(valueOf(best))} on ${formatDay(best.date, { weekday: "short", day: "numeric", month: "short" })}`;
   } else {
@@ -981,13 +993,14 @@ async function loadActions() {
   try {
     renderActions(await apiRequest("/api/actions"));
   } catch (error) {
-    if (error.status !== 401) actionsNote.textContent = "Actions could not be loaded.";
+    if (error.status !== 401) chickyState.show(actionsNote, "oops", "Actions could not be loaded. Refresh the page to try again.");
   }
 }
 
 function renderActions(cards) {
   actionList.replaceChildren(...cards.map(actionItem));
-  actionsNote.textContent = cards.length ? "" : "Nothing needs your attention right now.";
+  if (cards.length) actionsNote.textContent = "";
+  else chickyState.show(actionsNote, "cheer", "Nothing needs your attention right now.");
 }
 
 function actionItem(card) {
@@ -1022,7 +1035,7 @@ function actionItem(card) {
     try {
       await apiRequest("/api/actions/dismiss", { method: "POST", body: JSON.stringify({ key: card.key }) });
       item.remove();
-      if (!actionList.children.length) actionsNote.textContent = "Nothing needs your attention right now.";
+      if (!actionList.children.length) chickyState.show(actionsNote, "cheer", "Nothing needs your attention right now.");
     } catch (error) {
       dismiss.disabled = false;
       actionsNote.textContent = error.message || "That card could not be dismissed.";
@@ -1163,13 +1176,13 @@ document.getElementById("record-cancel").addEventListener("click", () => recordD
 function refreshDashboard() {
   loadDashboard().catch(error => {
     console.error(error);
-    showEmpty("Could not load sales. Is the backend running?");
+    showEmpty("Your sales couldn’t be loaded. Refresh the page to try again.", "oops");
   });
   loadActions();
   loadWeekSummary();
   loadHeatmap().catch(error => {
     console.error(error);
-    document.getElementById("heatmap-note").textContent = "Revenue by day could not be loaded.";
+    noteState("heatmap-note", "oops", "Revenue by day could not be loaded.");
   });
 }
 
