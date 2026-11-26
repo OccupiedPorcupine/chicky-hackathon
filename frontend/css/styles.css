@@ -111,26 +111,8 @@ body {
 /* The form side: the logo lockup, then one of the six panels. */
 .sign-in-side { display: flex; flex-direction: column; padding-top: 40px; }
 
-/* Text placeholder for #7's lockup: "chicky" in heavy, rounded Ink with the Coral swoosh under it. */
-.brand-lockup {
-  position: relative;
-  width: fit-content;
-  margin-bottom: 40px;
-  color: var(--ink);
-  font: 800 36px/1 var(--font-display);
-  letter-spacing: -0.01em;
-}
-.brand-lockup::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: -4%;
-  bottom: -8px;
-  height: 5px;
-  border-radius: var(--radius-pill);
-  background: var(--coral);
-  transform: rotate(-3deg);
-}
+/* The logo lockup (images/brand/logo-lockup.svg, 135:40). */
+.brand-lockup { display: block; align-self: flex-start; width: auto; height: 52px; margin-bottom: 36px; }
 
 .sign-in-panel { width: 100%; }
 
@@ -204,7 +186,7 @@ h1 span { display: block; color: var(--accent-strong); }
   body { padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
   .sign-in-card { display: flex; flex-direction: column; gap: 0; min-height: 0; padding: 20px 16px 24px; }
   .sign-in-side { display: contents; }
-  .brand-lockup { order: -1; margin: 4px auto 28px; font-size: 32px; }
+  .brand-lockup { order: -1; align-self: center; height: 44px; margin: 4px auto 24px; }
   .sign-in-visual { padding: 20px 20px 0; gap: 4px; }
   .hero-shape-yolk { width: 280px; right: -60px; bottom: -120px; }
   .hero-shape-coral { width: 130px; top: -50px; right: -50px; }

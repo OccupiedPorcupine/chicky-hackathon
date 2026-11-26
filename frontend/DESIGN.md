@@ -610,7 +610,6 @@ The script mocks the API, so no backend or login is needed.
 
 ## Known gaps
 
-- The sign-in card's logo lockup is a text placeholder (`.brand-lockup`) until #7's `logo-lockup.svg` lands.
 - Dashboard "Actions needed" items, the forecast "Ask about this forecast" card (disabled) and its
   "Local events" factor are placeholders that aren't connected yet. When they are, keep the
   components above.
