@@ -105,37 +105,185 @@
 @keyframes assistant-bar { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
 @keyframes assistant-dot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-3px); } }
 
+/* ---- The panel (issue #37): a floating window with a glow round its edge, and Uncle on a stage at the top,
+   standing behind his stall counter and breaking out over the window's top edge. Every size comes from --uncle. */
+@property --glow-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 .assistant-panel {
+  --uncle: 180px;
   position: fixed;
   right: calc(24px + env(safe-area-inset-right));
   bottom: calc(92px + env(safe-area-inset-bottom));
   z-index: 1000;
+  isolation: isolate;
+  width: min(400px, calc(100vw - 32px));
+  transform-origin: calc(100% - 28px) calc(100% + 40px);   /* the launcher */
+}
+.assistant-panel[hidden] { display: none; }
+.assistant-window {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(400px, calc(100vw - 32px));
-  max-height: min(580px, calc(100dvh - 120px - env(safe-area-inset-bottom)));
+  max-height: min(560px, calc(100dvh - 120px - var(--uncle) * 0.4 - env(safe-area-inset-bottom)));
   border: 1px solid var(--assistant-border);
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-float);
   overflow: hidden;
 }
-.assistant-panel[hidden] { display: none; }
 
-/* Header: Uncle's face and name, what he is doing, then the sound and close buttons. */
-.assistant-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 12px 12px 16px;
-  border-bottom: 1px solid var(--assistant-border);
-  background: var(--sand-soft);
+/* The glow: Yolk and Coral, blurred, round the window's edge. Dim and still at rest; it breathes (and follows the
+   mic) while listening, a shimmer travels round it while thinking, and it pulses with Uncle's voice while he
+   speaks. js/assistant.js sets --voice-level (0–1); with reduced motion it stays 0 and nothing moves. */
+.assistant-glow {
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: calc(var(--radius-xl) + 5px);
+  background: conic-gradient(from var(--glow-angle), var(--yolk), var(--coral), var(--yolk-soft), var(--yolk), var(--coral), var(--yolk));
+  filter: blur(14px);
+  opacity: 0.3;
+  transition: opacity 140ms linear, transform 140ms linear;
 }
-.assistant-header .assistant-face { width: 44px; height: 44px; }
+.assistant-panel[data-voice-state="listening"] .assistant-glow { opacity: calc(0.5 + var(--voice-level, 0) * 0.5); }
+.assistant-panel[data-voice-state="thinking"] .assistant-glow { opacity: 0.65; }
+.assistant-panel[data-voice-state="speaking"] .assistant-glow {
+  opacity: calc(0.45 + var(--voice-level, 0) * 0.55);
+  transform: scale(calc(1 + var(--voice-level, 0) * 0.025));
+}
+
+/* Uncle: a fixed frame clipped just below his counter, a bob inside it, and the hop on a change of pose. */
+.assistant-uncle {
+  position: absolute;
+  top: calc(var(--uncle) * -0.39);
+  left: 0;
+  z-index: 2;
+  width: var(--uncle);
+  height: var(--uncle);
+  pointer-events: none;
+  clip-path: inset(-50% -50% calc(var(--uncle) * 0.04) -50%);
+}
+.assistant-uncle-body { position: absolute; inset: 0; transform-origin: 50% 90%; }
+.assistant-uncle-body img { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* His mouth shut: ready.webp over speaking.webp (one canvas), only while speaking. */
+.assistant-uncle-mouth { opacity: 0; }
+/* Pointing and presenting are drawn on a wider canvas: smaller and to the left, so his hand stays off his name. */
+.assistant-panel:is([data-stage-pose="pointing"], [data-stage-pose="presenting"]) .assistant-uncle-pose { transform: translate(-8%, 7%) scale(0.86); }
+.assistant-panel.is-mouth-shut[data-stage-pose="speaking"] .assistant-uncle-mouth { opacity: 1; }
+/* The stall counter he stands behind, hiding where the picture ends. */
+.assistant-uncle::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--uncle) * 0.84);
+  left: calc(var(--uncle) * 0.1);
+  width: calc(var(--uncle) * 0.76);
+  height: calc(var(--uncle) * 0.12);
+  border-radius: var(--radius-md);
+  background: linear-gradient(var(--yolk) 0 38%, var(--coral) 38% 100%);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.assistant-uncle .assistant-fx {
+  position: absolute;
+  top: calc(var(--uncle) * 0.14);
+  left: calc(var(--uncle) * 0.76);
+  width: calc(var(--uncle) * 0.2);
+  height: calc(var(--uncle) * 0.2);
+}
+
+/* The stage: his name and the buttons, then his latest line in a speech bubble with its tail at him. */
+.assistant-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 4px;
+  min-height: calc(var(--uncle) * 0.62);
+  padding: 10px 10px 14px calc(var(--uncle) * 0.86);
+  border-bottom: 1px solid var(--assistant-border);
+  background: var(--wash-gradient);
+}
 .assistant-heading { min-width: 0; }
 .assistant-header h2 { margin: 0; font: 600 18px/1.2 var(--font-display); color: var(--assistant-ink); }
 .assistant-role { margin: 0; font-size: 12px; color: var(--assistant-muted); }
-.assistant-header .assistant-fx { width: 34px; height: 34px; }
+.assistant-say { position: relative; grid-column: 1 / -1; margin-top: 4px; }
+.assistant-say::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 1px solid var(--card-line);
+  border-left: 1px solid var(--card-line);
+  background: var(--surface);
+  transform: rotate(45deg);
+}
+.assistant-say-text {
+  max-height: 132px;
+  margin: 0;
+  padding: 9px 12px;
+  overflow-y: auto;
+  border: 1px solid var(--card-line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.assistant-say:not(.is-thinking):has(.assistant-say-text:empty) { display: none; }
+/* Thinking: three dots where his line will be. */
+.assistant-say.is-thinking .assistant-say-text::before { content: "•••"; letter-spacing: 3px; color: var(--muted); }
+
+/* Opening grows the panel out of the launcher with a spring; closing plays it backwards. */
+@media (prefers-reduced-motion: no-preference) {
+  .assistant-panel:not([hidden]) { animation: assistant-open 440ms var(--ease-spring) both; }
+  .assistant-panel.is-closing { animation: assistant-close 200ms var(--ease-in-out) both; pointer-events: none; }
+  .assistant-panel[data-voice-state="listening"] .assistant-glow { animation: glow-breathe 2.4s ease-in-out infinite; }
+  .assistant-panel[data-voice-state="thinking"] .assistant-glow { animation: glow-travel 2.6s linear infinite; }
+  .assistant-uncle-body { animation: uncle-bob 3.2s ease-in-out infinite alternate; }
+  .assistant-uncle-body.is-hopping { animation: uncle-hop 380ms var(--ease-spring), uncle-bob 3.2s ease-in-out 380ms infinite alternate; }
+  .assistant-say.is-thinking .assistant-say-text::before { animation: say-dots 1.2s ease-in-out infinite; }
+}
+@keyframes assistant-open { from { opacity: 0; transform: translateY(24px) scale(0.6); } }
+@keyframes assistant-close { to { opacity: 0; transform: translateY(24px) scale(0.6); } }
+@keyframes glow-breathe { 50% { scale: 1.03; } }
+@keyframes glow-travel { to { --glow-angle: 360deg; } }
+@keyframes uncle-bob { to { translate: 0 -3px; } }
+@keyframes uncle-hop {
+  0% { transform: none; }
+  30% { transform: scale(1.05, 0.93); }
+  65% { transform: translateY(-7px) scale(0.98, 1.03); }
+  100% { transform: none; }
+}
+@keyframes say-dots { 50% { opacity: 0.35; } }
+
+/* A saved confirm card: a little burst of Yolk and Coral off Uncle's counter (js/assistant.js, celebrate). */
+.assistant-confetti {
+  position: absolute;
+  top: calc(var(--uncle) * 0.12);
+  left: calc(var(--uncle) * 0.62);
+  z-index: 3;
+  pointer-events: none;
+}
+.assistant-confetti span {
+  position: absolute;
+  width: 10px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--yolk);
+  opacity: 0;
+  animation: confetti-pop 1.1s var(--ease-out) both;
+}
+.assistant-confetti span:nth-child(3n) { background: var(--coral); }
+.assistant-confetti span:nth-child(3n + 1) { width: 8px; height: 8px; border-radius: 50%; }
+.assistant-confetti span:nth-child(4n) { background: var(--accent); }
+@keyframes confetti-pop {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(var(--spin)); }
+}
+
 .assistant-sound {
   display: grid;
   place-items: center;
@@ -166,11 +314,24 @@
 }
 .assistant-close:hover { background: var(--neutral-soft); }
 
+/* The history under the stage. It is empty (no height) until there is something earlier than his latest line. */
 .assistant-log {
-  flex: 1;
-  min-height: 120px;
-  padding: 12px 16px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px 16px 4px;
   overflow-y: auto;
+}
+.assistant-log:not(:has(> :not(.is-on-stage))) { padding: 0; }
+/* His latest line is in the speech bubble: kept here, whole, for screen readers only. */
+.assistant-message.is-on-stage {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .assistant-message {
@@ -353,7 +514,16 @@
 
 @media (max-width: 600px) {
   .assistant-bubble { right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); }
-  .assistant-panel { right: calc(16px + env(safe-area-inset-right)); bottom: calc(84px + env(safe-area-inset-bottom)); }
+  /* A bottom sheet with a smaller stage. The launcher steps aside while it is open. */
+  .assistant-panel { --uncle: 140px; right: 0; bottom: 0; left: 0; width: 100%; transform-origin: calc(100% - 44px) 100%; }
+  .assistant-window {
+    max-height: calc(100dvh - var(--uncle) * 0.4 - 24px - env(safe-area-inset-top));
+    border-bottom: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .assistant-glow { inset: -5px 0 auto; height: 40px; border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+  .assistant-input { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .assistant-bubble[aria-expanded="true"] { display: none; }
 
   /* Too narrow for four columns: each entry puts the dish and its remove button on one line, with the
      date and portions below, so the date gets the room to show the whole year (#29). The inputs keep
