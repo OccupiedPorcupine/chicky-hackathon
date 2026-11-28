@@ -32,7 +32,7 @@ jobs:
     name: Prune container images
     runs-on: ubuntu-latest
     # Forks have no token, and shouldn't touch this project's registry.
-    if: github.repository == 'OccupiedPorcupine/CS203-Vincent-s-Disciples'
+    if: github.repository == 'OccupiedPorcupine/chicky-hackathon'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7

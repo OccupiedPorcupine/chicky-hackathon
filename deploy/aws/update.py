@@ -10,7 +10,7 @@ import urllib.request
 
 STATE = Path("/var/lib/chicky")
 PAUSED = STATE / "update-paused.json"
-REPO = "OccupiedPorcupine/CS203-Vincent-s-Disciples"
+REPO = "OccupiedPorcupine/chicky-hackathon"
 
 
 def order(tag):
