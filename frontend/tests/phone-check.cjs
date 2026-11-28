@@ -100,6 +100,8 @@ async function settle(page) {
 }
 
 async function mockApi(context) {
+  // Optional remote assets must not make local functional checks depend on CDN load.
+  await context.route(/^https:\/\/(?:fonts\.(?:googleapis|gstatic)\.com\/|cdn\.jsdelivr\.net\/npm\/lenis@)/, route => route.abort());
   let signedIn = false;
   const documents = [
     { id: 1, title: "Ah Huat Poultry", source: "UPLOAD", fileName: "suppliers-and-cut-off-times.docx", indexStatus: "INDEXED", characters: 1840, updatedAt: "2026-10-29T03:00:00Z" },
