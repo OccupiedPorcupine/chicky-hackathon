@@ -40,7 +40,7 @@ def main():
     command = [java, "-jar", str(jars[0]),
                "--spring.config.import=classpath:health.properties",
                "--spring.profiles.active=local-demo", "--server.address=127.0.0.1", f"--server.port={args.port}",
-               "--spring.datasource.url=jdbc:h2:mem:voice_demo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
+               "--spring.datasource.url=jdbc:h2:mem:voice_demo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1",
                "--spring.datasource.username=sa", "--spring.datasource.password=",
                "--app.nea.hawker-centre-sync.enabled=false", "--app.weather.enabled=false",
                "--app.setup-checks.on-startup=false", "--app.ml.base-url=http://localhost:8000",

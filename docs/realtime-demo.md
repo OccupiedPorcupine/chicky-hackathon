@@ -19,6 +19,8 @@ The launcher starts a fresh in-memory H2 database bound to localhost. It reads o
 `backend/.env`; it ignores production database, mail,
 Telegram and profile settings. Restarting clears this local dataset. Without a
 key, the backend runs and the page honestly reports live voice unavailable.
+The demo database stays alive for the JVM lifetime even if the connection pool
+recycles every connection; stopping the backend still clears it.
 
 In another terminal, from the repository root:
 
