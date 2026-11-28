@@ -7,6 +7,7 @@ and shows proposed changes for the owner to review and confirm.
 - Main deployment: [chicky-app.duckdns.org](https://chicky-app.duckdns.org)
 - Backup deployment: [chicky-zeta.vercel.app](https://chicky-zeta.vercel.app)
 - Demo and release checks: [hackathon checklist](docs/hackathon-readiness.md)
+- Live voice closing-shift demo: [setup and recording guide](docs/realtime-demo.md)
 
 Deployment addresses are configured in this repository; check their health before
 a presentation. Publishing container images does not by itself verify an EC2 deployment.
@@ -59,15 +60,18 @@ website.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    Browser[HTML / CSS / JavaScript] --> Proxy[Frontend server or Nginx]
-    Proxy --> Backend[Spring Boot API]
-    Backend --> DB[(H2 locally / Supabase Postgres)]
-    Backend --> ML[Python forecasting API / Chronos-2]
-    Backend --> AI[OpenAI assistant and speech]
-    Telegram[Telegram webhook] --> Backend
-```
+![Chicky backend: web and Telegram connect to Spring Boot, Supabase, OpenAI and Chronos-2 to turn sales into a prep list.](docs/diagrams/chicky-backend.png)
+
+[Editable Excalidraw](docs/diagrams/chicky-backend.excalidraw) ·
+[SVG for slides and video](docs/diagrams/chicky-backend.svg) ·
+[HTML preview](docs/diagrams/chicky-backend.html)
+
+The Spring Boot backend stores sales and recipes, calls Uncle for text and voice
+assistance, and turns demand forecasts into portions and ingredients to buy.
+Assistant changes require the owner's confirmation. Chronos-2 uses sales history
+and public holidays; the backend falls back to a historical baseline when there
+is too little history or the ML service is unavailable. The diagram shows
+Supabase Postgres; local development defaults to in-memory H2.
 
 - [Frontend](frontend/README.md): responsive pages, confirm cards and guided tours.
 - [Backend](backend/README.md): authentication, sales, imports, documents, forecasts
