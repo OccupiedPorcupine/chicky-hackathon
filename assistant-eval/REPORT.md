@@ -24,7 +24,7 @@ about this forecast" card.
 |---|---|---|
 | Understanding and replies | `gpt-6-luna` (OpenAI Responses API, function calling) | `store=false`, so OpenAI keeps no conversation. |
 | Speech to text | `gpt-transcribe` | The user's dish names and nicknames are sent as keywords, so "char siew" and "叉烧饭" are spelt right. Audio is never stored. |
-| Text to speech | `gpt-4o-mini-tts`, voice `marin` | Replies are read aloud unless muted. Repeated phrases come from a cache. |
+| Text to speech | `gpt-4o-mini-tts`, voice `cedar` | Replies are read aloud unless muted, in the voice of Uncle, the assistant's persona. Repeated phrases come from a cache. |
 | No OpenAI key | `offline-rules` | A rule-based stand-in for demos and tests. It isn't AI, and it drives the same tools so the rest of the pipeline is real. |
 
 Model names and prices are in `backend/src/main/resources/application.properties`.
