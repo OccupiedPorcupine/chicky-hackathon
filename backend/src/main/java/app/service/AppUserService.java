@@ -102,6 +102,22 @@ public class AppUserService {
         return appUserRepository.save(user);
     }
 
+    // Removes Google sign-in from a signed-in user. Refused for an account with no password, which would
+    // then have no way to sign in; such a user can set one first with "Forgot password".
+    @Transactional
+    public AppUser unlinkGoogle(Long userId) {
+        AppUser user = appUserRepository.findById(userId).orElseThrow();
+        if (user.getGoogleId() == null) {
+            return user;
+        }
+        if (!user.hasPassword()) {
+            throw new GoogleLinkConflictException("PASSWORD_REQUIRED",
+                    "Set a password before disconnecting Google: sign out, then use \"Forgot password\" on the sign-in page");
+        }
+        user.unlinkGoogle();
+        return appUserRepository.save(user);
+    }
+
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase(java.util.Locale.ROOT);
     }

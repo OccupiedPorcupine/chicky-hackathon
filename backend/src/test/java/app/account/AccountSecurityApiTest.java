@@ -227,6 +227,37 @@ class AccountSecurityApiTest {
     }
 
     @Test
+    void aLinkedAccountCanDisconnectGoogleAndKeepItsPassword() throws Exception {
+        Session session = signUp("unlink@account.test");
+        when(googleAuthService.verifyToken("unlink-credential")).thenReturn(googlePayload("google-unlink", "unlink@account.test"));
+        assertEquals(200, session.send("POST", "/api/account/google-link", "{\"credential\":\"unlink-credential\"}").statusCode());
+
+        HttpResponse<String> unlink = session.send("DELETE", "/api/account/google-link", null);
+
+        assertEquals(200, unlink.statusCode(), unlink.body());
+        assertTrue(session.get("/api/profile").body().contains("\"googleLinked\":false"));
+        assertEquals(200, login("unlink@account.test", PASSWORD).statusCode());
+        // Linking marked the email confirmed, so Google sign-in now needs linking again.
+        HttpResponse<String> google = new Session().send("POST", "/api/auth/google", "{\"credential\":\"unlink-credential\"}");
+        assertEquals(409, google.statusCode());
+        assertTrue(google.body().contains("\"code\":\"ACCOUNT_LINKING_REQUIRED\""), google.body());
+    }
+
+    @Test
+    void aGoogleOnlyAccountCannotDisconnectGoogle() throws Exception {
+        when(googleAuthService.verifyToken("only-credential")).thenReturn(googlePayload("google-only", "google-only@account.test"));
+        Session session = new Session();
+        assertEquals(200, session.send("POST", "/api/auth/google", "{\"credential\":\"only-credential\"}").statusCode());
+        assertTrue(session.get("/api/profile").body().contains("\"hasPassword\":false"));
+
+        HttpResponse<String> unlink = session.send("DELETE", "/api/account/google-link", null);
+
+        assertEquals(409, unlink.statusCode());
+        assertTrue(unlink.body().contains("\"code\":\"PASSWORD_REQUIRED\""), unlink.body());
+        assertTrue(session.get("/api/profile").body().contains("\"googleLinked\":true"));
+    }
+
+    @Test
     void linkingGoogleNeedsASignedInAccount() throws Exception {
         assertEquals(401, new Session().send("POST", "/api/account/google-link", "{\"credential\":\"anything\"}").statusCode());
     }

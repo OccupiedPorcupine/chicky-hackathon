@@ -48,10 +48,23 @@ function showGoogleLinkStatus(message, type) {
   googleLinkStatus.className = `status-text${type ? ` is-${type}` : ""}`;
 }
 
+let profileForGoogle = {};
+
 async function showGoogleLink(profile) {
+  profileForGoogle = profile;
   if (profile.googleLinked) {
-    googleLinkState.textContent = "Linked. You can sign in with Google or with your email and password.";
     googleLinkButton.replaceChildren();
+    if (profile.hasPassword) {
+      googleLinkState.textContent = "Linked. You can sign in with Google or with your email and password.";
+      const disconnect = element("button", "secondary-button", "Disconnect");
+      disconnect.type = "button";
+      disconnect.addEventListener("click", () => unlinkGoogle(profile, disconnect));
+      googleLinkButton.append(disconnect);
+    } else {
+      // Disconnecting would leave no way to sign in (the backend refuses it too).
+      googleLinkState.textContent = "Linked. Google is how you sign in. To disconnect it, first set a password: "
+        + "sign out, then use “Forgot password” on the sign-in page.";
+    }
     googleLink.hidden = false;
     return;
   }
@@ -91,12 +104,28 @@ async function showGoogleLink(profile) {
   });
 }
 
+async function unlinkGoogle(profile, button) {
+  if (!window.confirm("Disconnect Google? You’ll sign in with your email and password only.")) return;
+  button.disabled = true;
+  showGoogleLinkStatus("");
+  try {
+    await apiRequest("/api/account/google-link", { method: "DELETE" });
+    await showGoogleLink({ ...profile, googleLinked: false });
+    showGoogleLinkStatus("Google is disconnected. Sign in with your email and password.", "success");
+  } catch (error) {
+    if (error.status === 401) { window.location.href = "index.html"; return; }
+    button.disabled = false;
+    showGoogleLinkStatus(error.message || "Couldn’t disconnect Google. Try again.", "error");
+  }
+}
+
 async function linkGoogle({ credential }) {
   showGoogleLinkStatus("Linking Google…");
   try {
     await apiRequest("/api/account/google-link", { method: "POST", body: JSON.stringify({ credential }) });
     showGoogleLinkStatus("Google is linked. Next time, you can sign in with Google.", "success");
-    showGoogleLink({ googleLinked: true });
+    // Linking needs a signed-in account with a password (a Google-only account is linked already).
+    showGoogleLink({ ...profileForGoogle, googleLinked: true, hasPassword: true });
   } catch (error) {
     if (error.status === 401 && error.code === "AUTHENTICATION_REQUIRED") { window.location.href = "index.html"; return; }
     showGoogleLinkStatus(error.message || "Couldn’t link Google. Try again.", "error");

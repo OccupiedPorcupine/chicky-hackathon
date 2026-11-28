@@ -104,6 +104,11 @@ public class AppUser {
         markEmailVerified(Instant.now());
     }
 
+    // Removes Google sign-in; the caller checked a password remains to sign in with.
+    public void unlinkGoogle() {
+        this.googleId = null;
+    }
+
     public void changePassword(String passwordHash) {
         this.passwordHash = passwordHash;
     }
