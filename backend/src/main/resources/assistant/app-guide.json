@@ -133,7 +133,7 @@
         { "guideId": "nav-dishes", "description": "Link to the Dishes page, in the navigation: the sidebar on the left, or the Menu button on a phone." },
         { "guideId": "nav-documents", "description": "Link to the Documents page, in the navigation: the sidebar on the left, or the Menu button on a phone." },
         { "guideId": "account-menu", "description": "Your initials and name at the bottom of the left sidebar (at the top right on a phone). Opens the user's name and email, a link to the Account page (chat apps) and the Log out button." },
-        { "guideId": "account-details", "description": "The name and email the user signed in with." },
+        { "guideId": "account-details", "description": "The name and email the user signed in with, and Google sign-in: whether it is linked, and if not, a Continue with Google button that links the Google account with the same email so the user can sign in with Google as well as their email and password." },
         { "guideId": "session-settings", "description": "Sign-in duration settings: idle timeout in minutes and maximum sign-in duration in hours. Defaults are 60 minutes and 8 hours. Save settings applies them on the next sign-in, across devices; Use defaults fills in the defaults before saving." },
         { "guideId": "chat-apps", "description": "Chat apps set up on this server, such as Telegram, each with Connect or Disconnect. Connect shows a link (and a QR code on a computer) that opens the chat app; after tapping Start there, the user can send sales by text or voice note and confirm them in the chat." }
       ]
