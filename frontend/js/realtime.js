@@ -29,6 +29,11 @@
     _send(event) {
       if (this.channel?.readyState === "open") this.channel.send(JSON.stringify(event));
     }
+    _respond() {
+      if (this.turn) this._send({ type: "response.create", response: { metadata: {
+        chicky_turn_id: this.turn.id, chicky_sequence: String(this.turn.sequence)
+      } } });
+    }
     _post(suffix, body, options = {}) {
       return this.request(`${BASE}/sessions/${encodeURIComponent(this.sessionId)}${suffix}`, {
         method: "POST", body: JSON.stringify(body), signal: this.abort.signal, ...options
@@ -135,10 +140,19 @@
       });
     }
 
-    async _play() {
+    async _play(response) {
       if (!this.audio) return;
-      try { await this.audio.play(); this.playbackAllowed = true; }
-      catch { this.playbackAllowed = false; this._notify(new Error("Your browser blocked Uncle's audio. Unmute Uncle to retry playback, or use the Confirm button.")); }
+      const audio = this.audio;
+      try {
+        await audio.play();
+        if (audio !== this.audio) return;
+        this.playbackAllowed = true;
+        if (response) { response.playbackStarted = true; this._ackReadback(response); }
+      } catch {
+        if (response) response.audible = false;
+        this.playbackAllowed = false;
+        this._notify(new Error("Your browser blocked Uncle's audio. Unmute Uncle to retry playback, or use the Confirm button."));
+      }
     }
 
     _beginTurn(id) {
@@ -175,6 +189,9 @@
         await turn.ready;
         if (!this._current(generation, turn)) return;
         await this._post("/turns", { turnId: turn.id, sequence: turn.sequence, text: turn.text });
+        // An interrupted tool may already have committed a pending proposal on the
+        // server. Reconcile its revision before asking the model to correct it.
+        await this.toolQueue.catch(() => {});
         if (!this._current(generation, turn)) return;
         if (this.proposal && AFFIRMATIONS.has(normalize(turn.text))) {
           try { await this._confirm("voice", turn); }
@@ -186,7 +203,7 @@
         }
         if (!this._current(generation, turn)) return;
         this._state("thinking");
-        this._send({ type: "response.create" });
+        this._respond();
       } catch (error) { if (this._current(generation, turn)) this._notify(error); }
     }
 
@@ -200,16 +217,22 @@
         case "input_audio_buffer.speech_started": this._beginTurn(event.item_id); break;
         case "input_audio_buffer.speech_stopped": this._state("thinking"); break;
         case "conversation.item.input_audio_transcription.delta":
-          if (event.item_id === this.turn?.id) this._emit("transcript", { role: "user", text: event.delta || "", final: false, turnId: event.item_id });
+          if (event.item_id === this.turn?.id) {
+            this.turn.partial = (this.turn.partial || "") + (event.delta || "");
+            this._emit("transcript", { role: "user", text: this.turn.partial, final: false, turnId: event.item_id });
+          }
           break;
         case "conversation.item.input_audio_transcription.completed": void this._finalize(event); break;
         case "conversation.item.input_audio_transcription.failed":
           this._notify(new Error("I couldn't transcribe that. Please say it again or use the existing assistant.")); this._state("listening"); break;
         case "response.created": {
           const id = event.response?.id;
-          if (!id || !this.turn) break;
-          this.responses.set(id, { id, turn: this.turn, generation, revision: this.revision, completed: false, stopped: false, interrupted: false,
-            readback: this.pendingReadback && this.pendingReadback.turnId === this.turn.id ? { ...this.pendingReadback } : null });
+          const metadata = event.response?.metadata;
+          const turn = this.turns.get(metadata?.chicky_turn_id);
+          if (!id || !turn || String(turn.sequence) !== metadata?.chicky_sequence || turn !== this.turn) break;
+          this.responses.set(id, { id, turn, generation, revision: this.revision, completed: false, stopped: false, interrupted: false,
+            audible: !this.muted, playbackStarted: false,
+            readback: this.pendingReadback && this.pendingReadback.turnId === turn.id ? { ...this.pendingReadback } : null });
           break;
         }
         case "response.function_call_arguments.done":
@@ -218,7 +241,10 @@
         case "response.output_audio_transcript.delta":
         case "response.audio_transcript.delta": {
           const response = this.responses.get(event.response_id);
-          if (this._validResponse(response)) this._emit("transcript", { role: "assistant", text: event.delta || "", final: false, turnId: response.turn.id });
+          if (this._validResponse(response)) {
+            response.transcript = (response.transcript || "") + (event.delta || "");
+            this._emit("transcript", { role: "assistant", text: response.transcript, final: false, turnId: response.turn.id });
+          }
           break;
         }
         case "response.output_audio_transcript.done":
@@ -229,7 +255,10 @@
         }
         case "output_audio_buffer.started": {
           const response = this.responses.get(event.response_id);
-          if (this._validResponse(response)) { this.outputActive = true; this._state("speaking"); void this._play(); }
+          if (this._validResponse(response)) {
+            response.audible &&= !this.muted;
+            this.outputActive = true; this._state("speaking"); void this._play(response);
+          }
           break;
         }
         case "output_audio_buffer.stopped": {
@@ -286,11 +315,29 @@
             const args = typeof call.arguments === "string" ? JSON.parse(call.arguments) : call.arguments;
             if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Invalid voice action arguments.");
             const result = await this._post("/tools", { callId: call.call_id, turnId: response.turn.id, expectedRevision: this.revision, name: call.name, arguments: args });
-            if (!this._validResponse(response)) return;
+            if (!this._validResponse(response)) {
+              if (this._current(response.generation)) {
+                if (Number.isInteger(result.revision) && result.revision > this.revision) {
+                  this.revision = result.revision;
+                  if (result.proposal) this.proposal = result.proposal;
+                  this.pendingReadback = this.proposal ? { revision: this.revision, turnId: this.turn.id } : null;
+                }
+                // Finish the interrupted function protocol without rendering its
+                // stale UI result or starting an old-turn response.
+                this._send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result.output) } });
+              }
+              return;
+            }
             this._apply(result, response.turn);
             output = result.output;
           } catch (error) {
-            if (!this._validResponse(response)) return;
+            if (!this._validResponse(response)) {
+              if (this._current(response.generation)) this._send({ type: "conversation.item.create", item: {
+                type: "function_call_output", call_id: call.call_id,
+                output: JSON.stringify({ status: "superseded", no_action: true })
+              } });
+              return;
+            }
             output = { error: error.code || "TOOL_FAILED", message: "The application did not complete that action. Nothing should be described as saved." };
             this._notify(error);
           }
@@ -298,7 +345,7 @@
         if (!this._validResponse(response)) return;
         this._send({ type: "conversation.item.create", item: { type: "function_call_output", call_id: call.call_id, output: JSON.stringify(output) } });
       }
-      if (this._validResponse(response)) this._send({ type: "response.create" });
+      if (this._validResponse(response)) this._respond();
     }
 
     _apply(result, turn) {
@@ -320,7 +367,7 @@
     _ackReadback(response) {
       if (!this._validResponse(response) || !response.completed || !response.stopped || response.acknowledged
           || !response.readback || response.readback.revision !== this.revision || !this.proposal
-          || this.muted || !this.playbackAllowed || this.audio?.paused) return;
+          || !response.audible || !response.playbackStarted || this.muted || !this.playbackAllowed || this.audio?.paused) return;
       response.acknowledged = true;
       this.readbackPromise = this._post("/readback", { revision: this.revision, turnId: response.turn.id });
       this.readbackPromise.then(() => {
@@ -339,7 +386,7 @@
     }
 
     async confirm() {
-      try { const result = await this._confirm("button"); this._send({ type: "response.create" }); return result; }
+      try { const result = await this._confirm("button"); this._respond(); return result; }
       catch (error) { this._notify(error); throw error; }
     }
 
@@ -356,12 +403,15 @@
         this.pendingReadback = null;
         this._emit("proposal", { proposal: null, revision: this.revision });
         this._context({ cancelled: true, revision: this.revision });
-        this._send({ type: "response.create" });
+        this._respond();
       } catch (error) { this._notify(error); throw error; }
     }
 
     setMuted(muted) {
       this.muted = Boolean(muted);
+      if (this.muted) for (const response of this.responses?.values() || []) {
+        if (!response.stopped) response.audible = false;
+      }
       if (this.audio) {
         this.audio.muted = this.muted;
         if (!this.muted) void this._play();

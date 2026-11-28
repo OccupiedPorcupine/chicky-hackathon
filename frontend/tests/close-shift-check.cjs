@@ -99,6 +99,10 @@ window.ChickyRealtime = class extends EventTarget {
       await page.click("#shift-end");
       assert.equal(await page.isEnabled("#shift-start"), true);
       assert.equal(await page.isDisabled("#shift-end"), true);
+      await page.click("#shift-start");
+      await page.evaluate(() => window.__voice.emit("proposal", { proposal: window.__proposal, revision: 1 }));
+      await page.getByText("Awaiting confirmation", { exact: true }).waitFor();
+      assert.equal(await page.isEnabled("#shift-confirm-button"), true, "A new session's revision one must not be discarded");
       assert.deepEqual(errors, []);
       await context.close();
       console.log(`Passed closing-shift UI: ${width}px`);

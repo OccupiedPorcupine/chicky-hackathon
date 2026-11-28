@@ -221,6 +221,23 @@
   }
 
   start.addEventListener("click", () => action(async () => {
+    // A new live session begins at revision zero, independent of the previous take.
+    revision = 0;
+    pending = null;
+    captionRows.clear();
+    captions.replaceChildren();
+    byId("shift-sales-list").replaceChildren();
+    byId("shift-sales-empty").hidden = false;
+    byId("shift-change").hidden = true;
+    byId("shift-confirm").hidden = true;
+    byId("shift-sales-state").textContent = "Ready to record";
+    byId("shift-sales-state").dataset.saved = "false";
+    byId("shift-portions-list").replaceChildren();
+    byId("shift-ingredients-list").replaceChildren();
+    byId("shift-prep-empty").hidden = false;
+    byId("shift-ingredients-empty").hidden = false;
+    byId("shift-plan-date").hidden = true;
+    byId("shift-plan-note").hidden = true;
     note("Connecting your microphone…");
     await controller.start();
   }));

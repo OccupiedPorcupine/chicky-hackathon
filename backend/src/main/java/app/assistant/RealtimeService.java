@@ -6,6 +6,7 @@ import app.dto.ProposalEntryInput;
 import app.service.PrepListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -41,6 +42,8 @@ public class RealtimeService {
     private final AssistantUsageService usage;
     private final JsonMapper mapper;
     private final Clock clock;
+    @Value("${app.assistant.realtime.transcription-model:gpt-transcribe}")
+    private String transcriptionModel = "gpt-transcribe";
 
     public RealtimeService(RealtimeSessionProvider provider, RealtimeProposalStore proposals, AssistantService assistant,
                            AssistantTools tools, PrepListService prepLists, AssistantRateLimiter rate,
@@ -210,7 +213,7 @@ public class RealtimeService {
         synchronized (session) {
             active(session); revision(session, request.revision()); pending(session);
             requireTurn(session, request.turnId(), true);
-            if (session.proposalSequence != session.sequence) throw stale();
+            if (session.proposalSequence > session.sequence) throw stale();
             session.readbackRevision = session.revision;
             session.readbackSequence = session.sequence;
             return new ReadbackResult(session.revision, true);
@@ -248,8 +251,9 @@ public class RealtimeService {
     public void end(Long owner, String id) {
         Session session = owned(owner, id);
         synchronized (session) {
-            cancelPending(session);
-            sessions.remove(id, session);
+            session.closed = true;
+            try { cancelPending(session); }
+            finally { sessions.remove(id, session); }
         }
     }
 
@@ -264,7 +268,10 @@ public class RealtimeService {
         return session;
     }
     private void active(Session session) {
+        if (session.closed) throw new AssistantException(HttpStatus.NOT_FOUND,
+                "REALTIME_SESSION_NOT_FOUND", "This live session is not available.");
         if (!clock.instant().isBefore(session.expires)) {
+            session.closed = true;
             cancelPending(session);
             throw new AssistantException(HttpStatus.GONE, "REALTIME_SESSION_EXPIRED", "This live session expired. Please start again.");
         }
@@ -282,7 +289,8 @@ public class RealtimeService {
     private void removeExpired() {
         sessions.entrySet().removeIf(entry -> {
             synchronized (entry.getValue()) {
-                if (clock.instant().isBefore(entry.getValue().expires)) return false;
+                if (!entry.getValue().closed && clock.instant().isBefore(entry.getValue().expires)) return false;
+                entry.getValue().closed = true;
                 cancelPending(entry.getValue()); return true;
             }
         });
@@ -317,7 +325,7 @@ public class RealtimeService {
         var audio = config.putObject("audio");
         audio.putObject("output").put("voice", provider.voice());
         var input = audio.putObject("input");
-        input.putObject("transcription").put("model", "gpt-transcribe");
+        input.putObject("transcription").put("model", transcriptionModel);
         input.putObject("turn_detection").put("type", "semantic_vad")
                 .put("create_response", false).put("interrupt_response", true);
         config.putArray("output_modalities").add("audio");
@@ -361,6 +369,7 @@ public class RealtimeService {
         String turnId, text;
         AssistantMessageResponse.Proposal proposal;
         ConfirmProposalResponse saved;
+        boolean closed;
         final Map<String, Cached> calls = new LinkedHashMap<>();
         Session(Long owner, Instant expires) { this.owner = owner; this.expires = expires; }
     }

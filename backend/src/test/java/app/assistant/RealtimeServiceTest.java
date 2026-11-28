@@ -194,4 +194,26 @@ class RealtimeServiceTest {
         when(mutable.instant()).thenReturn(now.plusSeconds(901));
         code("REALTIME_SESSION_EXPIRED", () -> service.turn(owner,id,new Turn("late",1,"save")));
     }
+
+    @Test void aRequestAlreadyWaitingForTheSessionLockCannotRunAfterSessionEnd() throws Exception {
+        String id=start();
+        var field=RealtimeService.class.getDeclaredField("sessions"); field.setAccessible(true);
+        Object session=((java.util.Map<?,?>)field.get(realtime)).get(id);
+        var failure=new java.util.concurrent.atomic.AtomicReference<Throwable>();
+        Thread worker=new Thread(()->{
+            try { realtime.turn(owner,id,new Turn("late",1,"save")); }
+            catch(Throwable error) { failure.set(error); }
+        });
+        synchronized(session) {
+            worker.start();
+            long deadline=System.nanoTime()+java.time.Duration.ofSeconds(2).toNanos();
+            while(worker.getState()!=Thread.State.BLOCKED && System.nanoTime()<deadline) Thread.sleep(2);
+            assertEquals(Thread.State.BLOCKED,worker.getState(),"Request must already hold the session reference");
+            realtime.end(owner,id);
+        }
+        worker.join(2000);
+        assertFalse(worker.isAlive());
+        assertInstanceOf(AssistantException.class,failure.get());
+        assertEquals("REALTIME_SESSION_NOT_FOUND",((AssistantException)failure.get()).getCode());
+    }
 }
