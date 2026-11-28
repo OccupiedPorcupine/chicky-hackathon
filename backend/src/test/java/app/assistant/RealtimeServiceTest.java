@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
 
 /** Real proposal persistence/validation/confirmation with a fake SDP provider. No paid calls. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS)
 class RealtimeServiceTest {
     @LocalServerPort int port;
     @MockitoBean PublicHolidaySyncService holidays;
@@ -90,11 +91,14 @@ class RealtimeServiceTest {
         code("CONFIRMATION_REQUIRED", () -> realtime.confirm(owner,id,new Confirm(2,"turn-3","voice")));
         assertTrue(sales.findByDishIdOrderBySaleDateAsc(chicken.getId()).isEmpty());
         turn(id, 4, "对，save。");
-        var confirmed = realtime.confirm(owner,id,new Confirm(2,"turn-4","voice"));
+        code("CONFIRMATION_REQUIRED", () -> realtime.confirm(owner,id,new Confirm(2,"turn-4","voice")));
+        realtime.readback(owner,id,new Readback(2,"turn-4"));
+        turn(id,5,"yes, save");
+        var confirmed = realtime.confirm(owner,id,new Confirm(2,"turn-5","voice"));
         assertNotNull(confirmed.saved());
         assertEquals(42, sales.findByDishIdOrderBySaleDateAsc(chicken.getId()).getFirst().getQuantitySold());
         assertEquals(30, sales.findByDishIdOrderBySaleDateAsc(pork.getId()).getFirst().getQuantitySold());
-        realtime.confirm(owner,id,new Confirm(2,"turn-4","voice"));
+        realtime.confirm(owner,id,new Confirm(2,"turn-5","voice"));
         assertEquals(1, sales.findByDishIdOrderBySaleDateAsc(chicken.getId()).size());
         realtime.end(owner,id);
     }

@@ -24,7 +24,7 @@ Base: `/api/assistant/realtime`.
   audible readback of this proposal, never partial/interrupted audio.
 - `POST /sessions/{id}/confirm` `{revision, turnId, mode}` ->
   `{saved, proposal, revision}`. `mode` is `voice` or `button`. Voice requires an
-  explicit allowlisted latest finalized affirmation after readback, bound to the
+  explicit allowlisted affirmation in the next finalized turn after readback, bound to the
   latest proposal. Button is an intentional authenticated UI action. Reuse the
   existing confirmation service; the model has no confirm/save tool.
 - `POST /sessions/{id}/cancel` `{revision}` cancels pending sales.

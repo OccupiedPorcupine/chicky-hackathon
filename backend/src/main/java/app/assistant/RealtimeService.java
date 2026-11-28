@@ -229,7 +229,7 @@ public class RealtimeService {
             if (session.saved != null) return new Confirmed(session.saved, session.proposal, session.revision);
             pending(session);
             if ("voice".equals(request.mode()) && (session.readbackRevision != session.revision
-                    || session.sequence <= session.readbackSequence || !affirmative(session.text))) {
+                    || session.sequence != session.readbackSequence + 1 || !affirmative(session.text))) {
                 throw conflict("CONFIRMATION_REQUIRED", "Review the current card and explicitly say yes, save, or press Confirm.");
             }
             session.saved = assistant.confirmProposal(owner, session.proposal.id(), null);

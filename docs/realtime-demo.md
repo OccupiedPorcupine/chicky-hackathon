@@ -51,7 +51,7 @@ not prove that the account has access to the chosen Realtime and transcription m
   idempotent tool calls and a confirmation gate. Corrections cancel the older
   persisted proposal. Sales still write through the existing confirmation service.
 - Spoken affirmation is accepted only after an audible readback of the current
-  proposal and a later complete affirmative user turn. Negation, ambiguous speech,
+  proposal and the next complete affirmative user turn. Negation, ambiguous speech,
   muted/interrupted readbacks and old revisions do not authorize a save.
 - Deliberate Confirm and Cancel buttons remain available. They are the fallback
   when the microphone, playback or spoken affirmation cannot be established.
