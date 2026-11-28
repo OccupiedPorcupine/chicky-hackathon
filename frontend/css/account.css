@@ -9,6 +9,25 @@
   .session-fields { grid-template-columns: minmax(0, 1fr); }
   .session-settings .form-actions { flex-wrap: wrap; }
 }
+/* Google sign-in row in the "Signed in as" card: its state, then Google's button. */
+.google-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px 16px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+}
+.google-link[hidden] { display: none; }
+.google-link-name { font-weight: 600; }
+.google-link-button { min-height: 44px; display: flex; align-items: center; }
+.google-link-button:empty { display: none; }
+.google-link .status-text { grid-column: 1 / -1; }
+.google-link .status-text:empty { display: none; }
+@media (max-width: 760px) {
+  .google-link { grid-template-columns: minmax(0, 1fr); }
+}
 .muted-text { color: var(--muted); font-size: var(--text-sm); }
 .chat-apps-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .chat-apps-heading .card-title { margin: 0; }

@@ -69,6 +69,15 @@
       <h2 id="details-heading" class="card-title">Signed in as</h2>
       <p id="details-name">Loading…</p>
       <p id="details-email" class="muted-text"></p>
+      <!-- Link Google sign-in to this account (js/account.js). Hidden until the profile and /api/config load. -->
+      <div class="google-link" id="google-link" hidden>
+        <div class="google-link-text">
+          <p class="google-link-name">Google sign-in</p>
+          <p id="google-link-state" class="muted-text"></p>
+        </div>
+        <div id="google-link-button" class="google-link-button"></div>
+        <p id="google-link-status" class="status-text" role="status" aria-live="polite"></p>
+      </div>
     </section>
 
     <section class="card session-settings" aria-labelledby="session-heading" data-guide-id="session-settings">

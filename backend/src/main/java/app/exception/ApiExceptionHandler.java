@@ -57,8 +57,14 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT) //http error 409 as well 
                 .body(new ErrorResponse(
                         "ACCOUNT_LINKING_REQUIRED",
-                        "Sign in to the existing account before linking Google"
+                        "An account already uses this email. Sign in with your email and password, then link Google on the Account page"
                 ));
+    }
+
+    @ExceptionHandler(GoogleLinkConflictException.class)
+    public ResponseEntity<ErrorResponse> googleLinkConflict(GoogleLinkConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(exception.getCode(), exception.getMessage()));
     }
 
     @ExceptionHandler(AssistantException.class)
