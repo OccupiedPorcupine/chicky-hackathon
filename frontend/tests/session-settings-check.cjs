@@ -2,9 +2,10 @@
 const { chromium } = require(process.env.PW || "playwright");
 const assert = require("node:assert/strict");
 const path = require("node:path");
+const fs = require("node:fs/promises");
 
 (async () => {
-  const browser = await chromium.launch({ channel: "chrome", headless: true });
+  const browser = await chromium.launch({ headless: true });
   try {
     for (const width of [360, 375, 393, 414, 1280]) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, hasTouch: width < 500 });
@@ -61,7 +62,9 @@ const path = require("node:path");
           assert.ok(box.width >= 44 && box.height >= 44, selector);
         }
       }
-      await page.screenshot({ path: path.resolve(`backend/target/session-settings-${width}.png`), fullPage: true });
+      const screenshotDir = path.resolve(__dirname, "../../backend/target/browser-checks");
+      await fs.mkdir(screenshotDir, { recursive: true });
+      await page.screenshot({ path: path.join(screenshotDir, `session-settings-${width}.png`), fullPage: true });
       assert.deepEqual(errors, []);
       console.log(`Passed session settings: ${width}px`);
       await context.close();

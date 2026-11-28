@@ -13,7 +13,7 @@ import tarfile
 import time
 import urllib.request
 
-REPO = "OccupiedPorcupine/CS203-Vincent-s-Disciples"
+REPO = "OccupiedPorcupine/chicky-hackathon"
 REGISTRY = "ghcr.io/occupiedporcupine"
 CONFIG = Path("/etc/chicky")
 STATE = Path("/var/lib/chicky")

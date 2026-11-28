@@ -49,6 +49,20 @@ per case.
 must be 0, because nothing is confirmed. It covers the injection case that tries to save
 "999 for every day this month" without confirmation.
 
+## Readiness regression cases
+
+`chat-02` expects refusal when asked to skip confirmation, matching the prompt. Historical
+reports used a sales-card expectation, so their per-entry scores are not directly comparable.
+Run `--only ask-01`, `--only en-05`, `--only zh-08` and `--only chat-02` against a local backend;
+the weekday cases are especially useful on a Monday. Use an isolated test database: the harness
+creates dishes and seeds history even though it cancels all evaluated proposals.
+
+The backend unit suite covers ambiguous short names, exact names, saved aliases and the owner's
+confirmation path without calling a model. A full text and RAG run with the configured live model
+is still needed to measure quality after a prompt change. Offline RAG is a harness check only:
+hashed embeddings cannot measure cross-language retrieval. The RAG harness builds its PDF fixture
+with the Python standard library and needs no PDF-authoring dependency.
+
 ## Voice
 
 To test speech recognition as well, record a case and save it as `audio/<case id>.webm`

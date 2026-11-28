@@ -65,6 +65,70 @@ class AssistantGuardsTest {
     }
 
     @Test
+    void aSharedShortNameCannotBecomeAModelProposalEvenWithAValidDishId() {
+        var validator = validator(dish(3, "Chicken rice"), dish(4, "Lemon chicken rice"));
+        var input = new ProposalEntryInput(3L, null, "chicken", TODAY, 40);
+        var result = validator.validateProposal(7L, List.of(input), TODAY);
+        assertFalse(result.isValid());
+        assertTrue(result.entries().isEmpty());
+        assertTrue(result.problems().getFirst().contains("Chicken rice or Lemon chicken rice"));
+        assertTrue(validator.validate(7L, List.of(input), TODAY).isValid());
+    }
+
+    @Test
+    void anExactNameAndAUniqueShortNameStillProduceProposals() {
+        var validator = validator(dish(3, "Chicken rice"), dish(4, "Lemon chicken rice"));
+        for (var input : List.of(new ProposalEntryInput(3L, null, "CHICKEN rice", TODAY, 40),
+                new ProposalEntryInput(4L, null, "lemon chicken", TODAY, 7))) {
+            assertTrue(validator.validateProposal(7L, List.of(input), TODAY).isValid());
+        }
+    }
+
+    @Test
+    void aModelCannotUseTheWrongIdForAnExactDishName() {
+        var validator = validator(dish(3, "Chicken rice"), dish(4, "Lemon chicken rice"));
+        var result = validator.validateProposal(7L,
+                List.of(new ProposalEntryInput(4L, null, "Chicken rice", TODAY, 40)), TODAY);
+        assertFalse(result.isValid());
+        assertTrue(result.problems().getFirst().contains("not Lemon chicken rice"));
+    }
+
+    @Test
+    void aModelCannotInventANewDishToBypassAnAmbiguousName() {
+        var validator = validator(dish(3, "Chicken rice"), dish(4, "Lemon chicken rice"));
+        var result = validator.validateProposal(7L,
+                List.of(new ProposalEntryInput(null, "chicken", "chicken", TODAY, 40)), TODAY);
+        assertFalse(result.isValid());
+        assertTrue(result.entries().isEmpty());
+    }
+
+    @Test
+    void aUniqueShortNameCannotBeAssignedToTheWrongDish() {
+        var validator = validator(dish(3, "Chicken rice"), dish(4, "Lemon chicken rice"));
+        var result = validator.validateProposal(7L,
+                List.of(new ProposalEntryInput(3L, null, "lemon chicken", TODAY, 7)), TODAY);
+        assertFalse(result.isValid());
+        assertTrue(result.problems().getFirst().contains("belongs to Lemon chicken rice"));
+    }
+
+    @Test
+    void anExplicitSavedAliasDisambiguatesASharedShortName() {
+        var dishes = mock(DishRepository.class);
+        var aliases = mock(DishAliasRepository.class);
+        var sales = mock(DailySaleRepository.class);
+        var chicken = dish(3, "Chicken rice");
+        when(dishes.findByIdAndOwnerId(3L, 7L)).thenReturn(Optional.of(chicken));
+        var lemon = dish(4, "Lemon chicken rice");
+        when(dishes.findByOwnerIdOrderByNameAsc(7L)).thenReturn(List.of(chicken, lemon));
+        var alias = mock(app.dish.DishAlias.class);
+        when(alias.getDish()).thenReturn(chicken);
+        when(aliases.findByOwnerIdAndNormalizedAlias(7L, "chicken")).thenReturn(Optional.of(alias));
+        var validator = new ProposalValidator(dishes, aliases, sales);
+        assertTrue(validator.validateProposal(7L,
+                List.of(new ProposalEntryInput(3L, null, "chicken", TODAY, 40)), TODAY).isValid());
+    }
+
+    @Test
     void validatorRejectsFutureOldAndImplausibleEntries() {
         var validator = validator(dish(3, "Chicken rice"));
 

@@ -58,3 +58,21 @@ connected to the real database.
   targets under 44px, or the assistant button covering a control. How to run it is at the top of
   the file.
 - `frontend/design/capture-screenshots.cjs`: regenerates the screenshots in `DESIGN.md`.
+
+Run both browser checks with a pinned Playwright installation:
+
+```sh
+npm ci --prefix frontend/tests
+cd frontend/tests
+npx playwright install chromium webkit   # Linux: add --with-deps for system libraries
+cd ../..
+npm test --prefix frontend/tests
+```
+
+The runner starts its own frontend on port 5517 and stops it afterwards. Set
+`FRONTEND_TEST_PORT` to use another free port. API responses are mocked, so no backend,
+account, database or service credentials are needed. The checks cover the phone flows above
+and session-duration editing, persistence, validation and failed saves at phone and desktop
+widths. Session-settings screenshots go to `backend/target/browser-checks/`. GitHub CI runs
+both checks and uploads those screenshots as an artifact. Microphone permissions, actual
+speech recognition and native phone sharing still need a real-device test.

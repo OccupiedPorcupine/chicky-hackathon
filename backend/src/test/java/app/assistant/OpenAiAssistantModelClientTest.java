@@ -96,7 +96,7 @@ class OpenAiAssistantModelClientTest {
                 .andExpect(jsonPath("$.voice").value("marin"))
                 .andExpect(jsonPath("$.input").value("请确认后保存。"))
                 .andExpect(jsonPath("$.response_format").value("mp3"))
-                .andExpect(jsonPath("$.instructions").exists())
+                .andExpect(jsonPath("$.instructions").value(containsString("Read Chinese in Mandarin")))
                 .andRespond(withSuccess(new byte[]{73, 68, 51}, MediaType.valueOf("audio/mpeg")));
 
         byte[] audio = client.speak("请确认后保存。", SpeechFormat.MP3);

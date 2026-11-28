@@ -111,7 +111,7 @@ async function mockApi(context) {
     date.setUTCDate(date.getUTCDate() + offset);
     return date.toISOString().slice(0, 10);
   };
-  await context.route("http://localhost:8080/**", route => {
+  await context.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/csrf") return json(route, { headerName: "X-XSRF-TOKEN", token: "t" });
     if (path === "/api/config") return json(route, { googleClientId: "" });

@@ -107,6 +107,33 @@ jobs:
       # scripts/tests covers scripts/prune_container_images.py's choice of images (no Vercel calls).
       - run: python -m pytest ml/tests scripts/tests
 
+  browser:
+    name: Browser checks (WebKit and Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/tests/package-lock.json
+      - name: Install pinned browser test dependencies
+        run: npm ci --prefix frontend/tests
+      - name: Install browser engines and system dependencies
+        working-directory: frontend/tests
+        run: npx playwright install --with-deps chromium webkit
+      # The runner starts and stops the static frontend; every API response is mocked.
+      - name: Check phone flows and session settings
+        run: npm test --prefix frontend/tests
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-check-screenshots
+          path: backend/target/browser-checks/
+          if-no-files-found: ignore
+
   aws-config:
     name: AWS deployment configuration
     runs-on: ubuntu-latest

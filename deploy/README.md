@@ -96,13 +96,35 @@ Since 7 November 2026 the app also runs on one AWS EC2 instance. EC2 is the main
 - **`web`** is Nginx. It serves the pages and passes `/api/*` to the backend.
 - **`backend`** and **`ml`** are the same apps as on Vercel.
 
-The images come from ECR, tagged `RELEASE_TAG`. The settings are in `deploy/aws/.env` on the instance; `deploy/aws/.env.example` is the template.
+The publishing workflow pushes images to `ghcr.io/occupiedporcupine`, tagged `RELEASE_TAG`, and creates an `aws-…` GitHub release with a `deployment.json` record of their exact digests. The installed deployment scripts use `/etc/chicky/production.env` and `/etc/chicky/compose.yaml`; `deploy/aws/.env.example` is the environment template.
 
 **Both hosts use the same Supabase Production database.** So the data is the same on both, and every difference below comes from the code or the settings.
 
+### Moving deployment to the hackathon repository
+
+The workflows and EC2 scripts now use `OccupiedPorcupine/chicky-hackathon`. Complete these host and account steps when switching from the original repository:
+
+1. For each existing GHCR package (`chicky-web`, `chicky-backend`, `chicky-ml`), grant this repository **Write** access under **Package settings → Manage Actions access**. Confirm the publishing run passes and creates a completed `aws-…` release containing `deployment.json`.
+2. On EC2, from a checkout containing these changes, replace both installed scripts and the Compose configuration (including Telegram environment passthrough), then check the release source:
+
+   ```bash
+   sudo install -m 0755 deploy/aws/update.py /usr/local/sbin/chicky-update.py
+   sudo install -m 0755 deploy/aws/deploy.py /usr/local/sbin/chicky-deploy.py
+   sudo install -m 0644 deploy/aws/compose.yaml /etc/chicky/compose.yaml
+   sudo /usr/local/sbin/chicky-update.py --check
+   sudo systemctl status chicky-update.timer
+   ```
+
+   `--check` prints the deployed and newest published release without deploying. Installing the scripts changes what the next timer run will deploy. After it runs, check `sudo journalctl -u chicky-update.service --since "15 minutes ago"`, `/var/lib/chicky/current.json`, and the site's `/api/health`. If updates are paused, inspect `/var/lib/chicky/update-paused.json` and the logs before retrying. Migration changes require the deployer's existing approval at `/var/lib/chicky/approvals/<release-tag>.json` for the exact source commit, target commit, release tag and before/after migration fingerprints; switching repositories does not bypass it. The updater leaves the pause marker in place after a failed attempt, including a missing approval. It will not retry automatically until the failure has been reviewed and the pause resolved.
+3. Add the repository secret `CRON_SECRET`, matching the backend that the reminder workflow calls (currently Vercel). The workflow sends real due reminders; validate it when sending them is intended. Disable the original repository's reminder schedule during the handover so one scheduler owns the job.
+4. Add this repository's `VERCEL_TOKEN` secret, scoped to the Vercel team. First run **Prune container images** manually with **dry_run** enabled and review the retained images. Disable the original repository's pruning schedule during the handover so only one repository manages cleanup.
+5. Confirm the Vercel Git connection points to the intended repository and branch. Check both hosts after deployment and use the authenticated setup checks below to verify integrations.
+
+Repository secrets, installed scripts, external schedules and Vercel's Git connection are not copied automatically when a repository is copied.
+
 ### How they can drift apart
 
-**Code.** Vercel deploys every merge to `main`. EC2 runs whatever images `RELEASE_TAG` points at. #156 doesn't publish those automatically, so until a pipeline does, EC2 changes only when someone deploys a new release. Even with a pipeline on each side, the two finish at different times, and one can fail while the other succeeds. Neither tells you about the other.
+**Code.** Vercel deploys merges to `main` when connected to this repository. `.github/workflows/publish-images.yml` runs CI, publishes all three AWS images and then publishes a completed deployment record. On EC2, `chicky-update.timer` checks completed releases every five minutes and the deployer uses the recorded image digests. A successful publishing run does not prove that EC2 installed the release: check its deployment state and health. The two hosts finish at different times, and one can fail while the other succeeds.
 
 **Migrations.** Flyway runs when a backend starts, so whichever host deploys a new migration first applies it to the shared database. Until the other host catches up, it runs older code against the newer tables:
 - Adding a table, or a column that is nullable or has a default, is safe.
@@ -112,20 +134,20 @@ While both hosts are live, split such a change across two releases. Add the new 
 
 An older backend that restarts still starts. Flyway ignores applied migrations it doesn't have yet (its default `ignoreMigrationPatterns` is `*:future`).
 
-**Settings.** Vercel keeps its environment variables in the project settings. EC2 takes some from `deploy/aws/.env` and has others written into `compose.yaml`. So a new setting has to be added on both hosts. As of 8 November 2026, these differ:
+**Settings.** Vercel keeps its environment variables in the project settings. The installed EC2 deployment takes some from `/etc/chicky/production.env` and has others written into `compose.yaml`. A new setting has to be added on both hosts. The table combines the last recorded Vercel configuration (8 November 2026; verify current values) with the current Compose defaults:
 
 | Setting | Vercel Production | EC2 |
 |---|---|---|
 | `prod` profile | Off: `APP_CORS_ALLOWED_ORIGINS` isn't set (#109) | On |
-| Assistant | OpenAI | `offline`, unless `ASSISTANT_PROVIDER` is set in `.env` |
+| Assistant | OpenAI | `offline`, unless `ASSISTANT_PROVIDER` is set in `/etc/chicky/production.env` |
 | Hawker centre closure sync | On | Off (`HAWKER_CENTRE_SYNC_ENABLED=false` in `compose.yaml`) |
 | ML service | Private, through Vercel's service binding | On the Compose network only, and it checks `ML_SHARED_SECRET` |
-| Telegram | Token, username and webhook secret set | `compose.yaml` passes only `TELEGRAM_BOT_TOKEN`. Without `TELEGRAM_BOT_USERNAME` and `TELEGRAM_WEBHOOK_SECRET`, the bot refuses every webhook call |
+| Telegram | Token, username and webhook secret set | Compose passes token, username and webhook secret when set in `/etc/chicky/production.env`. Configure all three before registering this host as the bot's webhook |
 | Security headers | `vercel.json` | `deploy/aws/nginx.conf` |
 
 **Things only one host can have.** Point each of these at the main site:
 - **The Telegram webhook.** A bot sends updates to a single URL. `POST /api/admin/telegram/webhook` registers the address of the host it's called on, so the last host to call it gets the bot.
-- **The chat reminders.** `.github/workflows/chat-reminders.yml` calls `https://chicky-zeta.vercel.app`. One call reminds every owner, because the database is shared, so don't add a second job for the other host: owners would get every reminder twice. To move it to EC2, change the URL and set the same `CRON_SECRET` in `deploy/aws/.env`.
+- **The chat reminders.** `.github/workflows/chat-reminders.yml` calls `https://chicky-zeta.vercel.app`. One call reminds every owner, because the database is shared, so don't add a second job for the other host: owners would get every reminder twice. To move it to EC2, change the URL and set the same `CRON_SECRET` in `/etc/chicky/production.env`.
 
 `prune-container-images.yml` only concerns Vercel's registry, so its health check stays on Vercel.
 

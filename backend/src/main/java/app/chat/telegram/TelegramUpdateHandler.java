@@ -1,5 +1,6 @@
 package app.chat.telegram;
 
+import app.assistant.AssistantPersona;
 import app.chat.ChatChannel;
 import app.chat.ChatCommands;
 import app.chat.ChatInput;
@@ -43,19 +44,23 @@ public class TelegramUpdateHandler {
             new TelegramBotClient.Command("help", "What I can do"),
             new TelegramBotClient.Command("unlink", "Disconnect this chat from Chicky"));
 
+    // In Uncle's voice (issue #16); Chicky is still the app. The first line is also used on its own.
     static final String HELP = """
-            I'm Chicky's assistant. Send me your sales as a message or a voice note, like "chicken rice 42, char siew 30" \
-            or "closed tomorrow", then tap Confirm to save them. You can also ask what to prepare or why a forecast is what it is.
+            I'm %s, Chicky's helper. Just send me your sales as a message or a voice note, like "chicken rice 42, \
+            char siew 30" or "closed tomorrow", then tap Confirm to save. Can also ask me what to prepare, or why a \
+            forecast is what it is.
 
             /today – sales recorded today
             /prep – what to prepare tomorrow
             /forecast – tomorrow's forecast
             /remind – a reminder to send the day's sales, and tomorrow's prep list, each evening
-            /unlink – disconnect this chat from Chicky""";
+            /unlink – disconnect this chat from Chicky""".formatted(AssistantPersona.NAME);
 
-    static final String LINKED = "Linked to your Chicky account. Send me your sales any time, like \"chicken rice 42, char siew 30\".";
-    static final String LINK_FAILED = "That link has expired or was already used. In Chicky, open Account, then Chat apps, "
-            + "and tap Connect for a new one.";
+    static final String GREETING = "Hi! I'm %s, Chicky's helper. ".formatted(AssistantPersona.NAME);
+    static final String LINKED = ("Done, your Chicky account is linked. I'm %s, Chicky's helper. Send me your sales any time, "
+            + "like \"chicken rice 42, char siew 30\".").formatted(AssistantPersona.NAME);
+    static final String LINK_FAILED = "Sorry ah, that link has expired or was already used. In Chicky, open Account, then "
+            + "Chat apps, and tap Connect for a new one.";
 
     private final TelegramBotClient bot;
     private final ChatMessageService messages;
@@ -125,7 +130,7 @@ public class TelegramUpdateHandler {
     // "/start <code>" from a Connect link links the chat; a bare /start explains how.
     private String start(String chatId, String code, String name) {
         if (code.isEmpty()) {
-            return messages.isLinked(CHANNEL, chatId) ? HELP : "Hi! " + ChatMessageService.NOT_LINKED;
+            return messages.isLinked(CHANNEL, chatId) ? HELP : GREETING + ChatMessageService.NOT_LINKED;
         }
         return links.link(CHANNEL, chatId, name, code).isPresent() ? LINKED : LINK_FAILED;
     }
