@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Mid-tour, hold the first paint until js/guide.js has put the tour's spotlight back (#guide-ready
+       follows it), so the page never shows undimmed between steps. Chrome; other browsers ignore it. -->
+  <script>try { if (sessionStorage.getItem("chicky-guide-tour")) { const hold = document.createElement("link"); hold.rel = "expect"; hold.href = "#guide-ready"; hold.setAttribute("blocking", "render"); document.head.append(hold); } } catch (error) {}</script>
+  <title>Close your shift · Chicky</title>
+  <!-- Home-screen app (see DESIGN.md, "Phones"). -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./images/icons/icon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="./images/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./images/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Chicky">
+  <meta name="theme-color" content="#ffe7a1">
+  <!-- Read by js/api.js to reach the backend. -->
+  <meta name="api-base-url" content="http://localhost:8080">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600..800&family=Nunito:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/close-shift.css">
+  <link rel="stylesheet" href="./css/guide.css">
+  <!-- Smooth scrolling (Lenis), pinned and integrity-checked. Deferred and optional: if they fail to load the page is
+       fully usable without them (js/motion.js checks for window.Lenis). See THIRD_PARTY_NOTICES.md. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" integrity="sha384-R18XzqnxvVLEF+BYfhpmDx30v7eP83fAckyfoRzK7/Uf6nGqufcmsk0eAKo7S3RU" crossorigin="anonymous"></script>
+</head>
+<body class="app-shell close-shift-page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><img class="brand-logo" src="images/brand/logo-lockup.svg" alt="Chicky" width="135" height="40"></a>
+    <details class="navigation" data-guide-id="main-menu">
+      <summary aria-label="Menu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9.5 3.5v17"/></svg><span class="menu-label" aria-hidden="true">Menu</span></summary>
+      <nav class="menu-panel" aria-label="Main navigation">
+        <a href="dashboard.html" data-guide-id="nav-dashboard"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Dashboard</span></a>
+        <a href="forecast.html" data-guide-id="nav-forecast"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 7-8"/><path d="M15 7h5v5"/></svg><span>Demand forecast</span></a>
+        <a href="prep.html" data-guide-id="nav-prep"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2.5"/><path d="M9 4.5h6v3H9z"/><path d="M9 12.5h6M9 16.5h4"/></svg><span>Prep list</span></a>
+        <a href="data.html" data-guide-id="nav-data"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5"/><path d="M4 15v3.5A1.5 1.5 0 005.5 20h13a1.5 1.5 0 001.5-1.5V15"/></svg><span>Data ingestion</span></a>
+        <a href="dishes.html" data-guide-id="nav-dishes"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12.5h17a8.5 8.5 0 01-17 0z"/><path d="M9 8.5c0-1.6 1.5-1.6 1.5-3.2M14 8.5c0-1.6 1.5-1.6 1.5-3.2"/></svg><span>Dishes</span></a>
+        <a href="documents.html" data-guide-id="nav-documents"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h7.5l4.5 4.5v12a1 1 0 01-1 1h-11a1 1 0 01-1-1v-15a1 1 0 011-1z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></svg><span>Documents</span></a>
+      </nav>
+    </details>
+    <details class="account-menu" data-guide-id="account-menu">
+      <summary class="avatar" aria-label="Your account"><span class="avatar-initials" data-account-initials aria-hidden="true"><svg class="avatar-person" viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5.5 19.5a6.5 6.5 0 0113 0"/></svg></span><span class="account-label" data-account-label>Account</span></summary>
+      <div class="menu-panel">
+        <p class="account-name">Signed in</p>
+        <p class="account-email"></p>
+        <a class="secondary-button account-link" href="account.html">Account and chat apps</a>
+        <button class="secondary-button" type="button" data-action="log-out">Log out</button>
+        <p class="status-text" role="status" aria-live="polite"></p>
+      </div>
+    </details>
+  </header>
+
+  <main class="page close-shift" id="main-content" tabindex="-1">
+    <section class="page-heading shift-heading">
+      <div><a class="shift-back" href="dashboard.html">← Dashboard</a><p class="eyebrow">A good end to the day</p><h1>Close today.<br>Huat tomorrow.</h1><p class="lede">Tell Uncle what sold. Leave with tomorrow’s plan.</p></div>
+      <div class="shift-date"><span id="shift-date">Today</span><span class="shift-sample" id="shift-sample" hidden>Demo stall · sample data</span></div>
+    </section>
+
+    <section class="shift-voice card" aria-labelledby="shift-voice-title" data-state="disconnected">
+      <div class="shift-uncle-stage"><div class="shift-uncle-ring"><img id="shift-uncle" src="images/brand/uncle/ready.webp" width="192" height="192" alt=""></div><span class="shift-voice-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+      <div class="shift-conversation">
+        <div class="shift-voice-heading"><h2 id="shift-voice-title">Finish up with Uncle</h2><span class="shift-state" id="shift-state" role="status">Checking voice…</span></div>
+        <p class="shift-prompt" id="shift-prompt">“Today roast chicken rice forty, char siew thirty.”</p>
+        <div class="shift-caption" role="log" aria-live="polite" aria-label="Conversation captions" id="shift-captions"><p class="shift-caption-empty">Speak naturally in English, Mandarin, or both. You can interrupt to correct a number.</p></div>
+        <div class="shift-controls">
+          <button class="primary-button" type="button" id="shift-start" disabled>Talk to Uncle</button>
+          <button class="secondary-button" type="button" id="shift-mute" aria-pressed="false" disabled>Mute Uncle</button>
+          <button class="secondary-button" type="button" id="shift-end" disabled>End conversation</button>
+        </div>
+        <p class="status-text" id="shift-message" role="status" aria-live="polite">Checking your account and voice connection…</p>
+        <a class="shift-fallback" href="dashboard.html">Use the regular assistant on Dashboard</a>
+      </div>
+    </section>
+
+    <div class="shift-results">
+      <section class="card shift-result" aria-labelledby="shift-sales-title">
+        <div class="shift-card-heading"><span class="shift-step" aria-hidden="true">01</span><div><p class="eyebrow">Today</p><h2 id="shift-sales-title">Your sales</h2></div><span id="shift-sales-state" class="shift-result-state">Ready to record</span></div>
+        <p class="shift-empty" id="shift-sales-empty">Your sales will appear here for you to check. Nothing saves until you confirm.</p>
+        <ul class="shift-sales-list" id="shift-sales-list" aria-label="Sales to review"></ul>
+        <p class="shift-change" id="shift-change" role="status" aria-live="polite" hidden></p>
+        <div class="shift-confirm" id="shift-confirm" hidden><p>Check the dishes, dates and quantities. Say “yes, save” after Uncle’s readback, or use Confirm.</p><div class="shift-confirm-buttons"><button class="primary-button" type="button" id="shift-confirm-button">Confirm sales</button><button class="secondary-button" type="button" id="shift-cancel-button">Cancel</button></div></div>
+      </section>
+
+      <section class="card shift-result" aria-labelledby="shift-portions-title">
+        <div class="shift-card-heading"><span class="shift-step" aria-hidden="true">02</span><div><p class="eyebrow">Tomorrow</p><h2 id="shift-portions-title">Portions to prepare</h2></div></div>
+        <p class="shift-empty" id="shift-prep-empty">Ask “明天准备多少？” when you’re ready to plan tomorrow.</p>
+        <p class="shift-plan-date" id="shift-plan-date" hidden></p>
+        <ul class="shift-portions-list" id="shift-portions-list" aria-label="Tomorrow’s portions"></ul>
+        <p class="shift-plan-note" id="shift-plan-note" hidden></p>
+      </section>
+
+      <section class="card shift-result" aria-labelledby="shift-ingredients-title">
+        <div class="shift-card-heading"><span class="shift-step" aria-hidden="true">03</span><div><p class="eyebrow">Buy or take from stock</p><h2 id="shift-ingredients-title">Your ingredients</h2></div></div>
+        <p class="shift-empty" id="shift-ingredients-empty">Your recipes turn tomorrow’s portions into the quantities you need.</p>
+        <ul class="shift-ingredients-list" id="shift-ingredients-list" aria-label="Ingredients needed"></ul>
+        <a class="shift-detail-link" href="prep.html">Open the full prep list →</a>
+      </section>
+    </div>
+    <p class="shift-footer">One conversation. Today recorded. Tomorrow prepared.</p>
+  </main>
+  <script src="./js/api.js"></script>
+  <script src="./js/motion.js"></script>
+  <script src="./js/app-shell.js"></script>
+  <script src="./js/guide.js"></script>
+  <span id="guide-ready" hidden></span>
+  <script src="./js/realtime.js"></script>
+  <script src="./js/close-shift.js"></script>
+</body>
+</html>
