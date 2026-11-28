@@ -14,8 +14,9 @@ cd ..
 python3 scripts/run_voice_demo.py
 ```
 
-The launcher starts a fresh in-memory H2 database. It reads only `OPENAI_API_KEY`
-from your environment or `backend/.env`; it ignores production database, mail,
+The launcher starts a fresh in-memory H2 database bound to localhost. It reads only
+`OPENAI_API_KEY` and the listed `REALTIME_*` settings from your environment or
+`backend/.env`; it ignores production database, mail,
 Telegram and profile settings. Restarting clears this local dataset. Without a
 key, the backend runs and the page honestly reports live voice unavailable.
 
@@ -130,7 +131,8 @@ measured waste savings or pilot adoption from the invented dataset.
   modified client. Use a bounded demo project and inspect actual provider usage.
 - `REALTIME_ENABLED`, `REALTIME_MODEL`, `REALTIME_VOICE`, and
   `REALTIME_TRANSCRIPTION_MODEL` configure normal backend runs. The isolated
-  launcher intentionally imports only the API key and uses repository defaults.
+  launcher imports only those Realtime settings and the API key; database, mail,
+  Telegram and production profiles remain isolated.
 - Confirm actual key/model access, microphone and speaker behavior, interruption,
   readback, bilingual transcription, and end-to-end timing on the recording device.
   Those checks and the final video/submission remain open until performed.
