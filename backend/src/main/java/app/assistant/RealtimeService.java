@@ -356,7 +356,7 @@ public class RealtimeService {
     }
     private ObjectNode schema(String name, String description, String parameters) {
         var schema = mapper.createObjectNode().put("type", "function").put("name", name)
-                .put("description", description).put("strict", true);
+                .put("description", description);
         schema.set("parameters", mapper.readTree(parameters));
         return schema;
     }

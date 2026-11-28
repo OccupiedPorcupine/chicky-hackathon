@@ -145,6 +145,8 @@ class RealtimeServiceTest {
         var config=realtime.sessionConfiguration(owner);
         assertFalse(config.path("audio").path("input").path("turn_detection").path("create_response").asBoolean());
         assertEquals(3,config.path("tools").size());
+        // RealtimeFunctionTool differs from Responses tools: strict is not a supported field.
+        config.path("tools").forEach(tool -> assertFalse(tool.has("strict")));
         assertTrue(config.path("instructions").asText().contains("Roasted chicken rice"));
         assertFalse(config.path("instructions").asText().contains("Other dish"));
         when(provider.available()).thenReturn(false);
