@@ -44,7 +44,8 @@ public class ProfileController {
         boolean verified = account != null && account.isEmailVerified();
         // A missing row counts as seen, so nobody is held on the welcome.
         boolean welcomeSeen = account == null || account.hasSeenWelcome();
-        return ResponseEntity.ok(ProfileResponse.from(user, verified, welcomeSeen));
+        boolean googleLinked = account != null && account.getGoogleId() != null;
+        return ResponseEntity.ok(ProfileResponse.from(user, verified, welcomeSeen, googleLinked));
     }
 
     @Operation(summary = "Mark the welcome as seen",

@@ -181,6 +181,64 @@ class AccountSecurityApiTest {
     }
 
     @Test
+    void aSignedInAccountCanLinkGoogleAndThenSignInWithEither() throws Exception {
+        clearInvocations(emailSender);
+        Session session = signUp("link@account.test");
+        String token = emailedToken("link@account.test", "Confirm your email for Chicky");
+        new Session().send("POST", "/api/auth/verify-email", "{\"token\":\"" + token + "\"}");
+        when(googleAuthService.verifyToken("link-credential")).thenReturn(googlePayload("google-link", "Link@Account.test"));
+        assertTrue(session.get("/api/profile").body().contains("\"googleLinked\":false"));
+
+        HttpResponse<String> link = session.send("POST", "/api/account/google-link", "{\"credential\":\"link-credential\"}");
+
+        assertEquals(200, link.statusCode(), link.body());
+        assertTrue(session.get("/api/profile").body().contains("\"googleLinked\":true"));
+        HttpResponse<String> google = new Session().send("POST", "/api/auth/google", "{\"credential\":\"link-credential\"}");
+        assertEquals(200, google.statusCode(), google.body());
+        assertEquals(200, login("link@account.test", PASSWORD).statusCode());
+        // Linking the same Google account again is a no-op.
+        assertEquals(200, session.send("POST", "/api/account/google-link", "{\"credential\":\"link-credential\"}").statusCode());
+    }
+
+    @Test
+    void linkingAGoogleAccountForAnotherEmailIsRefused() throws Exception {
+        Session session = signUp("mismatch@account.test");
+        when(googleAuthService.verifyToken("other-credential")).thenReturn(googlePayload("google-other", "someone-else@account.test"));
+
+        HttpResponse<String> link = session.send("POST", "/api/account/google-link", "{\"credential\":\"other-credential\"}");
+
+        assertEquals(409, link.statusCode());
+        assertTrue(link.body().contains("\"code\":\"GOOGLE_EMAIL_MISMATCH\""), link.body());
+        assertTrue(session.get("/api/profile").body().contains("\"googleLinked\":false"));
+    }
+
+    @Test
+    void aGoogleAccountLinkedElsewhereCannotBeLinkedAgain() throws Exception {
+        when(googleAuthService.verifyToken("taken-credential")).thenReturn(googlePayload("google-taken", "taken@account.test"));
+        assertEquals(200, new Session().send("POST", "/api/auth/google", "{\"credential\":\"taken-credential\"}").statusCode());
+        // The Google account's email changed since, and a password account now uses its new address.
+        Session session = signUp("taken-new@account.test");
+        when(googleAuthService.verifyToken("taken-credential")).thenReturn(googlePayload("google-taken", "taken-new@account.test"));
+
+        HttpResponse<String> link = session.send("POST", "/api/account/google-link", "{\"credential\":\"taken-credential\"}");
+
+        assertEquals(409, link.statusCode());
+        assertTrue(link.body().contains("\"code\":\"GOOGLE_ACCOUNT_IN_USE\""), link.body());
+    }
+
+    @Test
+    void linkingGoogleNeedsASignedInAccount() throws Exception {
+        assertEquals(401, new Session().send("POST", "/api/account/google-link", "{\"credential\":\"anything\"}").statusCode());
+    }
+
+    private GoogleIdToken.Payload googlePayload(String subject, String email) {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject(subject);
+        payload.setEmail(email);
+        return payload;
+    }
+
+    @Test
     void errorsOutsideTheControllersUseTheSameBody() throws Exception {
         HttpResponse<String> unauthenticated = new Session().get("/api/profile");
         assertEquals(401, unauthenticated.statusCode());
