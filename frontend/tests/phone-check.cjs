@@ -111,7 +111,7 @@ async function mockApi(context) {
     date.setUTCDate(date.getUTCDate() + offset);
     return date.toISOString().slice(0, 10);
   };
-  await context.route("http://localhost:8080/**", route => {
+  await context.route("**/api/**", route => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/api/csrf") return json(route, { headerName: "X-XSRF-TOKEN", token: "t" });
     if (path === "/api/config") return json(route, { googleClientId: "" });
@@ -293,10 +293,16 @@ async function mockApi(context) {
     ]));
     for (const step of ["first step", "second step"]) {
       if (step !== "first step") await page.tap(".guide-next");
-      await page.waitForTimeout(900);
+      await page.waitForSelector(".guide-bubble.is-new");
+      await settle(page);
       const problems = await page.evaluate(checkGuide);
-      const guideButtons = await page.$$eval(".guide-actions button:not([hidden])", buttons => buttons.map(b => b.getBoundingClientRect()).filter(r => r.width < 44 || r.height < 44).length);
-      if (guideButtons) problems.push(`${guideButtons} tour button(s) under 44px`);
+      const guideButtons = await page.$$eval(".guide-actions button:not([hidden])", buttons => buttons.flatMap(button => {
+        const rect = button.getBoundingClientRect();
+        return rect.width < 44 || rect.height < 44
+          ? [`tour button "${button.textContent.trim()}" is ${rect.width.toFixed(2)}×${rect.height.toFixed(2)}px (under 44px)`]
+          : [];
+      }));
+      problems.push(...guideButtons);
       problems.forEach(problem => failures.push(`${phone.name}, guided tour ${step}: ${problem}`));
       console.log(`${problems.length ? "✗" : "✓"} ${phone.name}: guided tour, ${step}`);
     }

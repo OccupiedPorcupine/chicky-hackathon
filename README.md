@@ -1,0 +1,97 @@
+# Chicky — Huat tomorrow
+
+Chicky helps hawker stall owners record sales, forecast demand and turn tomorrow's
+portions into an ingredient prep list. Uncle, the assistant, accepts text or voice
+and shows proposed changes for the owner to review and confirm.
+
+- Main deployment: [chicky-app.duckdns.org](https://chicky-app.duckdns.org)
+- Backup deployment: [chicky-zeta.vercel.app](https://chicky-zeta.vercel.app)
+- Demo and release checks: [hackathon checklist](docs/hackathon-readiness.md)
+
+Deployment addresses are configured in this repository; check their health before
+a presentation. Publishing container images does not by itself verify an EC2 deployment.
+
+## Run locally
+
+Requires Java 21+, Node.js and Python 3. The frontend has no build step; the
+backend includes a Maven wrapper.
+
+1. Start the backend from `backend/`:
+
+   ```sh
+   cd backend
+   ./mvnw spring-boot:run
+   ```
+
+   Without a `backend/.env`, this uses an in-memory H2 database, which is cleared
+   on restart. An existing `.env` may select Supabase: check it before seeding
+   data. See [backend setup](backend/README.md) and the optional settings in
+   [backend/.env.example](backend/.env.example).
+
+2. In a second terminal, from the repository root:
+
+   ```sh
+   node frontend/server.mjs
+   ```
+
+3. For a local demo, add `ASSISTANT_PROVIDER=offline` to `backend/.env` and restart
+   the backend. This supports typed examples without an API key; voice input and
+   generated speech require the OpenAI integration. Google sign-in is optional.
+
+4. With the backend running against the intended local database, populate an
+   example account:
+
+   ```sh
+   python3 scripts/seed_demo_data.py
+   ```
+
+   Sign in at [localhost:5500](http://localhost:5500) with
+   `demo@chicky.test` / `chicky-demo-password`. These are public demo credentials;
+   use them only for local development. The script creates five dishes, recipes,
+   prices and 120 days of invented sales, and can be rerun to fill missing data.
+
+The ML service is optional for this quick start: forecasts fall back to the
+historical baseline when it is unavailable. To demonstrate Chronos-2 forecasts,
+use a deployed Chicky app with ML configured, or run the ML service locally using
+[ML setup](ml/README.md) and [deployment instructions](deploy/README.md). The
+deployed ML service is private; a local backend cannot call it through the public
+website.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Browser[HTML / CSS / JavaScript] --> Proxy[Frontend server or Nginx]
+    Proxy --> Backend[Spring Boot API]
+    Backend --> DB[(H2 locally / Supabase Postgres)]
+    Backend --> ML[Python forecasting API / Chronos-2]
+    Backend --> AI[OpenAI assistant and speech]
+    Telegram[Telegram webhook] --> Backend
+```
+
+- [Frontend](frontend/README.md): responsive pages, confirm cards and guided tours.
+- [Backend](backend/README.md): authentication, sales, imports, documents, forecasts
+  and assistant tools. Writes proposed by the assistant require confirmation.
+- [ML](ml/README.md): forecasting API, benchmarks and prep-policy simulations.
+- [Database](database/README.md): Supabase configuration and migration guidance.
+- [Assistant evaluation](assistant-eval/README.md): repeatable text, document and
+  recorded-audio evaluations; [report](assistant-eval/REPORT.md) lists limitations.
+- [Deployment](deploy/README.md): hosting, container releases and setup checks.
+
+## Verification
+
+```sh
+# Backend tests, including API and authorization checks; isolated test database
+cd backend
+./mvnw verify
+```
+
+ML checks and their pinned Python environment are described in
+[ml/README.md](ml/README.md); browser checks are in
+[frontend/README.md](frontend/README.md). GitHub Actions runs the repository's
+automated checks. Real microphone permissions, email delivery, Telegram and
+home-screen behavior also need the [manual acceptance pass](docs/hackathon-readiness.md).
+
+The forecast uses sales history and public holidays. Weather-based dashboard
+insights are separate from the forecasting model. Simulated improvements are
+research results, not measured gains from real hawker stalls.

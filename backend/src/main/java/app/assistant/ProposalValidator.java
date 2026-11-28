@@ -98,6 +98,13 @@ public class ProposalValidator {
                 problems.add(label + ": needs a dish or a new dish name.");
                 continue;
             }
+            if (fillFromRecord) {
+                Optional<String> ambiguous = ambiguousSpokenName(ownerId, input.spokenName(), dish);
+                if (ambiguous.isPresent()) {
+                    problems.add(ambiguous.get());
+                    continue;
+                }
+            }
             if (input.date() == null) {
                 problems.add(label + ": needs a date.");
                 continue;
@@ -169,6 +176,33 @@ public class ProposalValidator {
                     + "). Ask the user to confirm the number for each day, or to correct them on the Data page.");
         }
         return new Result(entries, problems);
+    }
+
+    // Catch a model choosing an ID from a shared short name before any card is shown.
+    // Exact dish names and saved aliases are deliberate choices, even when a longer name
+    // contains them. Semantic translations remain the model's job; only matching text is checked.
+    private Optional<String> ambiguousSpokenName(Long ownerId, String spokenName, Optional<Dish> selected) {
+        if (spokenName == null || spokenName.isBlank()) return Optional.empty();
+        String normalized = DishAlias.normalize(spokenName);
+        List<Dish> dishes = dishRepository.findByOwnerIdOrderByNameAsc(ownerId);
+        Optional<Dish> exact = dishes.stream()
+                .filter(dish -> DishAlias.normalize(dish.getName()).equals(normalized)).findFirst()
+                .or(() -> dishAliasRepository.findByOwnerIdAndNormalizedAlias(ownerId, normalized).map(DishAlias::getDish));
+        if (exact.isPresent()) return selectedDishProblem(spokenName, exact.get(), selected);
+        List<Dish> matches = dishes.stream()
+                .filter(dish -> DishAlias.normalize(dish.getName()).contains(normalized)).toList();
+        if (matches.size() > 1) {
+            return Optional.of(spokenName + ": could mean "
+                    + String.join(" or ", matches.stream().map(Dish::getName).toList())
+                    + ". Ask which dish before proposing sales, using its full name in the next call.");
+        }
+        return matches.size() == 1 ? selectedDishProblem(spokenName, matches.getFirst(), selected) : Optional.empty();
+    }
+
+    private Optional<String> selectedDishProblem(String spokenName, Dish matched, Optional<Dish> selected) {
+        return selected.filter(dish -> dish.getId().equals(matched.getId())).isPresent() ? Optional.empty()
+                : Optional.of(spokenName + ": this name belongs to " + matched.getName()
+                + ", not " + selected.map(Dish::getName).orElse("a new dish") + ". Use the matching dish.");
     }
 
     // Compared with the dish's best day in the HISTORY_DAYS before the date.
