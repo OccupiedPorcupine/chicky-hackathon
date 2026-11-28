@@ -231,7 +231,7 @@
           const turn = this.turns.get(metadata?.chicky_turn_id);
           if (!id || !turn || String(turn.sequence) !== metadata?.chicky_sequence || turn !== this.turn) break;
           this.responses.set(id, { id, turn, generation, revision: this.revision, completed: false, stopped: false, interrupted: false,
-            audible: !this.muted, playbackStarted: false,
+            audible: !this.muted, playbackStarted: false, hasAudio: false,
             readback: this.pendingReadback && this.pendingReadback.turnId === turn.id ? { ...this.pendingReadback } : null });
           break;
         }
@@ -242,6 +242,7 @@
         case "response.audio_transcript.delta": {
           const response = this.responses.get(event.response_id);
           if (this._validResponse(response)) {
+            response.hasAudio = true;
             response.transcript = (response.transcript || "") + (event.delta || "");
             this._emit("transcript", { role: "assistant", text: response.transcript, final: false, turnId: response.turn.id });
           }
@@ -250,12 +251,17 @@
         case "response.output_audio_transcript.done":
         case "response.audio_transcript.done": {
           const response = this.responses.get(event.response_id);
-          if (this._validResponse(response)) this._emit("transcript", { role: "assistant", text: event.transcript || "", final: true, turnId: response.turn.id });
+          if (this._validResponse(response)) {
+            response.hasAudio = true;
+            this._emit("transcript", { role: "assistant", text: event.transcript || "", final: true, turnId: response.turn.id });
+          }
           break;
         }
         case "output_audio_buffer.started": {
           const response = this.responses.get(event.response_id);
           if (this._validResponse(response)) {
+            response.hasAudio = true;
+            response.stopped = false;
             response.audible &&= !this.muted;
             this.outputActive = true; this._state("speaking"); void this._play(response);
           }
@@ -263,15 +269,27 @@
         }
         case "output_audio_buffer.stopped": {
           const response = this.responses.get(event.response_id);
+          if (!this._validResponse(response)) break;
+          const wasActive = this.outputActive;
           this.outputActive = false;
-          if (response) { response.stopped = true; this._ackReadback(response); }
-          if (this._validResponse(response)) this._state("listening");
+          // Consecutive model responses can share one continuous WebRTC output
+          // buffer. A drain proves all queued audio in this turn has finished,
+          // including a readback that had no separate buffer-start event.
+          for (const queued of this.responses.values()) {
+            if (queued.turn !== response.turn || !this._validResponse(queued) || !queued.hasAudio) continue;
+            queued.stopped = true;
+            if (wasActive && this.playbackAllowed && !this.audio?.paused) queued.playbackStarted = true;
+            this._ackReadback(queued);
+          }
+          this._state("listening");
           break;
         }
         case "output_audio_buffer.cleared": {
           const response = this.responses.get(event.response_id);
           this.outputActive = false;
-          if (response) response.interrupted = true;
+          if (response) for (const queued of this.responses.values()) {
+            if (queued.turn === response.turn && !queued.stopped) queued.interrupted = true;
+          }
           break;
         }
         case "response.done": {

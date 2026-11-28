@@ -224,3 +224,18 @@ test("a rejected interrupted tool completes the function protocol without stale 
   assert.equal(h.events.filter(e=>e.name==="proposal").length,0);
   await h.client.disconnect();
 });
+
+test("consecutive audio responses sharing one buffer acknowledge the final readback at drain", async () => {
+  const h=harness();await h.client.start();await h.user("turn-1","chicken forty");
+  h.created("prelude");
+  h.event({type:"output_audio_buffer.started",response_id:"prelude"});await flush();
+  h.event({type:"response.done",response:{id:"prelude",status:"completed",output:[h.call()]}});await flush();
+  h.created("readback");
+  h.event({type:"response.output_audio_transcript.done",response_id:"readback",transcript:"Forty chicken. Save?"});
+  h.event({type:"response.done",response:{id:"readback",status:"completed",output:[]}});
+  assert.equal(requestsTo(h,"/readback").length,0);
+  // The provider may identify either response when their shared output buffer drains.
+  h.event({type:"output_audio_buffer.stopped",response_id:"prelude"});await flush();
+  assert.equal(requestsTo(h,"/readback").length,1);
+  await h.client.disconnect();
+});
