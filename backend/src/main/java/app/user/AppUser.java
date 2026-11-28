@@ -97,6 +97,18 @@ public class AppUser {
         updateProfile(email, name, pictureUrl);
     }
 
+    // Adds Google sign-in to a signed-in account and keeps its password. Google only issues tokens for
+    // addresses it has verified, and the caller checked the address matches, so it counts as confirmed.
+    public void linkGoogle(String googleId) {
+        this.googleId = googleId;
+        markEmailVerified(Instant.now());
+    }
+
+    // Removes Google sign-in; the caller checked a password remains to sign in with.
+    public void unlinkGoogle() {
+        this.googleId = null;
+    }
+
     public void changePassword(String passwordHash) {
         this.passwordHash = passwordHash;
     }

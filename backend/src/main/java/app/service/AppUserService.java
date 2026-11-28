@@ -2,6 +2,7 @@ package app.service;
 
 import app.user.*;
 import app.exception.AccountLinkingRequiredException;
+import app.exception.GoogleLinkConflictException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,52 @@ public class AppUserService {
         emailOwner.claimWithGoogle(googleId, email, name, pictureUrl);
         sessions.findByPrincipalName(String.valueOf(emailOwner.getId())).keySet().forEach(sessions::deleteById);
         return appUserRepository.save(emailOwner);
+    }
+
+    // Links a Google account to a signed-in user (GoogleLinkController). The emails must match: a returning
+    // Google sign-in copies Google's email onto the account (updateGoogleProfile), so a different one would
+    // silently change the address this account signs in with.
+    @Transactional
+    public AppUser linkGoogle(Long userId, GoogleIdToken.Payload payload) {
+        String googleId = payload.getSubject();
+        String email = normalizeEmail(payload.getEmail());
+        AppUser user = appUserRepository.findById(userId).orElseThrow();
+
+        if (googleId.equals(user.getGoogleId())) {
+            return user;
+        }
+        if (user.getGoogleId() != null) {
+            throw new GoogleLinkConflictException("GOOGLE_ALREADY_LINKED",
+                    "This account is already linked to a different Google account");
+        }
+        if (!email.equals(normalizeEmail(user.getEmail()))) {
+            throw new GoogleLinkConflictException("GOOGLE_EMAIL_MISMATCH",
+                    "Use the Google account for " + user.getEmail() + " to link Google sign-in");
+        }
+        appUserRepository.findByGoogleId(googleId)
+                .filter(owner -> !owner.getId().equals(user.getId()))
+                .ifPresent(owner -> {
+                    throw new GoogleLinkConflictException("GOOGLE_ACCOUNT_IN_USE",
+                            "That Google account is already linked to another Chicky account");
+                });
+        user.linkGoogle(googleId);
+        return appUserRepository.save(user);
+    }
+
+    // Removes Google sign-in from a signed-in user. Refused for an account with no password, which would
+    // then have no way to sign in; such a user can set one first with "Forgot password".
+    @Transactional
+    public AppUser unlinkGoogle(Long userId) {
+        AppUser user = appUserRepository.findById(userId).orElseThrow();
+        if (user.getGoogleId() == null) {
+            return user;
+        }
+        if (!user.hasPassword()) {
+            throw new GoogleLinkConflictException("PASSWORD_REQUIRED",
+                    "Set a password before disconnecting Google: sign out, then use \"Forgot password\" on the sign-in page");
+        }
+        user.unlinkGoogle();
+        return appUserRepository.save(user);
     }
 
     private String normalizeEmail(String email) {
