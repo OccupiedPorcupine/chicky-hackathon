@@ -32,7 +32,7 @@ const { once } = require("node:events");
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     if (!ready) throw new Error("Frontend server did not start within five seconds");
-    for (const script of ["phone-check.cjs", "session-settings-check.cjs"]) {
+    for (const script of ["realtime-controller-check.cjs", "phone-check.cjs", "session-settings-check.cjs", "close-shift-check.cjs"]) {
       const check = spawn(process.execPath, [path.join(__dirname, script)], {
         cwd: root, env: { ...process.env, BASE: base }, stdio: "inherit"
       });

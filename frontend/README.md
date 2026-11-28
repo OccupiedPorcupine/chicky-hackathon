@@ -76,3 +76,14 @@ and session-duration editing, persistence, validation and failed saves at phone 
 widths. Session-settings screenshots go to `backend/target/browser-checks/`. GitHub CI runs
 both checks and uploads those screenshots as an artifact. Microphone permissions, actual
 speech recognition and native phone sharing still need a real-device test.
+
+## Live closing-shift demo
+
+`/close-shift.html` uses the continuous Realtime controller to show sales, corrections,
+explicit confirmation and tomorrow's prep on one page. Add `?sample=1` when recording
+an intentionally seeded demo account. See [setup and recording](../docs/realtime-demo.md).
+Without a configured live integration, the page links to the existing assistant.
+
+The browser runner also checks `realtime-controller-check.cjs` (mocked transport
+and lifecycle) and `close-shift-check.cjs` (the rendered sales/correction/prep flow).
+These tests do not establish actual speech recognition or live provider access.

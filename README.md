@@ -7,6 +7,7 @@ and shows proposed changes for the owner to review and confirm.
 - Main deployment: [chicky-app.duckdns.org](https://chicky-app.duckdns.org)
 - Backup deployment: [chicky-zeta.vercel.app](https://chicky-zeta.vercel.app)
 - Demo and release checks: [hackathon checklist](docs/hackathon-readiness.md)
+- Live voice closing-shift demo: [setup and recording guide](docs/realtime-demo.md)
 
 Deployment addresses are configured in this repository; check their health before
 a presentation. Publishing container images does not by itself verify an EC2 deployment.
